@@ -1,0 +1,4244 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="tactical" data-view="desktop">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compensation Journey</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        /* ========================================
+           CSS CUSTOM PROPERTIES - THEMES
+           ======================================== */
+        
+        :root {
+            --transition-speed: 0.3s;
+        }
+
+        /* TACTICAL THEME (Anduril/Palantir) */
+        [data-theme="tactical"] {
+            --bg-primary: #0a0a0b;
+            --bg-secondary: #111113;
+            --bg-tertiary: #1a1a1d;
+            --bg-card: #141416;
+            --bg-hover: #1e1e21;
+            
+            --text-primary: #e8e8e8;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666666;
+            
+            --accent-primary: #d4a845;
+            --accent-secondary: #45d48a;
+            --accent-tertiary: #4598d4;
+            --accent-warning: #d45745;
+            
+            --border-color: #2a2a2d;
+            --border-accent: #3a3a3d;
+            
+            --chart-grid: rgba(255, 255, 255, 0.06);
+            --chart-line-1: #d4a845;
+            --chart-line-2: #45d48a;
+            --chart-fill-1: rgba(212, 168, 69, 0.15);
+            --chart-fill-2: rgba(69, 212, 138, 0.15);
+            
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'Space Grotesk', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --radius-sm: 2px;
+            --radius-md: 4px;
+            --radius-lg: 6px;
+            
+            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.6);
+            
+            --glow-primary: 0 0 20px rgba(212, 168, 69, 0.3);
+            --glow-secondary: 0 0 20px rgba(69, 212, 138, 0.3);
+
+            --tooltip-bg: #1a1a1d;
+            --tooltip-border: #3a3a3d;
+        }
+
+        /* ARTISTIC THEME (Zoho) */
+        [data-theme="artistic"] {
+            --bg-primary: #faf8f5;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f5f2ed;
+            --bg-card: #ffffff;
+            --bg-hover: #f0ebe3;
+            
+            --text-primary: #2d2a26;
+            --text-secondary: #5c5650;
+            --text-muted: #8a837a;
+            
+            --accent-primary: #e85d04;
+            --accent-secondary: #0096c7;
+            --accent-tertiary: #7b2cbf;
+            --accent-warning: #d00000;
+            
+            --border-color: #e8e2da;
+            --border-accent: #d4cdc3;
+            
+            --chart-grid: rgba(0, 0, 0, 0.06);
+            --chart-line-1: #e85d04;
+            --chart-line-2: #0096c7;
+            --chart-fill-1: rgba(232, 93, 4, 0.12);
+            --chart-fill-2: rgba(0, 150, 199, 0.12);
+            
+            --font-display: 'Libre Baskerville', serif;
+            --font-body: 'Nunito', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            --shadow-card: 0 4px 20px rgba(45, 42, 38, 0.08);
+            --shadow-hover: 0 8px 30px rgba(45, 42, 38, 0.12);
+            
+            --glow-primary: none;
+            --glow-secondary: none;
+
+            --tooltip-bg: #ffffff;
+            --tooltip-border: #e8e2da;
+        }
+
+        /* ========================================
+           BASE STYLES
+           ======================================== */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background var(--transition-speed), color var(--transition-speed);
+            min-height: 100vh;
+        }
+
+        [data-theme="tactical"] body {
+            background-image: 
+                linear-gradient(rgba(212, 168, 69, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(212, 168, 69, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        [data-theme="artistic"] body {
+            background-image: radial-gradient(circle at 100% 0%, rgba(232, 93, 4, 0.03) 0%, transparent 50%),
+                              radial-gradient(circle at 0% 100%, rgba(0, 150, 199, 0.03) 0%, transparent 50%);
+        }
+
+        /* ========================================
+           LANDING PAGE STYLES
+           ======================================== */
+        
+        .landing-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .landing-container {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 0;
+            max-width: 1000px;
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+        }
+
+        @media (max-width: 800px) {
+            .landing-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Left Panel */
+        .landing-left {
+            background: var(--bg-tertiary);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 800px) {
+            .landing-left {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+        }
+
+        .landing-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+
+        .landing-logo-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            background: linear-gradient(135deg, var(--accent-primary), #b8942e);
+            color: #0a0a0b;
+        }
+
+        [data-theme="artistic"] .landing-logo-icon {
+            background: linear-gradient(135deg, var(--accent-primary), #ff7b00);
+            color: white;
+        }
+
+        .landing-logo-text h1 {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        [data-theme="tactical"] .landing-logo-text h1 {
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.85rem;
+        }
+
+        .landing-logo-text span {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .landing-description {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Features List */
+        .features-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .feature-icon {
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        /* Privacy Badge */
+        .privacy-badge {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--accent-secondary);
+            border-radius: var(--radius-md);
+            padding: 0.75rem;
+            margin-top: auto;
+        }
+
+        .privacy-icon {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+
+        .privacy-content h3 {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--accent-secondary);
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .privacy-description {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            margin-bottom: 0.5rem;
+        }
+
+        .privacy-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.2rem 0.75rem;
+        }
+
+        .privacy-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        .privacy-feature .check {
+            color: var(--accent-secondary);
+            font-weight: bold;
+        }
+
+        /* Right Panel */
+        .landing-right {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .landing-right-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .landing-right-header h2 {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin: 0;
+        }
+
+        [data-theme="tactical"] .landing-right-header h2 {
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 0.8rem;
+        }
+
+        /* Demo CTA */
+        .demo-cta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, rgba(69, 212, 138, 0.1), rgba(69, 152, 212, 0.1));
+            border: 1px solid var(--accent-secondary);
+            border-radius: var(--radius-md);
+        }
+
+        [data-theme="artistic"] .demo-cta {
+            background: linear-gradient(135deg, rgba(0, 150, 199, 0.1), rgba(123, 44, 191, 0.1));
+        }
+
+        .btn-demo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            background: var(--accent-secondary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all var(--transition-speed);
+            white-space: nowrap;
+        }
+
+        .btn-demo:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(69, 212, 138, 0.3);
+        }
+
+        [data-theme="artistic"] .btn-demo:hover {
+            box-shadow: 0 4px 12px rgba(0, 150, 199, 0.3);
+        }
+
+        .demo-icon {
+            font-size: 0.65rem;
+        }
+
+        .demo-hint {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .alt-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .btn-text {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            padding: 0.4rem 0.6rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            transition: color var(--transition-speed);
+        }
+
+        .btn-text:hover {
+            color: var(--accent-primary);
+        }
+
+        .btn-text-alt {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            padding: 0.4rem;
+            cursor: pointer;
+            transition: color var(--transition-speed);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .btn-text-alt:hover {
+            color: var(--accent-primary);
+        }
+
+        .alt-divider {
+            color: var(--border-color);
+            font-size: 0.7rem;
+        }
+
+        /* Inline Instructions */
+        .instructions-box {
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-bottom: 0.75rem;
+        }
+
+        .instructions-box .instructions-title {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .instructions-list {
+            margin: 0;
+            padding-left: 1.1rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .instructions-list li {
+            margin-bottom: 0.3rem;
+            padding-left: 0.2rem;
+        }
+
+        .instructions-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .instructions-list code {
+            background: var(--bg-primary);
+            padding: 0.1rem 0.3rem;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--accent-primary);
+        }
+
+        .paste-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 0.75rem;
+        }
+
+        .paste-area label {
+            display: block;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+
+        .paste-area textarea {
+            width: 100%;
+            flex: 1;
+            min-height: 180px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.75rem;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            line-height: 1.4;
+            resize: none;
+            transition: border-color var(--transition-speed);
+        }
+
+        .paste-area textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .paste-area textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .validation-message {
+            margin-top: 0.5rem;
+            padding: 0.4rem 0.6rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.7rem;
+            font-family: var(--font-mono);
+            display: none;
+        }
+
+        .validation-message.visible {
+            display: block;
+        }
+
+        .validation-message.success {
+            background: rgba(69, 212, 138, 0.15);
+            border: 1px solid var(--accent-secondary);
+            color: var(--accent-secondary);
+        }
+
+        .validation-message.error {
+            background: rgba(212, 87, 69, 0.1);
+            border: 1px solid var(--accent-warning);
+            color: var(--accent-warning);
+        }
+
+        .validation-message.warning {
+            background: rgba(212, 168, 69, 0.15);
+            border: 1px solid var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .landing-footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.6rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            border: 1px solid transparent;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .btn-primary:hover {
+            box-shadow: var(--glow-primary);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border-color: var(--border-color);
+            padding: 0.5rem 0.75rem;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* Theme toggle on landing */
+        .landing-theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .landing-theme-btn {
+            padding: 0.35rem 0.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 0.55rem;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .landing-theme-btn.active {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+
+        /* ========================================
+           MOBILE VIEW SIMULATION
+           ======================================== */
+        
+        [data-view="mobile"] .main-container {
+            max-width: 430px;
+            margin: 0 auto;
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            min-height: 100vh;
+        }
+
+        [data-view="mobile"] .metrics-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 0.75rem;
+        }
+
+        [data-view="mobile"] .metric-card {
+            padding: 1rem;
+        }
+
+        [data-view="mobile"] .metric-value {
+            font-size: 1.4rem;
+        }
+
+        [data-view="mobile"] .analytics-grid {
+            grid-template-columns: 1fr !important;
+        }
+
+        [data-view="mobile"] .help-grid {
+            grid-template-columns: 1fr !important;
+        }
+
+        [data-view="mobile"] .header-content {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        [data-view="mobile"] .header-controls {
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        [data-view="mobile"] .input-group {
+            flex-direction: column;
+        }
+
+        [data-view="mobile"] .chart-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        [data-view="mobile"] .story-content {
+            padding: 1.5rem !important;
+        }
+
+        [data-view="mobile"] .milestone-grid {
+            grid-template-columns: 1fr !important;
+        }
+
+        /* ========================================
+           TOOLTIP STYLES
+           ======================================== */
+        
+        .info-tooltip {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            font-size: 10px;
+            color: var(--text-muted);
+            cursor: help;
+            margin-left: 6px;
+            font-family: var(--font-mono);
+            font-weight: 600;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+
+        .info-tooltip::before {
+            content: '?';
+        }
+
+        .info-tooltip .tip-text {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--tooltip-bg);
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.75rem;
+            font-weight: 400;
+            line-height: 1.5;
+            width: max-content;
+            max-width: 280px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            border: 1px solid var(--tooltip-border);
+            box-shadow: var(--shadow-card);
+            z-index: 9999;
+            font-family: var(--font-body);
+            text-align: left;
+            white-space: normal;
+            pointer-events: none;
+        }
+
+        .info-tooltip .tip-text::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--tooltip-border);
+        }
+
+        .info-tooltip:hover .tip-text {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .info-tooltip.tip-left .tip-text {
+            left: auto;
+            right: 0;
+            transform: none;
+        }
+
+        .info-tooltip.tip-left .tip-text::after {
+            left: auto;
+            right: 10px;
+            transform: none;
+        }
+
+        .info-tooltip.tip-right .tip-text {
+            left: 0;
+            transform: none;
+        }
+
+        .info-tooltip.tip-right .tip-text::after {
+            left: 10px;
+            transform: none;
+        }
+
+        /* ========================================
+           DEMO BANNER
+           ======================================== */
+        
+        .demo-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 0.6rem 1rem;
+            background: linear-gradient(90deg, #d45745, #d4a845);
+            color: white;
+            font-size: 0.8rem;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+        }
+
+        .demo-banner.hidden {
+            display: none;
+        }
+
+        .demo-banner-icon {
+            font-size: 1rem;
+        }
+
+        .demo-banner-text {
+            text-align: center;
+        }
+
+        .demo-banner-text strong {
+            font-weight: 700;
+        }
+
+        .demo-banner-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--transition-speed);
+            flex-shrink: 0;
+        }
+
+        .demo-banner-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* ========================================
+           HEADER
+           ======================================== */
+        
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        [data-theme="tactical"] .header {
+            background: rgba(17, 17, 19, 0.95);
+        }
+
+        [data-theme="artistic"] .header {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+        }
+
+        [data-theme="tactical"] .logo-icon {
+            background: linear-gradient(135deg, var(--accent-primary), #b8942e);
+            color: #0a0a0b;
+        }
+
+        [data-theme="artistic"] .logo-icon {
+            background: linear-gradient(135deg, var(--accent-primary), #ff7b00);
+            color: white;
+        }
+
+        .logo-text h1 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        [data-theme="tactical"] .logo-text h1 {
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-size: 1rem;
+        }
+
+        .logo-text span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .toggle-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 40px;
+            height: 22px;
+            background: var(--bg-primary);
+            border-radius: 11px;
+            cursor: pointer;
+            transition: background var(--transition-speed);
+            border: 1px solid var(--border-color);
+        }
+
+        .toggle-switch.active {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: var(--text-primary);
+            border-radius: 50%;
+            transition: transform var(--transition-speed);
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(18px);
+            background: var(--bg-primary);
+        }
+
+        .theme-switcher {
+            display: flex;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .theme-btn {
+            padding: 0.5rem 0.75rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .theme-btn.active {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+
+        .theme-btn:hover:not(.active) {
+            background: var(--bg-hover);
+        }
+
+        /* ========================================
+           KEYBOARD SHORTCUTS HINT
+           ======================================== */
+        
+        .keyboard-hint {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.5rem 0.75rem;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            box-shadow: var(--shadow-card);
+            z-index: 50;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .keyboard-hint:hover {
+            opacity: 1;
+        }
+
+        .keyboard-hint kbd {
+            background: var(--bg-tertiary);
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            border: 1px solid var(--border-color);
+            margin: 0 0.15rem;
+        }
+
+        /* ========================================
+           MAIN CONTAINER
+           ======================================== */
+        
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            transition: max-width 0.3s ease;
+        }
+
+        /* ========================================
+           ANIMATIONS
+           ======================================== */
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .animate-delay-1 { animation-delay: 0.1s; }
+        .animate-delay-2 { animation-delay: 0.2s; }
+        .animate-delay-3 { animation-delay: 0.3s; }
+        .animate-delay-4 { animation-delay: 0.4s; }
+
+        /* ========================================
+           HERO METRICS
+           ======================================== */
+        
+        .hero-section {
+            margin-bottom: 2rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            transition: all var(--transition-speed);
+            position: relative;
+        }
+
+        [data-theme="tactical"] .metric-card {
+            box-shadow: var(--shadow-card);
+        }
+
+        [data-theme="artistic"] .metric-card {
+            box-shadow: var(--shadow-card);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent-primary);
+        }
+
+        [data-theme="tactical"] .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-primary), transparent);
+        }
+
+        [data-theme="artistic"] .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-primary);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+
+        .metric-label {
+            display: flex;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-family: var(--font-mono);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-family: var(--font-mono);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        [data-theme="artistic"] .metric-value {
+            font-family: var(--font-display);
+        }
+
+        .metric-value.highlight {
+            color: var(--accent-primary);
+        }
+
+        .metric-subtext {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .metric-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            margin-top: 0.5rem;
+        }
+
+        .metric-change.positive {
+            background: rgba(69, 212, 138, 0.15);
+            color: var(--accent-secondary);
+        }
+
+        [data-theme="artistic"] .metric-change.positive {
+            background: rgba(0, 150, 199, 0.15);
+            color: var(--accent-secondary);
+        }
+
+        /* ========================================
+           CHART CONTAINER
+           ======================================== */
+        
+        .chart-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-card);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .chart-title {
+            display: flex;
+            align-items: center;
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        [data-theme="tactical"] .chart-title {
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.9rem;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .chart-type-btn {
+            padding: 0.5rem 0.75rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            text-transform: uppercase;
+        }
+
+        .chart-type-btn.active {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .chart-type-btn:hover:not(.active) {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 350px;
+        }
+
+        /* ========================================
+           TABS
+           ======================================== */
+        
+        .tabs-container {
+            margin-bottom: 2rem;
+        }
+
+        .tabs-header {
+            display: flex;
+            gap: 0.25rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        .tab-btn {
+            padding: 1rem 1.25rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            cursor: pointer;
+            position: relative;
+            transition: all var(--transition-speed);
+            white-space: nowrap;
+        }
+
+        [data-theme="tactical"] .tab-btn {
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            color: var(--accent-primary);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent-primary);
+        }
+
+        [data-theme="artistic"] .tab-btn.active::after {
+            height: 3px;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab-shortcut {
+            font-size: 0.6rem;
+            opacity: 0.5;
+            margin-left: 0.5rem;
+            padding: 0.1rem 0.3rem;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* ========================================
+           STORY TAB
+           ======================================== */
+        
+        .story-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+        }
+
+        .story-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+        }
+
+        [data-theme="tactical"] .story-header {
+            background: linear-gradient(135deg, rgba(212, 168, 69, 0.1), transparent);
+        }
+
+        [data-theme="artistic"] .story-header {
+            background: linear-gradient(135deg, rgba(232, 93, 4, 0.05), rgba(0, 150, 199, 0.05));
+        }
+
+        .story-header h2 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        [data-theme="tactical"] .story-header h2 {
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-size: 1.1rem;
+        }
+
+        .story-header .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        [data-theme="tactical"] .story-header .subtitle {
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.75rem;
+        }
+
+        .story-content {
+            padding: 2.5rem;
+        }
+
+        .story-text {
+            font-size: 1rem;
+            line-height: 1.9;
+            color: var(--text-secondary);
+            max-width: 800px;
+        }
+
+        [data-theme="tactical"] .story-text {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+
+        [data-theme="artistic"] .story-text {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 1.05rem;
+        }
+
+        .story-text p {
+            margin-bottom: 1.5rem;
+        }
+
+        .story-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        .story-highlight {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        [data-theme="artistic"] .story-highlight {
+            font-style: normal;
+        }
+
+        .story-stat {
+            display: inline-block;
+            background: var(--bg-tertiary);
+            padding: 0.15rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            font-style: normal;
+        }
+
+        /* Milestones */
+        .milestones-section {
+            margin-top: 2.5rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .milestones-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        [data-theme="tactical"] .milestones-title {
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.8rem;
+        }
+
+        .milestone-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        @media (max-width: 900px) {
+            .milestone-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .milestone-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .milestone-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .milestone-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--accent-secondary);
+        }
+
+        .milestone-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .milestone-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        [data-theme="tactical"] .milestone-title {
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .milestone-detail {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .milestone-date {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Market Comparison Section */
+        .market-section {
+            margin-top: 2.5rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .market-section:first-of-type {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+
+        /* Market Tab Container */
+        .market-tab-container {
+            padding: 2rem;
+        }
+
+        .market-header {
+            margin-bottom: 2rem;
+        }
+
+        .market-header h2 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        [data-theme="tactical"] .market-header h2 {
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 1.2rem;
+        }
+
+        .market-header .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Market Summary Card */
+        .market-summary-cards {
+            margin-bottom: 2rem;
+        }
+
+        .market-summary-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.25rem;
+            padding: 1.5rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            border-left: 4px solid var(--accent-primary);
+        }
+
+        .market-summary-card.outperforming {
+            border-left-color: var(--accent-secondary);
+        }
+
+        .market-summary-card.underperforming {
+            border-left-color: var(--accent-warning);
+        }
+
+        .market-summary-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .market-summary-content {
+            flex: 1;
+        }
+
+        .market-summary-headline {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        [data-theme="tactical"] .market-summary-headline {
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.95rem;
+        }
+
+        .market-summary-detail {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .market-summary-detail strong {
+            color: var(--text-primary);
+        }
+
+        /* Inflation Analysis Section */
+        .inflation-analysis {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 700px) {
+            .inflation-analysis {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .inflation-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+        }
+
+        .inflation-card-title {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .inflation-card-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            margin-bottom: 0.25rem;
+        }
+
+        .inflation-card-value.positive {
+            color: var(--accent-secondary);
+        }
+
+        .inflation-card-value.negative {
+            color: var(--accent-warning);
+        }
+
+        .inflation-card-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .inflation-breakdown {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .inflation-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            padding: 0.35rem 0;
+        }
+
+        .inflation-row-label {
+            color: var(--text-secondary);
+        }
+
+        .inflation-row-value {
+            font-family: var(--font-mono);
+            font-weight: 600;
+        }
+
+        .inflation-row-value.positive {
+            color: var(--accent-secondary);
+        }
+
+        .inflation-row-value.negative {
+            color: var(--accent-warning);
+        }
+
+        .market-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        [data-theme="tactical"] .market-title {
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.8rem;
+        }
+
+        .market-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        @media (max-width: 900px) {
+            .market-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .market-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .market-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            position: relative;
+        }
+
+        .market-card.positive {
+            border-color: var(--accent-secondary);
+        }
+
+        .market-card.negative {
+            border-color: var(--accent-warning);
+        }
+
+        .market-card.neutral {
+            border-color: var(--border-color);
+        }
+
+        .market-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .market-card-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: var(--font-mono);
+        }
+
+        .market-card-badge {
+            font-size: 0.6rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .market-card-badge.above {
+            background: rgba(69, 212, 138, 0.2);
+            color: var(--accent-secondary);
+        }
+
+        .market-card-badge.below {
+            background: rgba(212, 87, 69, 0.2);
+            color: var(--accent-warning);
+        }
+
+        .market-card-badge.at {
+            background: rgba(212, 168, 69, 0.2);
+            color: var(--accent-primary);
+        }
+
+        .market-card-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            margin-bottom: 0.25rem;
+        }
+
+        .market-card-value.positive {
+            color: var(--accent-secondary);
+        }
+
+        .market-card-value.negative {
+            color: var(--accent-warning);
+        }
+
+        .market-card-comparison {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .market-card-comparison strong {
+            color: var(--text-primary);
+        }
+
+        .market-footnote {
+            margin-top: 1.25rem;
+            padding-top: 1rem;
+            border-top: 1px dashed var(--border-color);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Story stat indicators */
+        .story-stat.positive {
+            color: var(--accent-secondary);
+            background: rgba(69, 212, 138, 0.15);
+        }
+
+        .story-stat.negative {
+            color: var(--accent-warning);
+            background: rgba(212, 87, 69, 0.15);
+        }
+
+        [data-theme="artistic"] .story-stat.positive {
+            color: var(--accent-secondary);
+            background: rgba(0, 150, 199, 0.15);
+        }
+
+        /* ========================================
+           DATA TABLE
+           ======================================== */
+        
+        .data-table-container {
+            overflow-x: auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .data-table th {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            text-align: left;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table th .info-tooltip {
+            margin-left: 4px;
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+        }
+
+        [data-theme="artistic"] .data-table td {
+            font-family: var(--font-body);
+        }
+
+        .data-table tr:hover td {
+            background: var(--bg-hover);
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.7rem;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+        }
+
+        .badge-merit {
+            background: rgba(69, 212, 138, 0.15);
+            color: var(--accent-secondary);
+        }
+
+        .badge-equity {
+            background: rgba(69, 152, 212, 0.15);
+            color: var(--accent-tertiary);
+        }
+
+        .badge-market {
+            background: rgba(212, 168, 69, 0.15);
+            color: var(--accent-primary);
+        }
+
+        .badge-new {
+            background: rgba(212, 87, 69, 0.15);
+            color: var(--accent-warning);
+        }
+
+        /* ========================================
+           ANALYTICS SECTION
+           ======================================== */
+        
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .analytics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .analytics-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            box-shadow: var(--shadow-card);
+        }
+
+        .analytics-card-title {
+            display: flex;
+            align-items: center;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-family: var(--font-mono);
+            margin-bottom: 0.75rem;
+        }
+
+        .analytics-card-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+        }
+
+        [data-theme="artistic"] .analytics-card-value {
+            font-family: var(--font-display);
+        }
+
+        .analytics-card-detail {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* ========================================
+           PROJECTIONS SECTION
+           ======================================== */
+        
+        .projections-controls {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-card);
+        }
+
+        .control-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-label {
+            display: flex;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-family: var(--font-mono);
+            margin-bottom: 0.75rem;
+        }
+
+        .interval-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .interval-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+        }
+
+        .interval-btn.active {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .interval-btn:hover:not(.active) {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .slider-container {
+            margin-top: 1rem;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .slider-value {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--bg-tertiary);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            cursor: pointer;
+            box-shadow: var(--glow-primary);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            cursor: pointer;
+            border: none;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .input-field {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .input-field label {
+            display: flex;
+            align-items: center;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-family: var(--font-mono);
+            margin-bottom: 0.5rem;
+        }
+
+        .input-field input {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+        }
+
+        .input-field input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .projection-result {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .projection-result-title {
+            display: flex;
+            align-items: center;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-family: var(--font-mono);
+        }
+
+        .projection-result-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-secondary);
+            font-family: var(--font-mono);
+            margin-top: 0.25rem;
+        }
+
+        .projections-table {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+        }
+
+        /* ========================================
+           HELP SECTION
+           ======================================== */
+        
+        .help-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .help-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .help-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-card);
+        }
+
+        .help-card h3 {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--accent-primary);
+        }
+
+        [data-theme="tactical"] .help-card h3 {
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.85rem;
+        }
+
+        .help-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .help-card code {
+            background: var(--bg-tertiary);
+            padding: 0.15rem 0.4rem;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+        }
+
+        /* ========================================
+           FOOTER
+           ======================================== */
+        
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            border-top: 1px solid var(--border-color);
+            margin-top: 2rem;
+        }
+
+        /* ========================================
+           UTILITY: HIDDEN
+           ======================================== */
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ========================================
+           RESPONSIVE
+           ======================================== */
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .main-container {
+                padding: 1rem;
+            }
+
+            .chart-wrapper {
+                height: 280px;
+            }
+
+            .keyboard-hint {
+                display: none;
+            }
+
+            .privacy-badge {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .privacy-features {
+                justify-content: center;
+            }
+
+            .landing-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ==========================================
+         LANDING PAGE
+         ========================================== -->
+    <div id="landingPage" class="landing-page">
+        <!-- Theme toggle -->
+        <div class="landing-theme-toggle">
+            <button class="landing-theme-btn active" data-theme="tactical" onclick="setTheme('tactical')">Tactical</button>
+            <button class="landing-theme-btn" data-theme="artistic" onclick="setTheme('artistic')">Artistic</button>
+        </div>
+
+        <div class="landing-container">
+            <!-- Left Panel: Logo, Instructions, Privacy -->
+            <div class="landing-left">
+                <div class="landing-logo">
+                    <div class="landing-logo-icon">CJ</div>
+                    <div class="landing-logo-text">
+                        <h1>Compensation Journey</h1>
+                        <span>Paylocity → Insights</span>
+                    </div>
+                </div>
+
+                <p class="landing-description">
+                    Transform your raw Paylocity pay history into a beautiful, interactive dashboard. Visualize your career growth, analyze raise patterns, and project future earnings.
+                </p>
+
+                <div class="features-list">
+                    <div class="feature-item">
+                        <span class="feature-icon">📈</span>
+                        <span>Interactive salary timeline with multiple chart types</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📊</span>
+                        <span>Analytics: CAGR, averages, raise frequency & more</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🔮</span>
+                        <span>Future projections with customizable growth rates</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📖</span>
+                        <span>Auto-generated narrative of your career story</span>
+                    </div>
+                </div>
+
+                <div class="privacy-badge">
+                    <div class="privacy-icon">🔒</div>
+                    <div class="privacy-content">
+                        <h3>100% Private & Local</h3>
+                        <p class="privacy-description">Your salary data never leaves your browser. No servers, no uploads, no tracking—works completely offline.</p>
+                        <div class="privacy-features">
+                            <span class="privacy-feature"><span class="check">✓</span> Offline capable</span>
+                            <span class="privacy-feature"><span class="check">✓</span> No AI processing</span>
+                            <span class="privacy-feature"><span class="check">✓</span> No external requests</span>
+                            <span class="privacy-feature"><span class="check">✓</span> No data storage</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Paste Area & Actions -->
+            <div class="landing-right">
+                <div class="landing-right-header">
+                    <h2>📋 Import Your Data</h2>
+                </div>
+
+                <div class="demo-cta">
+                    <button class="btn btn-demo" onclick="loadDemoData()">
+                        <span class="demo-icon">▶</span> View Demo Dashboard
+                    </button>
+                    <span class="demo-hint">See what you'll get before importing your data</span>
+                </div>
+
+                <div class="instructions-box">
+                    <div class="instructions-title">How to get your data from Paylocity</div>
+                    <ol class="instructions-list">
+                        <li>Log in to <code>paylocity.com</code></li>
+                        <li>On your dashboard, click the <code>Pay</code> card heading</li>
+                        <li>Click the <code>Show Private Data</code> button</li>
+                        <li>Navigate to the <code>Rates</code> tab</li>
+                        <li>Select all content starting from <code>Rates</code> at the top, through the History table, down to <code>items</code> at the bottom</li>
+                        <li>Copy (Ctrl+C / Cmd+C) and paste below</li>
+                    </ol>
+                </div>
+
+                <div class="paste-area">
+                    <label for="pasteInput">Paste your Paylocity data here</label>
+                    <textarea id="pasteInput" placeholder="Rates
+Current
+Effective Date  Change Reason  Pay Type  Per Check  Annual Salary
+01/15/2025  Merit Increase  Salary  $4,583.33  $110,000.00
+
+History
+02/01/2024  Merit Increase  Salary  $4,250.00  $102,000.00
+03/15/2023  Market Adjustment  Salary  $3,958.33  $95,000.00
+..." oninput="validatePasteInput()"></textarea>
+                    <div id="validationMessage" class="validation-message"></div>
+                </div>
+
+                <div class="landing-footer">
+                    <button class="btn btn-primary" id="generateBtn" onclick="parseAndGenerate()" disabled>Generate Dashboard</button>
+                    <button class="btn-text-alt" onclick="document.getElementById('jsonFileInput').click()">or load saved .json</button>
+                    <input type="file" id="jsonFileInput" class="file-input" accept=".json" onchange="loadJsonFile(event)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         DASHBOARD
+         ========================================== -->
+    <div id="dashboardPage" class="hidden">
+        <!-- DEMO BANNER -->
+        <div id="demoBanner" class="demo-banner hidden">
+            <span class="demo-banner-icon">⚠️</span>
+            <span class="demo-banner-text"><strong>Demo Mode:</strong> You're viewing randomly generated sample data. This is not real compensation information.</span>
+            <button class="demo-banner-close" onclick="document.getElementById('demoBanner').classList.add('hidden')">✕</button>
+        </div>
+
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">CJ</div>
+                    <div class="logo-text">
+                        <h1>Compensation Journey</h1>
+                        <span>Personal Dashboard</span>
+                    </div>
+                </div>
+                <div class="header-controls">
+                    <div class="toggle-group">
+                        <span class="toggle-label">$</span>
+                        <div class="toggle-switch active" id="privacyToggle" onclick="togglePrivacy()"></div>
+                    </div>
+                    <div class="toggle-group">
+                        <span class="toggle-label">Mobile</span>
+                        <div class="toggle-switch" id="viewToggle" onclick="toggleView()"></div>
+                    </div>
+                    <div class="theme-switcher">
+                        <button class="theme-btn active" data-theme="tactical" onclick="setTheme('tactical')">Tactical</button>
+                        <button class="theme-btn" data-theme="artistic" onclick="setTheme('artistic')">Artistic</button>
+                    </div>
+                    <button class="btn btn-secondary" onclick="downloadData()" style="padding: 0.5rem 0.75rem; font-size: 0.65rem;">Save Data</button>
+                    <button class="btn btn-secondary" onclick="resetDashboard()" style="padding: 0.5rem 0.75rem; font-size: 0.65rem;">Start Over</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- KEYBOARD SHORTCUTS HINT -->
+        <div class="keyboard-hint">
+            <kbd>1</kbd>-<kbd>6</kbd> tabs · <kbd>T</kbd> theme · <kbd>P</kbd> privacy
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-container">
+            <!-- HERO METRICS -->
+            <section class="hero-section">
+                <div class="metrics-grid">
+                    <div class="metric-card animate-in animate-delay-1">
+                        <div class="metric-label">
+                            Current Compensation
+                            <span class="info-tooltip"><span class="tip-text">Your most recent annual salary as of the last recorded adjustment. This reflects base salary only, excluding bonuses or equity.</span></span>
+                        </div>
+                        <div class="metric-value highlight" id="currentSalary">$281,600</div>
+                        <div class="metric-subtext" id="currentSalaryIndexed">Index: 704</div>
+                    </div>
+                    <div class="metric-card animate-in animate-delay-2">
+                        <div class="metric-label">
+                            Total Growth
+                            <span class="info-tooltip"><span class="tip-text">The percentage increase from your starting salary to your current salary. Calculated as: ((Current - Starting) / Starting) × 100</span></span>
+                        </div>
+                        <div class="metric-value" id="totalGrowth">+604%</div>
+                        <div class="metric-change positive">↑ Since hire</div>
+                    </div>
+                    <div class="metric-card animate-in animate-delay-3">
+                        <div class="metric-label">
+                            Years of Service
+                            <span class="info-tooltip"><span class="tip-text">Total time elapsed since your hire date to the most recent compensation record.</span></span>
+                        </div>
+                        <div class="metric-value" id="yearsService">12.8</div>
+                        <div class="metric-subtext" id="hireDateText">Since Mar 2012</div>
+                    </div>
+                    <div class="metric-card animate-in animate-delay-4">
+                        <div class="metric-label">
+                            Total Adjustments
+                            <span class="info-tooltip"><span class="tip-text">The number of compensation changes on record, including merit increases, equity adjustments, market adjustments, and your initial hire rate.</span></span>
+                        </div>
+                        <div class="metric-value" id="totalRaises">19</div>
+                        <div class="metric-subtext" id="avgRaisesPerYear">Avg: 1.5 per year</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MAIN CHART -->
+            <section class="chart-section animate-in" style="animation-delay: 0.5s;">
+                <div class="chart-header">
+                    <h2 class="chart-title">
+                        Compensation Timeline
+                        <span class="info-tooltip"><span class="tip-text">Visual representation of your salary progression over time. Each point represents a compensation adjustment. Hover over points for details.</span></span>
+                    </h2>
+                    <div class="chart-controls">
+                        <button class="chart-type-btn active" data-chart="line" onclick="setChartType('line')">Line</button>
+                        <button class="chart-type-btn" data-chart="area" onclick="setChartType('area')">Area</button>
+                        <button class="chart-type-btn" data-chart="bar" onclick="setChartType('bar')">Bar</button>
+                        <button class="chart-type-btn" data-chart="step" onclick="setChartType('step')">Step</button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </section>
+
+            <!-- TABS -->
+            <section class="tabs-container">
+                <div class="tabs-header">
+                    <button class="tab-btn active" data-tab="story" onclick="setTab('story')">Story<span class="tab-shortcut">1</span></button>
+                    <button class="tab-btn" data-tab="market" onclick="setTab('market')">Market<span class="tab-shortcut">2</span></button>
+                    <button class="tab-btn" data-tab="history" onclick="setTab('history')">History<span class="tab-shortcut">3</span></button>
+                    <button class="tab-btn" data-tab="analytics" onclick="setTab('analytics')">Analytics<span class="tab-shortcut">4</span></button>
+                    <button class="tab-btn" data-tab="projections" onclick="setTab('projections')">Projections<span class="tab-shortcut">5</span></button>
+                    <button class="tab-btn" data-tab="help" onclick="setTab('help')">Help<span class="tab-shortcut">6</span></button>
+                </div>
+
+                <!-- STORY TAB -->
+                <div class="tab-content active" id="tab-story">
+                    <div class="story-container">
+                        <div class="story-header">
+                            <h2 id="storyTitle">Mission Debrief: Compensation Trajectory</h2>
+                            <p class="subtitle" id="storySubtitle">Classification: Personnel Asset Valuation Report</p>
+                        </div>
+                        <div class="story-content">
+                            <div class="story-text" id="storyText"></div>
+                            
+                            <div class="milestones-section">
+                                <h3 class="milestones-title">
+                                    Key Milestones Achieved
+                                    <span class="info-tooltip"><span class="tip-text">Automatically detected career achievements based on your compensation history.</span></span>
+                                </h3>
+                                <div class="milestone-grid" id="milestonesGrid"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MARKET TAB -->
+                <div class="tab-content" id="tab-market">
+                    <div class="market-tab-container">
+                        <div class="market-header">
+                            <h2 id="marketTitle">Market Position Analysis</h2>
+                            <p class="subtitle" id="marketSubtitle">How your compensation compares to B2B SaaS industry benchmarks</p>
+                        </div>
+                        
+                        <div class="market-summary-cards">
+                            <div class="market-summary-card" id="marketSummaryCard">
+                                <div class="market-summary-icon">📊</div>
+                                <div class="market-summary-content">
+                                    <div class="market-summary-headline" id="marketSummaryHeadline">Loading...</div>
+                                    <div class="market-summary-detail" id="marketSummaryDetail"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="market-section">
+                            <h3 class="market-title">
+                                Key Metrics vs Industry
+                                <span class="info-tooltip"><span class="tip-text">Your compensation metrics compared to B2B SaaS industry benchmarks. Data compiled from Radford, Mercer, and industry surveys.</span></span>
+                            </h3>
+                            <div class="market-grid" id="marketComparisonGrid"></div>
+                        </div>
+
+                        <div class="market-section">
+                            <h3 class="market-title">
+                                Inflation & Purchasing Power
+                                <span class="info-tooltip"><span class="tip-text">How inflation has impacted your real earnings over time. CPI data from Bureau of Labor Statistics.</span></span>
+                            </h3>
+                            <div class="inflation-analysis" id="inflationAnalysis"></div>
+                        </div>
+
+                        <div class="market-footnote" id="marketFootnote">
+                            Benchmarks based on B2B SaaS industry data. Individual results vary by role, location, and company stage.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HISTORY TAB -->
+                <div class="tab-content" id="tab-history">
+                    <div class="data-table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Effective Date</th>
+                                    <th>Reason</th>
+                                    <th>Annual Salary</th>
+                                    <th>Index</th>
+                                    <th>Change</th>
+                                    <th>% Change</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ANALYTICS TAB -->
+                <div class="tab-content" id="tab-analytics">
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <div class="analytics-card-title">
+                                Compound Annual Growth Rate
+                                <span class="info-tooltip"><span class="tip-text">CAGR measures your average annual growth rate as if your salary grew at a constant rate each year.</span></span>
+                            </div>
+                            <div class="analytics-card-value" id="cagr">16.4%</div>
+                            <div class="analytics-card-detail">Average annual growth over career</div>
+                        </div>
+                        <div class="analytics-card">
+                            <div class="analytics-card-title">
+                                Average Raise
+                                <span class="info-tooltip"><span class="tip-text">The arithmetic mean of all your raise percentages.</span></span>
+                            </div>
+                            <div class="analytics-card-value" id="avgRaise">12.7%</div>
+                            <div class="analytics-card-detail" id="avgRaiseDollar">~$12,700 per adjustment</div>
+                        </div>
+                        <div class="analytics-card">
+                            <div class="analytics-card-title">
+                                Median Raise
+                                <span class="info-tooltip"><span class="tip-text">The middle value when all raises are sorted.</span></span>
+                            </div>
+                            <div class="analytics-card-value" id="medianRaise">11.2%</div>
+                            <div class="analytics-card-detail">Middle value of all raises</div>
+                        </div>
+                        <div class="analytics-card">
+                            <div class="analytics-card-title">
+                                Largest Single Increase
+                                <span class="info-tooltip"><span class="tip-text">Your biggest percentage raise in a single adjustment.</span></span>
+                            </div>
+                            <div class="analytics-card-value" id="largestRaise">29.5%</div>
+                            <div class="analytics-card-detail" id="largestRaiseDate">April 2015</div>
+                        </div>
+                        <div class="analytics-card">
+                            <div class="analytics-card-title">
+                                Avg. Time Between Raises
+                                <span class="info-tooltip"><span class="tip-text">The average number of months between compensation adjustments.</span></span>
+                            </div>
+                            <div class="analytics-card-value" id="avgTimeBetween">8.1 mo</div>
+                            <div class="analytics-card-detail" id="avgTimeDetail">Based on 19 adjustments</div>
+                        </div>
+                        <div class="analytics-card">
+                            <div class="analytics-card-title">
+                                Merit Increases
+                                <span class="info-tooltip"><span class="tip-text">Number of raises specifically categorized as merit-based.</span></span>
+                            </div>
+                            <div class="analytics-card-value" id="meritCount">14</div>
+                            <div class="analytics-card-detail" id="meritPercent">73.7% of all adjustments</div>
+                        </div>
+                    </div>
+
+                    <div class="chart-section">
+                        <div class="chart-header">
+                            <h2 class="chart-title">Year-over-Year Growth</h2>
+                            <div class="chart-controls">
+                                <button class="chart-type-btn active" data-chart="yoy-bar" onclick="setYoyChartType('bar')">Bar</button>
+                                <button class="chart-type-btn" data-chart="yoy-line" onclick="setYoyChartType('line')">Line</button>
+                            </div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="yoyChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-section">
+                        <div class="chart-header">
+                            <h2 class="chart-title">Adjustments by Category</h2>
+                        </div>
+                        <div class="chart-wrapper" style="height: 250px;">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROJECTIONS TAB -->
+                <div class="tab-content" id="tab-projections">
+                    <div class="projections-controls">
+                        <div class="control-group">
+                            <label class="control-label">Projection Timeline</label>
+                            <div class="interval-buttons">
+                                <button class="interval-btn" data-years="1" onclick="setProjectionYears(1)">1 yr</button>
+                                <button class="interval-btn" data-years="2" onclick="setProjectionYears(2)">2 yr</button>
+                                <button class="interval-btn" data-years="3" onclick="setProjectionYears(3)">3 yr</button>
+                                <button class="interval-btn active" data-years="5" onclick="setProjectionYears(5)">5 yr</button>
+                                <button class="interval-btn" data-years="10" onclick="setProjectionYears(10)">10 yr</button>
+                                <button class="interval-btn" data-years="15" onclick="setProjectionYears(15)">15 yr</button>
+                                <button class="interval-btn" data-years="20" onclick="setProjectionYears(20)">20 yr</button>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <div class="slider-container">
+                                <div class="slider-header">
+                                    <label class="control-label">Custom Annual Growth Rate</label>
+                                    <span class="slider-value" id="customRateValue">8%</span>
+                                </div>
+                                <input type="range" min="0" max="25" value="8" id="customRateSlider" oninput="updateCustomRate()">
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label">Target Salary Goal</label>
+                            <div class="input-group">
+                                <div class="input-field">
+                                    <label>Target Amount ($)</label>
+                                    <input type="number" id="targetSalary" value="500000" onchange="calculateTimeToTarget()">
+                                </div>
+                                <div class="input-field">
+                                    <label>Assumed Growth (%)</label>
+                                    <input type="number" id="targetGrowth" value="8" onchange="calculateTimeToTarget()">
+                                </div>
+                            </div>
+                            <div class="projection-result">
+                                <div class="projection-result-title">Time to Reach Target</div>
+                                <div class="projection-result-value" id="timeToTarget">~7.5 years</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-section">
+                        <div class="chart-header">
+                            <h2 class="chart-title">Future Trajectory</h2>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="projectionChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="projections-table">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Year</th>
+                                    <th>Historical CAGR</th>
+                                    <th>Conservative (5%)</th>
+                                    <th>Custom Rate</th>
+                                    <th>Optimistic (12%)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="projectionTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- HELP TAB -->
+                <div class="tab-content" id="tab-help">
+                    <div class="help-grid">
+                        <div class="help-card">
+                            <h3>Understanding Indexed Values</h3>
+                            <p>When privacy mode is enabled, salary values are shown as an index where your starting salary equals <code>100</code>. An index of <code>704</code> means your current compensation is 7.04× your starting salary.</p>
+                        </div>
+                        <div class="help-card">
+                            <h3>CAGR (Compound Annual Growth Rate)</h3>
+                            <p>CAGR represents the mean annual growth rate over a specified time period. Formula: <code>((Final/Initial)^(1/years)) - 1</code></p>
+                        </div>
+                        <div class="help-card">
+                            <h3>Adjustment Categories</h3>
+                            <p><strong>Merit Increase:</strong> Performance-based raise.<br>
+                            <strong>Equity:</strong> Internal fairness alignment.<br>
+                            <strong>Market Adjustment:</strong> External market response.<br>
+                            <strong>New Hire:</strong> Starting compensation.</p>
+                        </div>
+                        <div class="help-card">
+                            <h3>Saving Your Data</h3>
+                            <p>Click <code>Save Data</code> to download a JSON file. Load it later with <code>Load Saved Data</code> on the landing page—no need to re-paste from Paylocity.</p>
+                        </div>
+                        <div class="help-card">
+                            <h3>Privacy & Security</h3>
+                            <p>All processing happens in your browser. No data is sent to any server. You can verify this by disconnecting from the internet—the dashboard will still work.</p>
+                        </div>
+                        <div class="help-card">
+                            <h3>Keyboard Shortcuts</h3>
+                            <p><code>1-6</code> Switch tabs<br>
+                            <code>T</code> Toggle theme<br>
+                            <code>P</code> Toggle privacy<br>
+                            <code>M</code> Toggle mobile view</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <p>Compensation Journey Dashboard • 100% Local Processing • Your data never leaves your device</p>
+        </footer>
+    </div>
+
+    <script>
+        // ========================================
+        // STATE
+        // ========================================
+        
+        let employeeData = null;
+        
+        let state = {
+            theme: 'tactical',
+            showDollars: true,
+            viewMode: 'desktop',
+            currentTab: 'story',
+            mainChartType: 'line',
+            yoyChartType: 'bar',
+            projectionYears: 5,
+            customRate: 8
+        };
+
+        let charts = {
+            main: null,
+            yoy: null,
+            category: null,
+            projection: null
+        };
+
+        // ========================================
+        // BENCHMARK DATA (B2B SaaS Industry)
+        // ========================================
+        
+        const benchmarks = {
+            // Annual raise percentages
+            typicalRaise: { min: 3, max: 5, avg: 4 },
+            highPerformerRaise: { min: 6, max: 10, avg: 8 },
+            promotionBump: { min: 10, max: 20, avg: 15 },
+            
+            // Growth metrics
+            industryCagr: 6, // ~6% average CAGR for tech compensation
+            
+            // Timing
+            avgMonthsBetweenRaises: 12,
+            
+            // Sources: Compiled from Radford, Mercer, Levels.fyi, Glassdoor B2B SaaS data
+            lastUpdated: '2025'
+        };
+
+        // US CPI-U Annual Inflation Rates (%)
+        // Source: Bureau of Labor Statistics
+        const cpiData = {
+            2010: 1.6, 2011: 3.2, 2012: 2.1, 2013: 1.5, 2014: 1.6,
+            2015: 0.1, 2016: 1.3, 2017: 2.1, 2018: 2.4, 2019: 1.8,
+            2020: 1.2, 2021: 4.7, 2022: 8.0, 2023: 4.1, 2024: 2.9,
+            2025: 2.5 // Projected
+        };
+
+        // ========================================
+        // BENCHMARK CALCULATION FUNCTIONS
+        // ========================================
+        
+        function calculateInflationOverPeriod(startYear, endYear) {
+            let cumulativeInflation = 1;
+            for (let year = startYear; year <= endYear; year++) {
+                const rate = cpiData[year] || 2.5; // Default to 2.5% if year not found
+                cumulativeInflation *= (1 + rate / 100);
+            }
+            return (cumulativeInflation - 1) * 100; // Return as percentage
+        }
+
+        function calculateRealGrowth(nominalGrowthPercent, inflationPercent) {
+            // Real growth = ((1 + nominal) / (1 + inflation)) - 1
+            const nominal = nominalGrowthPercent / 100;
+            const inflation = inflationPercent / 100;
+            return ((1 + nominal) / (1 + inflation) - 1) * 100;
+        }
+
+        function calculateInflationAdjustedSalary(salary, fromYear, toYear) {
+            let adjustedSalary = salary;
+            for (let year = fromYear; year < toYear; year++) {
+                const rate = cpiData[year] || 2.5;
+                adjustedSalary *= (1 + rate / 100);
+            }
+            return adjustedSalary;
+        }
+
+        function getBenchmarkComparisons() {
+            if (!employeeData) return null;
+            
+            const raises = employeeData.records.filter(r => r.changePercent > 0);
+            const avgRaise = raises.length > 0 
+                ? raises.reduce((sum, r) => sum + r.changePercent, 0) / raises.length 
+                : 0;
+            
+            const userCagr = calculateCAGR();
+            const years = calculateYearsOfService();
+            const startYear = new Date(employeeData.hireDate).getFullYear();
+            const endYear = new Date(employeeData.currentDate).getFullYear();
+            
+            // Calculate time between raises
+            const dates = employeeData.records.map(r => new Date(r.date)).sort((a, b) => a - b);
+            let totalDays = 0;
+            for (let i = 1; i < dates.length; i++) {
+                totalDays += (dates[i] - dates[i-1]) / (1000 * 60 * 60 * 24);
+            }
+            const avgMonthsBetween = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30 : 12;
+            
+            // Inflation calculations
+            const totalInflation = calculateInflationOverPeriod(startYear, endYear);
+            const startSalary = getStartingSalary();
+            const currentSalary = getCurrentSalary();
+            const nominalGrowth = ((currentSalary - startSalary) / startSalary) * 100;
+            const realGrowth = calculateRealGrowth(nominalGrowth, totalInflation);
+            
+            // What starting salary would be worth today (inflation-adjusted)
+            const inflationAdjustedStart = calculateInflationAdjustedSalary(startSalary, startYear, endYear);
+            const purchasingPowerGain = currentSalary - inflationAdjustedStart;
+            
+            // Industry comparison: what would salary be at industry CAGR?
+            const industryProjectedSalary = startSalary * Math.pow(1 + benchmarks.industryCagr / 100, years);
+            
+            return {
+                // User metrics
+                avgRaise,
+                userCagr,
+                avgMonthsBetween,
+                totalRaises: raises.length,
+                
+                // Growth comparisons
+                nominalGrowth,
+                totalInflation,
+                realGrowth,
+                inflationAdjustedStart,
+                purchasingPowerGain,
+                
+                // Industry comparisons
+                industryProjectedSalary,
+                vsIndustrySalary: currentSalary - industryProjectedSalary,
+                vsIndustryPercent: ((currentSalary / industryProjectedSalary) - 1) * 100,
+                
+                // Raise comparisons
+                raiseVsTypical: avgRaise - benchmarks.typicalRaise.avg,
+                raiseVsHighPerformer: avgRaise - benchmarks.highPerformerRaise.avg,
+                cagrVsIndustry: userCagr - benchmarks.industryCagr,
+                
+                // Timing comparisons
+                raisesMoreFrequent: benchmarks.avgMonthsBetweenRaises - avgMonthsBetween,
+                
+                // Performance tier
+                performanceTier: avgRaise >= benchmarks.highPerformerRaise.min ? 'high' :
+                                 avgRaise >= benchmarks.typicalRaise.avg ? 'solid' : 'below'
+            };
+        }
+
+        // ========================================
+        // PARSER
+        // ========================================
+        
+        function parsePaylocityData(rawText) {
+            const records = [];
+            
+            // Clean up the text
+            let text = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+            
+            // Find all date patterns (MM/DD/YYYY) which start each record
+            const datePattern = /(\d{2}\/\d{2}\/\d{4})/g;
+            const dates = [];
+            let match;
+            
+            while ((match = datePattern.exec(text)) !== null) {
+                dates.push({ date: match[1], index: match.index });
+            }
+            
+            if (dates.length === 0) {
+                throw new Error('No valid dates found in the data');
+            }
+            
+            // Extract each record between dates
+            for (let i = 0; i < dates.length; i++) {
+                const startIdx = dates[i].index;
+                const endIdx = i < dates.length - 1 ? dates[i + 1].index : text.length;
+                const recordText = text.substring(startIdx, endIdx);
+                
+                try {
+                    const record = parseRecord(dates[i].date, recordText);
+                    if (record) {
+                        records.push(record);
+                    }
+                } catch (e) {
+                    console.warn('Failed to parse record:', recordText, e);
+                }
+            }
+            
+            if (records.length === 0) {
+                throw new Error('Could not parse any records from the data');
+            }
+            
+            // Sort by date descending (most recent first)
+            records.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Find hire date (earliest record)
+            const sortedByDate = [...records].sort((a, b) => new Date(a.date) - new Date(b.date));
+            const hireDate = sortedByDate[0].date;
+            const currentDate = sortedByDate[sortedByDate.length - 1].date;
+            
+            return {
+                hireDate,
+                currentDate,
+                records
+            };
+        }
+        
+        function parseRecord(dateStr, text) {
+            // Convert date format from MM/DD/YYYY to YYYY-MM-DD
+            const [month, day, year] = dateStr.split('/');
+            const date = `${year}-${month}-${day}`;
+            
+            // Extract change reason
+            let reason = 'Unknown';
+            const reasons = ['Merit Increase', 'Market Adjustment', 'Equity', 'New Hire'];
+            for (const r of reasons) {
+                if (text.includes(r)) {
+                    reason = r;
+                    break;
+                }
+            }
+            if (text.includes('—') && reason === 'Unknown') {
+                reason = '—';
+            }
+            
+            // Extract dollar amounts - use exactly 2 decimal places to handle concatenated values
+            // e.g., "$1,166.6712.2807" should parse as $1,166.67 (not $1,166.6712)
+            const dollarPattern = /\$([0-9,]+\.\d{2})/g;
+            const dollars = [];
+            let dollarMatch;
+            while ((dollarMatch = dollarPattern.exec(text)) !== null) {
+                dollars.push(parseFloat(dollarMatch[1].replace(/,/g, '')));
+            }
+            
+            // Expected order: Per Check, Annual Salary, Amount (change)
+            let perCheck = 0, annual = 0, change = 0;
+            
+            if (dollars.length >= 2) {
+                // Find the annual salary (typically the largest reasonable number, >= 20000)
+                const annualCandidates = dollars.filter(d => d >= 20000);
+                if (annualCandidates.length > 0) {
+                    annual = annualCandidates[0];
+                }
+                
+                // Per check is usually the first dollar amount
+                perCheck = dollars[0];
+                if (perCheck >= 20000) {
+                    // First one was annual, find actual per check
+                    perCheck = dollars.find(d => d < 20000 && d > 100) || 0;
+                }
+                
+                // Change/Amount is usually after annual salary
+                if (dollars.length >= 3) {
+                    const annualIdx = dollars.indexOf(annual);
+                    const afterAnnual = dollars.slice(annualIdx + 1);
+                    change = afterAnnual.length > 0 ? afterAnnual[0] : 0;
+                }
+            }
+            
+            // Extract hourly rate (XXX.XXXX / Hour)
+            const hourlyPattern = /(\d+\.?\d*)\s*\/\s*Hour/i;
+            const hourlyMatch = text.match(hourlyPattern);
+            const hourlyRate = hourlyMatch ? parseFloat(hourlyMatch[1]) : 0;
+            
+            // Extract percentage - it's the last decimal number in the string
+            // Look for pattern like "12.2807" or "0.0000" at the end (after last $X.XX amount)
+            const percentPattern = /(\d+\.\d{4})\s*$/;
+            const percentMatch = text.trim().match(percentPattern);
+            let changePercent = 0;
+            if (percentMatch) {
+                changePercent = parseFloat(percentMatch[1]);
+            } else {
+                // Fallback: try to find any percentage-like number at end
+                const fallbackMatch = text.trim().match(/(\d+\.?\d*)\s*$/);
+                if (fallbackMatch) {
+                    const potential = parseFloat(fallbackMatch[1]);
+                    if (potential < 100) {
+                        changePercent = potential;
+                    }
+                }
+            }
+            
+            // Validate we have minimum required data
+            if (annual === 0) {
+                return null;
+            }
+            
+            return {
+                date,
+                reason,
+                perCheck,
+                annual,
+                hourlyRate,
+                change,
+                changePercent
+            };
+        }
+
+        // ========================================
+        // PARSE AND GENERATE
+        // ========================================
+        
+        function parseAndGenerate() {
+            const input = document.getElementById('pasteInput').value.trim();
+            const messageDiv = document.getElementById('validationMessage');
+            
+            if (!input) {
+                messageDiv.className = 'validation-message error visible';
+                messageDiv.textContent = '✗ Please paste your Paylocity data first.';
+                return;
+            }
+            
+            try {
+                employeeData = parsePaylocityData(input);
+                
+                if (employeeData.records.length < 2) {
+                    throw new Error('Need at least 2 records to generate insights');
+                }
+                
+                employeeData.isDemo = false;
+                messageDiv.className = 'validation-message';
+                showDashboard();
+                // Hide demo banner for real data
+                document.getElementById('demoBanner').classList.add('hidden');
+            } catch (e) {
+                console.error('Parse error:', e);
+                messageDiv.className = 'validation-message error visible';
+                messageDiv.textContent = `✗ ${e.message}. Please make sure you copied from "Rates" down to "items".`;
+            }
+        }
+
+        // ========================================
+        // REAL-TIME VALIDATION
+        // ========================================
+        
+        function validatePasteInput() {
+            const input = document.getElementById('pasteInput').value.trim();
+            const messageDiv = document.getElementById('validationMessage');
+            const generateBtn = document.getElementById('generateBtn');
+            
+            if (!input) {
+                messageDiv.className = 'validation-message';
+                messageDiv.textContent = '';
+                generateBtn.disabled = true;
+                return;
+            }
+            
+            // Check for date patterns (MM/DD/YYYY)
+            const datePattern = /\d{2}\/\d{2}\/\d{4}/g;
+            const dates = input.match(datePattern) || [];
+            
+            // Check for dollar amounts with exactly 2 decimal places (standard currency)
+            const dollarPattern = /\$[0-9,]+\.\d{2}/g;
+            const dollars = input.match(dollarPattern) || [];
+            
+            // Check for key structural indicators
+            const hasRates = /rates/i.test(input);
+            const hasCurrent = /current/i.test(input);
+            const hasHistory = /history/i.test(input);
+            const hasItems = /items/i.test(input);
+            const hasSalary = /salary/i.test(input);
+            
+            // Validation checks
+            if (dates.length === 0) {
+                messageDiv.className = 'validation-message error visible';
+                messageDiv.textContent = '✗ No dates found. Make sure you copied the table data including dates (MM/DD/YYYY format).';
+                generateBtn.disabled = true;
+                return;
+            }
+            
+            if (dollars.length === 0) {
+                messageDiv.className = 'validation-message error visible';
+                messageDiv.textContent = '✗ No salary amounts found. Make sure "Show Private Data" is enabled in Paylocity.';
+                generateBtn.disabled = true;
+                return;
+            }
+            
+            if (!hasSalary) {
+                messageDiv.className = 'validation-message warning visible';
+                messageDiv.textContent = '⚠ Data looks incomplete. Make sure you copied from the Rates tab.';
+                generateBtn.disabled = false;
+                return;
+            }
+            
+            if (!hasHistory && dates.length < 3) {
+                messageDiv.className = 'validation-message warning visible';
+                messageDiv.textContent = '⚠ Only ' + dates.length + ' record(s) found. Did you include the History table?';
+                generateBtn.disabled = false;
+                return;
+            }
+            
+            if (dollars.length < dates.length) {
+                messageDiv.className = 'validation-message warning visible';
+                messageDiv.textContent = '⚠ Found ' + dates.length + ' dates but only ' + dollars.length + ' salary values. Some data may be missing.';
+                generateBtn.disabled = false;
+                return;
+            }
+            
+            // Success
+            messageDiv.className = 'validation-message success visible';
+            messageDiv.textContent = '✓ Found ' + dates.length + ' compensation records. Ready to generate!';
+            generateBtn.disabled = false;
+        }
+
+        // ========================================
+        // DEMO DATA
+        // ========================================
+        
+        function loadDemoData() {
+            // Fake employee: 7 years, started at $60k in 2018
+            employeeData = {
+                hireDate: "2018-02-12",
+                currentDate: "2025-01-15",
+                records: [
+                    { date: "2025-01-15", reason: "Merit Increase", perCheck: 4583.33, annual: 110000.00, hourlyRate: 52.88, change: 333.33, changePercent: 7.84 },
+                    { date: "2024-02-01", reason: "Merit Increase", perCheck: 4250.00, annual: 102000.00, hourlyRate: 49.04, change: 291.67, changePercent: 7.50 },
+                    { date: "2023-03-15", reason: "Market Adjustment", perCheck: 3958.33, annual: 95000.00, hourlyRate: 45.67, change: 416.67, changePercent: 11.76 },
+                    { date: "2022-02-01", reason: "Merit Increase", perCheck: 3541.67, annual: 85000.00, hourlyRate: 40.87, change: 208.33, changePercent: 6.25 },
+                    { date: "2021-02-15", reason: "Merit Increase", perCheck: 3333.33, annual: 80000.00, hourlyRate: 38.46, change: 208.33, changePercent: 6.67 },
+                    { date: "2020-03-01", reason: "Merit Increase", perCheck: 3125.00, annual: 75000.00, hourlyRate: 36.06, change: 208.33, changePercent: 7.14 },
+                    { date: "2019-02-15", reason: "Merit Increase", perCheck: 2916.67, annual: 70000.00, hourlyRate: 33.65, change: 208.33, changePercent: 8.00 },
+                    { date: "2018-09-01", reason: "Equity", perCheck: 2708.33, annual: 65000.00, hourlyRate: 31.25, change: 208.33, changePercent: 8.33 },
+                    { date: "2018-02-12", reason: "New Hire", perCheck: 2500.00, annual: 60000.00, hourlyRate: 28.85, change: 0, changePercent: 0 }
+                ],
+                isDemo: true
+            };
+            showDashboard();
+            // Show demo banner
+            document.getElementById('demoBanner').classList.remove('hidden');
+        }
+
+        // ========================================
+        // FILE HANDLING
+        // ========================================
+        
+        function loadJsonFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    employeeData = JSON.parse(e.target.result);
+                    if (!employeeData.records || !employeeData.hireDate) {
+                        throw new Error('Invalid data format');
+                    }
+                    employeeData.isDemo = false;
+                    showDashboard();
+                    // Hide demo banner for loaded data
+                    document.getElementById('demoBanner').classList.add('hidden');
+                } catch (err) {
+                    alert('Error loading file: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        function downloadData() {
+            if (!employeeData) return;
+            
+            const dataStr = JSON.stringify(employeeData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'compensation-data.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // ========================================
+        // VIEW SWITCHING
+        // ========================================
+        
+        function showDashboard() {
+            document.getElementById('landingPage').classList.add('hidden');
+            document.getElementById('dashboardPage').classList.remove('hidden');
+            window.scrollTo(0, 0);
+            initDashboard();
+        }
+        
+        function resetDashboard() {
+            // Destroy all charts
+            Object.values(charts).forEach(chart => {
+                if (chart) chart.destroy();
+            });
+            charts = { main: null, yoy: null, category: null, projection: null };
+            
+            // Reset state
+            state.currentTab = 'story';
+            
+            // Show landing page
+            document.getElementById('dashboardPage').classList.add('hidden');
+            document.getElementById('landingPage').classList.remove('hidden');
+            
+            // Clear paste area and validation
+            document.getElementById('pasteInput').value = '';
+            document.getElementById('validationMessage').className = 'validation-message';
+            document.getElementById('generateBtn').disabled = true;
+        }
+
+        // ========================================
+        // STORY CONTENT
+        // ========================================
+        
+        const storyContent = {
+            tactical: {
+                title: "Mission Debrief: Compensation Trajectory",
+                subtitle: "Classification: Personnel Asset Valuation Report",
+                getText: (data) => `
+                    <p><span class="story-highlight">MISSION START:</span> Asset deployed on <span class="story-stat">${data.hireDateFormatted}</span> with initial resource allocation of <span class="story-stat">${data.startSalary}</span>. Operational status: New Hire.</p>
+                    
+                    <p><span class="story-highlight">OPERATIONAL SUMMARY:</span> Over <span class="story-stat">${data.years} years</span> of continuous deployment, the asset has demonstrated consistent value appreciation. Total resource adjustments: <span class="story-stat">${data.totalAdjustments} modifications</span>. Current valuation stands at <span class="story-stat">${data.currentSalary}</span>, representing a <span class="story-stat">${data.growth}%</span> increase from baseline.</p>
+                    
+                    <p><span class="story-highlight">PERFORMANCE METRICS:</span> Compound Annual Growth Rate (CAGR) calculated at <span class="story-stat">${data.cagr}%</span>. Average interval between resource reallocations: <span class="story-stat">${data.avgInterval} months</span>. Primary adjustment category: Merit-based (${data.meritPercent}% of all modifications).</p>
+                    
+                    <p><span class="story-highlight">NOTABLE OPERATIONS:</span> Largest single-event appreciation occurred <span class="story-stat">${data.largestRaiseDate}</span> with a <span class="story-stat">${data.largestRaise}%</span> value increase.${data.sixFigureDate ? ` Six-figure threshold breached <span class="story-stat">${data.sixFigureDate}</span>.` : ''}</p>
+                    
+                    <p><span class="story-highlight">STATUS:</span> Asset remains in active deployment. See <strong>Market</strong> tab for industry benchmarks and inflation analysis.</p>
+                `
+            },
+            artistic: {
+                title: "A Journey of Growth",
+                subtitle: "A Personal Narrative of Professional Evolution",
+                getText: (data) => `
+                    <p>It began, as many stories do, with a single step into the unknown. On <span class="story-stat">${data.hireDateFormatted}</span>, a new chapter opened—modest in its beginnings at <span class="story-stat">${data.startSalary}</span>, yet rich with promise.</p>
+                    
+                    <p>The years that followed would weave a tapestry of <span class="story-stat">${data.totalAdjustments} defining moments</span>—each raise a recognition, each adjustment a milestone. Through seasons of challenge and triumph spanning <span class="story-stat">${data.years} years</span>, the path led upward to today's summit of <span class="story-stat">${data.currentSalary}</span>.</p>
+                    
+                    <p>The mathematics tell their own poetry: a <span class="story-stat">${data.growth}%</span> transformation from those humble origins. A compound annual growth of <span class="story-stat">${data.cagr}%</span>—not merely numbers, but a testament to dedication rewarded.</p>
+                    
+                    <p>There were crescendos in this symphony. <span class="story-stat">${data.largestRaiseDate}</span> brought the most dramatic movement—a <span class="story-stat">${data.largestRaise}%</span> leap that spoke of exceptional contribution.${data.sixFigureDate ? ` The crossing into six figures in <span class="story-stat">${data.sixFigureDate}</span> marked a passage between chapters.` : ''}</p>
+                    
+                    <p>And so the story continues, unfinished, with pages yet to be written. Explore the <strong>Market</strong> tab to see how this journey compares to the broader landscape.</p>
+                `
+            }
+        };
+
+        // ========================================
+        // UTILITY FUNCTIONS
+        // ========================================
+        
+        function formatCurrency(amount, showDollars = state.showDollars) {
+            if (showDollars) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }).format(amount);
+            }
+            const startingSalary = getStartingSalary();
+            const index = (amount / startingSalary) * 100;
+            return index.toFixed(0);
+        }
+
+        function formatPercent(value) {
+            return value.toFixed(1) + '%';
+        }
+
+        function getStartingSalary() {
+            return employeeData.records[employeeData.records.length - 1].annual;
+        }
+
+        function getCurrentSalary() {
+            return employeeData.records[0].annual;
+        }
+
+        function calculateCAGR() {
+            const start = getStartingSalary();
+            const end = getCurrentSalary();
+            const years = calculateYearsOfService();
+            if (years <= 0) return 0;
+            return (Math.pow(end / start, 1 / years) - 1) * 100;
+        }
+
+        function calculateYearsOfService() {
+            const hire = new Date(employeeData.hireDate);
+            const current = new Date(employeeData.currentDate);
+            return (current - hire) / (1000 * 60 * 60 * 24 * 365.25);
+        }
+
+        function getThemeColors() {
+            const style = getComputedStyle(document.documentElement);
+            return {
+                line1: style.getPropertyValue('--chart-line-1').trim(),
+                line2: style.getPropertyValue('--chart-line-2').trim(),
+                fill1: style.getPropertyValue('--chart-fill-1').trim(),
+                fill2: style.getPropertyValue('--chart-fill-2').trim(),
+                grid: style.getPropertyValue('--chart-grid').trim(),
+                text: style.getPropertyValue('--text-secondary').trim(),
+                accent: style.getPropertyValue('--accent-primary').trim()
+            };
+        }
+
+        // ========================================
+        // MILESTONES DETECTION
+        // ========================================
+        
+        function detectMilestones() {
+            const milestones = [];
+            const records = [...employeeData.records].reverse();
+            const startingSalary = getStartingSalary();
+            
+            // Six figures
+            const sixFigures = records.find(r => r.annual >= 100000);
+            if (sixFigures) {
+                milestones.push({
+                    icon: '💯',
+                    title: 'Six Figures',
+                    detail: 'Crossed $100,000 annual salary',
+                    date: new Date(sixFigures.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                });
+            }
+
+            // Salary doubled
+            const doubled = records.find(r => r.annual >= startingSalary * 2);
+            if (doubled) {
+                const doubledDate = new Date(doubled.date);
+                const hireDate = new Date(employeeData.hireDate);
+                const monthsToDouble = Math.round((doubledDate - hireDate) / (1000 * 60 * 60 * 24 * 30));
+                milestones.push({
+                    icon: '📈',
+                    title: 'Salary Doubled',
+                    detail: `Reached 2× starting salary in ${monthsToDouble} months`,
+                    date: doubledDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                });
+            }
+
+            // $200k milestone
+            const twoHundredK = records.find(r => r.annual >= 200000);
+            if (twoHundredK) {
+                milestones.push({
+                    icon: '🎯',
+                    title: '$200K Milestone',
+                    detail: 'Crossed $200,000 annual salary',
+                    date: new Date(twoHundredK.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                });
+            }
+
+            // Biggest raise
+            const raises = employeeData.records.filter(r => r.changePercent > 0);
+            if (raises.length > 0) {
+                const biggestRaise = raises.reduce((max, r) => r.changePercent > max.changePercent ? r : max);
+                milestones.push({
+                    icon: '⭐',
+                    title: 'Largest Raise',
+                    detail: `${biggestRaise.changePercent.toFixed(1)}% increase`,
+                    date: new Date(biggestRaise.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                });
+            }
+
+            // 10 year mark
+            const years = calculateYearsOfService();
+            if (years >= 10) {
+                milestones.push({
+                    icon: '🏆',
+                    title: 'Decade of Service',
+                    detail: '10+ years with the organization',
+                    date: new Date(new Date(employeeData.hireDate).getTime() + 10 * 365.25 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                });
+            }
+
+            return milestones;
+        }
+
+        // ========================================
+        // THEME FUNCTIONS
+        // ========================================
+        
+        function setTheme(theme) {
+            state.theme = theme;
+            document.documentElement.setAttribute('data-theme', theme);
+            
+            // Update all theme buttons
+            document.querySelectorAll('.theme-btn, .landing-theme-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.theme === theme);
+            });
+
+            if (employeeData) {
+                updateStory();
+                setTimeout(() => {
+                    buildMainChart();
+                    if (charts.yoy) buildYoyChart();
+                    if (charts.category) buildCategoryChart();
+                    if (charts.projection) buildProjectionChart();
+                }, 100);
+            }
+        }
+
+        // ========================================
+        // VIEW TOGGLE
+        // ========================================
+        
+        function toggleView() {
+            state.viewMode = state.viewMode === 'desktop' ? 'mobile' : 'desktop';
+            document.documentElement.setAttribute('data-view', state.viewMode);
+            document.getElementById('viewToggle').classList.toggle('active', state.viewMode === 'mobile');
+            
+            setTimeout(() => {
+                Object.values(charts).forEach(chart => {
+                    if (chart) chart.resize();
+                });
+            }, 350);
+        }
+
+        // ========================================
+        // PRIVACY TOGGLE
+        // ========================================
+        
+        function togglePrivacy() {
+            state.showDollars = !state.showDollars;
+            document.getElementById('privacyToggle').classList.toggle('active', state.showDollars);
+            updateAllDisplays();
+        }
+
+        function updateAllDisplays() {
+            const current = getCurrentSalary();
+            const start = getStartingSalary();
+            
+            document.getElementById('currentSalary').textContent = state.showDollars 
+                ? formatCurrency(current) 
+                : `Index: ${formatCurrency(current, false)}`;
+            
+            document.getElementById('currentSalaryIndexed').textContent = state.showDollars 
+                ? `Index: ${formatCurrency(current, false)}` 
+                : `Base 100 = Starting salary`;
+
+            buildHistoryTable();
+            updateAnalytics();
+            updateStory();
+            buildMainChart();
+            if (charts.projection) {
+                buildProjectionChart();
+                buildProjectionTable();
+            }
+        }
+
+        // ========================================
+        // STORY UPDATE
+        // ========================================
+        
+        function updateStory() {
+            const content = storyContent[state.theme];
+            document.getElementById('storyTitle').textContent = content.title;
+            document.getElementById('storySubtitle').textContent = content.subtitle;
+            
+            const start = getStartingSalary();
+            const current = getCurrentSalary();
+            const growth = ((current - start) / start) * 100;
+            const cagr = calculateCAGR();
+            const years = calculateYearsOfService();
+            
+            const raises = employeeData.records.filter(r => r.changePercent > 0);
+            const largestRaise = raises.length > 0 ? raises.reduce((max, r) => r.changePercent > max.changePercent ? r : max) : null;
+            
+            const meritCount = employeeData.records.filter(r => r.reason.includes('Merit')).length;
+            const meritPercent = ((meritCount / employeeData.records.length) * 100).toFixed(1);
+            
+            // Calculate avg interval
+            const dates = employeeData.records.map(r => new Date(r.date)).sort((a, b) => a - b);
+            let totalDays = 0;
+            for (let i = 1; i < dates.length; i++) {
+                totalDays += (dates[i] - dates[i-1]) / (1000 * 60 * 60 * 24);
+            }
+            const avgMonths = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30 : 0;
+            
+            // Find six figure date
+            const recordsChron = [...employeeData.records].reverse();
+            const sixFigures = recordsChron.find(r => r.annual >= 100000);
+            
+            const data = {
+                hireDateFormatted: new Date(employeeData.hireDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+                startSalary: state.showDollars ? formatCurrency(start) : 'Index 100',
+                currentSalary: state.showDollars ? formatCurrency(current) : `Index ${formatCurrency(current, false)}`,
+                years: years.toFixed(1),
+                totalAdjustments: employeeData.records.length,
+                growth: growth.toFixed(0),
+                cagr: cagr.toFixed(1),
+                avgInterval: avgMonths.toFixed(1),
+                meritPercent,
+                largestRaiseDate: largestRaise ? new Date(largestRaise.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'N/A',
+                largestRaise: largestRaise ? largestRaise.changePercent.toFixed(1) : '0',
+                sixFigureDate: sixFigures ? new Date(sixFigures.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : null
+            };
+            
+            document.getElementById('storyText').innerHTML = content.getText(data);
+            buildMilestones();
+        }
+
+        function updateMarket() {
+            const bench = getBenchmarkComparisons();
+            if (!bench) return;
+
+            const start = getStartingSalary();
+            const current = getCurrentSalary();
+            const years = calculateYearsOfService();
+            
+            // Update header based on theme
+            const isOutperforming = bench.cagrVsIndustry > 0 && bench.realGrowth > 0;
+            const summaryCard = document.getElementById('marketSummaryCard');
+            summaryCard.className = 'market-summary-card ' + (isOutperforming ? 'outperforming' : bench.cagrVsIndustry < -1 ? 'underperforming' : '');
+            
+            // Generate summary headline
+            let headline, detail;
+            if (bench.performanceTier === 'high') {
+                headline = state.theme === 'tactical' 
+                    ? 'PERFORMANCE STATUS: EXCEEDING BENCHMARKS'
+                    : 'Your growth outpaces the industry';
+                detail = `Your <strong>${bench.userCagr.toFixed(1)}% CAGR</strong> exceeds the B2B SaaS benchmark of ${benchmarks.industryCagr}%. With raises averaging <strong>${bench.avgRaise.toFixed(1)}%</strong> (above the typical ${benchmarks.typicalRaise.min}-${benchmarks.typicalRaise.max}% range), your compensation trajectory demonstrates exceptional growth.`;
+            } else if (bench.performanceTier === 'solid') {
+                headline = state.theme === 'tactical'
+                    ? 'PERFORMANCE STATUS: MEETING STANDARDS'
+                    : 'Tracking with industry benchmarks';
+                detail = `Your <strong>${bench.userCagr.toFixed(1)}% CAGR</strong> ${bench.cagrVsIndustry >= 0 ? 'meets' : 'approaches'} the B2B SaaS benchmark of ${benchmarks.industryCagr}%. With raises averaging <strong>${bench.avgRaise.toFixed(1)}%</strong>, your compensation growth aligns with industry norms.`;
+            } else {
+                headline = state.theme === 'tactical'
+                    ? 'PERFORMANCE STATUS: OPPORTUNITY IDENTIFIED'
+                    : 'Room to grow toward benchmarks';
+                detail = `Your <strong>${bench.userCagr.toFixed(1)}% CAGR</strong> trails the B2B SaaS benchmark of ${benchmarks.industryCagr}%. With raises averaging <strong>${bench.avgRaise.toFixed(1)}%</strong>, there may be opportunity to negotiate stronger increases.`;
+            }
+            
+            document.getElementById('marketSummaryHeadline').textContent = headline;
+            document.getElementById('marketSummaryDetail').innerHTML = detail;
+            
+            // Build comparison cards
+            buildMarketComparison();
+            
+            // Build inflation analysis
+            buildInflationAnalysis(bench, start, current, years);
+        }
+
+        function buildInflationAnalysis(bench, start, current, years) {
+            const container = document.getElementById('inflationAnalysis');
+            const nominalGrowth = ((current - start) / start) * 100;
+            
+            container.innerHTML = `
+                <div class="inflation-card">
+                    <div class="inflation-card-title">Cumulative Inflation</div>
+                    <div class="inflation-card-value">${bench.totalInflation.toFixed(1)}%</div>
+                    <div class="inflation-card-label">CPI increase over ${years.toFixed(1)} years</div>
+                    <div class="inflation-breakdown">
+                        <div class="inflation-row">
+                            <span class="inflation-row-label">Your nominal growth</span>
+                            <span class="inflation-row-value">${nominalGrowth.toFixed(1)}%</span>
+                        </div>
+                        <div class="inflation-row">
+                            <span class="inflation-row-label">Minus inflation</span>
+                            <span class="inflation-row-value">-${bench.totalInflation.toFixed(1)}%</span>
+                        </div>
+                        <div class="inflation-row" style="border-top: 1px solid var(--border-color); padding-top: 0.5rem; margin-top: 0.25rem;">
+                            <span class="inflation-row-label"><strong>Real growth</strong></span>
+                            <span class="inflation-row-value ${bench.realGrowth >= 0 ? 'positive' : 'negative'}"><strong>${bench.realGrowth >= 0 ? '+' : ''}${bench.realGrowth.toFixed(1)}%</strong></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="inflation-card">
+                    <div class="inflation-card-title">Purchasing Power ${bench.purchasingPowerGain >= 0 ? 'Gained' : 'Lost'}</div>
+                    <div class="inflation-card-value ${bench.purchasingPowerGain >= 0 ? 'positive' : 'negative'}">${state.showDollars ? (bench.purchasingPowerGain >= 0 ? '+' : '') + formatCurrency(bench.purchasingPowerGain) : (bench.purchasingPowerGain >= 0 ? '+' : '') + (bench.purchasingPowerGain / start * 100).toFixed(0) + ' pts'}</div>
+                    <div class="inflation-card-label">In today's dollars</div>
+                    <div class="inflation-breakdown">
+                        <div class="inflation-row">
+                            <span class="inflation-row-label">Starting salary (then)</span>
+                            <span class="inflation-row-value">${state.showDollars ? formatCurrency(start) : '100'}</span>
+                        </div>
+                        <div class="inflation-row">
+                            <span class="inflation-row-label">Adjusted for inflation (now)</span>
+                            <span class="inflation-row-value">${state.showDollars ? formatCurrency(bench.inflationAdjustedStart) : Math.round(bench.inflationAdjustedStart / start * 100)}</span>
+                        </div>
+                        <div class="inflation-row">
+                            <span class="inflation-row-label">Current salary</span>
+                            <span class="inflation-row-value">${state.showDollars ? formatCurrency(current) : Math.round(current / start * 100)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function buildMilestones() {
+            const milestones = detectMilestones();
+            const grid = document.getElementById('milestonesGrid');
+            
+            grid.innerHTML = milestones.map(m => `
+                <div class="milestone-card">
+                    <div class="milestone-icon">${m.icon}</div>
+                    <div class="milestone-title">${m.title}</div>
+                    <div class="milestone-detail">${m.detail}</div>
+                    <div class="milestone-date">${m.date}</div>
+                </div>
+            `).join('');
+        }
+
+        function buildMarketComparison() {
+            const grid = document.getElementById('marketComparisonGrid');
+            const bench = getBenchmarkComparisons();
+            
+            if (!bench) {
+                grid.innerHTML = '<p style="color: var(--text-muted);">Unable to calculate market comparisons.</p>';
+                return;
+            }
+            
+            const start = getStartingSalary();
+            const current = getCurrentSalary();
+            
+            const cards = [
+                {
+                    label: 'Your CAGR',
+                    value: `${bench.userCagr.toFixed(1)}%`,
+                    comparison: `Industry avg: <strong>${benchmarks.industryCagr}%</strong>`,
+                    diff: bench.cagrVsIndustry,
+                    badge: bench.cagrVsIndustry > 0.5 ? 'above' : bench.cagrVsIndustry < -0.5 ? 'below' : 'at'
+                },
+                {
+                    label: 'Avg Raise',
+                    value: `${bench.avgRaise.toFixed(1)}%`,
+                    comparison: `Typical range: <strong>${benchmarks.typicalRaise.min}-${benchmarks.typicalRaise.max}%</strong>`,
+                    diff: bench.raiseVsTypical,
+                    badge: bench.avgRaise > benchmarks.typicalRaise.max ? 'above' : bench.avgRaise >= benchmarks.typicalRaise.min ? 'at' : 'below'
+                },
+                {
+                    label: 'Raise Frequency',
+                    value: `${bench.avgMonthsBetween.toFixed(0)} mo`,
+                    comparison: `Industry avg: <strong>${benchmarks.avgMonthsBetweenRaises} months</strong>`,
+                    diff: benchmarks.avgMonthsBetweenRaises - bench.avgMonthsBetween,
+                    badge: bench.avgMonthsBetween < benchmarks.avgMonthsBetweenRaises - 1 ? 'above' : bench.avgMonthsBetween > benchmarks.avgMonthsBetweenRaises + 1 ? 'below' : 'at'
+                },
+                {
+                    label: 'Real Growth',
+                    value: `${bench.realGrowth.toFixed(1)}%`,
+                    comparison: `After <strong>${bench.totalInflation.toFixed(1)}%</strong> cumulative inflation`,
+                    diff: bench.realGrowth,
+                    badge: bench.realGrowth > 10 ? 'above' : bench.realGrowth > 0 ? 'at' : 'below'
+                },
+                {
+                    label: 'Purchasing Power',
+                    value: state.showDollars 
+                        ? (bench.purchasingPowerGain >= 0 ? '+' : '') + formatCurrency(bench.purchasingPowerGain)
+                        : (bench.purchasingPowerGain >= 0 ? '+' : '') + (bench.purchasingPowerGain / start * 100).toFixed(0) + ' pts',
+                    comparison: `${state.showDollars ? formatCurrency(bench.inflationAdjustedStart) : Math.round(bench.inflationAdjustedStart / start * 100)} would equal start salary today`,
+                    diff: bench.purchasingPowerGain,
+                    badge: bench.purchasingPowerGain > 0 ? 'above' : bench.purchasingPowerGain < 0 ? 'below' : 'at'
+                },
+                {
+                    label: 'vs Industry Path',
+                    value: state.showDollars 
+                        ? (bench.vsIndustrySalary >= 0 ? '+' : '') + formatCurrency(bench.vsIndustrySalary)
+                        : (bench.vsIndustrySalary >= 0 ? '+' : '') + (bench.vsIndustrySalary / start * 100).toFixed(0) + ' pts',
+                    comparison: `At ${benchmarks.industryCagr}% CAGR: <strong>${state.showDollars ? formatCurrency(bench.industryProjectedSalary) : Math.round(bench.industryProjectedSalary / start * 100)}</strong>`,
+                    diff: bench.vsIndustrySalary,
+                    badge: bench.vsIndustryPercent > 5 ? 'above' : bench.vsIndustryPercent < -5 ? 'below' : 'at'
+                }
+            ];
+            
+            grid.innerHTML = cards.map(card => `
+                <div class="market-card ${card.diff > 0 ? 'positive' : card.diff < 0 ? 'negative' : 'neutral'}">
+                    <div class="market-card-header">
+                        <span class="market-card-label">${card.label}</span>
+                        <span class="market-card-badge ${card.badge}">${card.badge === 'above' ? '↑ Above' : card.badge === 'below' ? '↓ Below' : '● At'}</span>
+                    </div>
+                    <div class="market-card-value ${card.diff > 0 ? 'positive' : card.diff < 0 ? 'negative' : ''}">${card.value}</div>
+                    <div class="market-card-comparison">${card.comparison}</div>
+                </div>
+            `).join('');
+            
+            // Update footnote
+            document.getElementById('marketFootnote').textContent = `Benchmarks based on B2B SaaS industry data (${benchmarks.lastUpdated}). CPI data from Bureau of Labor Statistics. Individual results vary by role, location, and company stage.`;
+        }
+
+        // ========================================
+        // TAB FUNCTIONS
+        // ========================================
+        
+        function setTab(tabId) {
+            state.currentTab = tabId;
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabId);
+            });
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.toggle('active', content.id === `tab-${tabId}`);
+            });
+
+            if (tabId === 'market') {
+                setTimeout(() => {
+                    updateMarket();
+                }, 100);
+            }
+            if (tabId === 'analytics' && !charts.yoy) {
+                setTimeout(() => {
+                    buildYoyChart();
+                    buildCategoryChart();
+                }, 100);
+            }
+            if (tabId === 'projections' && !charts.projection) {
+                setTimeout(() => {
+                    buildProjectionChart();
+                    buildProjectionTable();
+                }, 100);
+            }
+        }
+
+        // ========================================
+        // KEYBOARD SHORTCUTS
+        // ========================================
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (!employeeData) return;
+            
+            switch(e.key) {
+                case '1': setTab('story'); break;
+                case '2': setTab('market'); break;
+                case '3': setTab('history'); break;
+                case '4': setTab('analytics'); break;
+                case '5': setTab('projections'); break;
+                case '6': setTab('help'); break;
+                case 't':
+                case 'T': setTheme(state.theme === 'tactical' ? 'artistic' : 'tactical'); break;
+                case 'p':
+                case 'P': togglePrivacy(); break;
+                case 'm':
+                case 'M': toggleView(); break;
+            }
+        });
+
+        // ========================================
+        // CHART FUNCTIONS
+        // ========================================
+        
+        function setChartType(type) {
+            state.mainChartType = type;
+            document.querySelectorAll('.chart-controls .chart-type-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.chart === type);
+            });
+            buildMainChart();
+        }
+
+        function setYoyChartType(type) {
+            state.yoyChartType = type;
+            document.querySelectorAll('[data-chart^="yoy-"]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.chart === `yoy-${type}`);
+            });
+            buildYoyChart();
+        }
+
+        function buildMainChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            const colors = getThemeColors();
+            
+            const data = [...employeeData.records].reverse();
+            
+            const labels = data.map(r => {
+                const date = new Date(r.date);
+                return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+            });
+            
+            const values = data.map(r => state.showDollars ? r.annual : (r.annual / getStartingSalary()) * 100);
+
+            if (charts.main) {
+                charts.main.destroy();
+            }
+
+            charts.main = new Chart(ctx, {
+                type: state.mainChartType === 'bar' ? 'bar' : 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: state.showDollars ? 'Annual Salary' : 'Index Value',
+                        data: values,
+                        borderColor: colors.line1,
+                        backgroundColor: state.mainChartType === 'area' ? colors.fill1 : 
+                                        state.mainChartType === 'bar' ? colors.line1 : 'transparent',
+                        fill: state.mainChartType === 'area',
+                        tension: state.mainChartType === 'step' ? 0 : 0.3,
+                        stepped: state.mainChartType === 'step' ? 'before' : false,
+                        borderWidth: 2,
+                        pointBackgroundColor: colors.line1,
+                        pointBorderColor: colors.line1,
+                        pointRadius: state.mainChartType === 'bar' ? 0 : 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: state.theme === 'tactical' ? '#1a1a1d' : '#ffffff',
+                            titleColor: state.theme === 'tactical' ? '#e8e8e8' : '#2d2a26',
+                            bodyColor: state.theme === 'tactical' ? '#a0a0a0' : '#5c5650',
+                            borderColor: state.theme === 'tactical' ? '#2a2a2d' : '#e8e2da',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: (ctx) => state.showDollars ? `$${ctx.raw.toLocaleString()}` : `Index: ${ctx.raw.toFixed(0)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: colors.grid, drawBorder: false },
+                            ticks: { color: colors.text, maxRotation: 45, minRotation: 45 }
+                        },
+                        y: {
+                            grid: { color: colors.grid, drawBorder: false },
+                            ticks: {
+                                color: colors.text,
+                                callback: (v) => state.showDollars ? '$' + (v / 1000) + 'k' : v
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function buildYoyChart() {
+            const ctx = document.getElementById('yoyChart').getContext('2d');
+            const colors = getThemeColors();
+            
+            const yoyData = {};
+            employeeData.records.forEach(r => {
+                const year = new Date(r.date).getFullYear();
+                if (!yoyData[year]) {
+                    yoyData[year] = { start: r.annual, end: r.annual };
+                } else {
+                    yoyData[year].start = r.annual;
+                }
+            });
+
+            const years = Object.keys(yoyData).sort();
+            const growthRates = [];
+            
+            for (let i = 1; i < years.length; i++) {
+                const prevYear = years[i - 1];
+                const currYear = years[i];
+                const growth = ((yoyData[currYear].end - yoyData[prevYear].end) / yoyData[prevYear].end) * 100;
+                growthRates.push({ year: currYear, growth: Math.max(0, growth) });
+            }
+
+            if (charts.yoy) charts.yoy.destroy();
+
+            charts.yoy = new Chart(ctx, {
+                type: state.yoyChartType,
+                data: {
+                    labels: growthRates.map(d => d.year),
+                    datasets: [{
+                        label: 'YoY Growth %',
+                        data: growthRates.map(d => d.growth),
+                        borderColor: colors.line2,
+                        backgroundColor: state.yoyChartType === 'bar' ? colors.line2 : 'transparent',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: state.theme === 'tactical' ? '#1a1a1d' : '#ffffff',
+                            titleColor: state.theme === 'tactical' ? '#e8e8e8' : '#2d2a26',
+                            bodyColor: state.theme === 'tactical' ? '#a0a0a0' : '#5c5650',
+                            borderColor: state.theme === 'tactical' ? '#2a2a2d' : '#e8e2da',
+                            borderWidth: 1,
+                            callbacks: { label: (ctx) => `${ctx.raw.toFixed(1)}% growth` }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text } },
+                        y: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, callback: (v) => v + '%' } }
+                    }
+                }
+            });
+        }
+
+        function buildCategoryChart() {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            const colors = getThemeColors();
+            
+            const categories = {};
+            employeeData.records.forEach(r => {
+                const reason = r.reason || 'Other';
+                if (reason !== '—') {
+                    categories[reason] = (categories[reason] || 0) + 1;
+                }
+            });
+
+            const labels = Object.keys(categories);
+            const data = Object.values(categories);
+            
+            const categoryColors = [colors.line1, colors.line2, 
+                state.theme === 'tactical' ? '#4598d4' : '#7b2cbf',
+                state.theme === 'tactical' ? '#d45745' : '#d00000'];
+
+            if (charts.category) charts.category.destroy();
+
+            charts.category = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        data,
+                        backgroundColor: categoryColors,
+                        borderColor: state.theme === 'tactical' ? '#141416' : '#ffffff',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: colors.text,
+                                padding: 20,
+                                font: { family: state.theme === 'tactical' ? 'JetBrains Mono' : 'Nunito', size: 12 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function buildProjectionChart() {
+            const ctx = document.getElementById('projectionChart').getContext('2d');
+            const colors = getThemeColors();
+            
+            const currentSalary = getCurrentSalary();
+            const cagr = calculateCAGR() / 100;
+            const years = state.projectionYears;
+            const customRate = state.customRate / 100;
+
+            const labels = ['Now'];
+            const historical = [currentSalary];
+            const conservative = [currentSalary];
+            const custom = [currentSalary];
+            const optimistic = [currentSalary];
+
+            for (let i = 1; i <= years; i++) {
+                labels.push(`+${i}yr`);
+                historical.push(currentSalary * Math.pow(1 + cagr, i));
+                conservative.push(currentSalary * Math.pow(1.05, i));
+                custom.push(currentSalary * Math.pow(1 + customRate, i));
+                optimistic.push(currentSalary * Math.pow(1.12, i));
+            }
+
+            if (charts.projection) charts.projection.destroy();
+
+            charts.projection = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: `Historical CAGR (${(cagr * 100).toFixed(1)}%)`, data: historical, borderColor: colors.line1, backgroundColor: 'transparent', borderWidth: 3, tension: 0.3, pointRadius: 4 },
+                        { label: 'Conservative (5%)', data: conservative, borderColor: state.theme === 'tactical' ? '#666' : '#8a837a', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5,5], tension: 0.3, pointRadius: 3 },
+                        { label: `Custom (${state.customRate}%)`, data: custom, borderColor: colors.line2, backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 4 },
+                        { label: 'Optimistic (12%)', data: optimistic, borderColor: state.theme === 'tactical' ? '#4598d4' : '#7b2cbf', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5,5], tension: 0.3, pointRadius: 3 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    plugins: {
+                        legend: { position: 'top', labels: { color: colors.text, padding: 20, font: { family: state.theme === 'tactical' ? 'JetBrains Mono' : 'Nunito', size: 11 } } },
+                        tooltip: {
+                            backgroundColor: state.theme === 'tactical' ? '#1a1a1d' : '#ffffff',
+                            titleColor: state.theme === 'tactical' ? '#e8e8e8' : '#2d2a26',
+                            bodyColor: state.theme === 'tactical' ? '#a0a0a0' : '#5c5650',
+                            borderColor: state.theme === 'tactical' ? '#2a2a2d' : '#e8e2da',
+                            borderWidth: 1,
+                            callbacks: { label: (ctx) => `${ctx.dataset.label}: $${Math.round(ctx.raw).toLocaleString()}` }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text } },
+                        y: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, callback: (v) => '$' + (v/1000) + 'k' } }
+                    }
+                }
+            });
+        }
+
+        // ========================================
+        // TABLE FUNCTIONS
+        // ========================================
+        
+        function buildHistoryTable() {
+            const tbody = document.getElementById('historyTableBody');
+            const startingSalary = getStartingSalary();
+            
+            tbody.innerHTML = employeeData.records.map(r => {
+                const badgeClass = getBadgeClass(r.reason);
+                const index = ((r.annual / startingSalary) * 100).toFixed(0);
+                const changeDisplay = r.change > 0 
+                    ? (state.showDollars ? `+${formatCurrency(r.change * 24)}` : `+${((r.change * 24 / startingSalary) * 100).toFixed(1)}`)
+                    : '—';
+                
+                return `
+                    <tr>
+                        <td>${new Date(r.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                        <td><span class="badge ${badgeClass}">${r.reason}</span></td>
+                        <td>${state.showDollars ? formatCurrency(r.annual) : `Index: ${index}`}</td>
+                        <td>${index}</td>
+                        <td>${changeDisplay}</td>
+                        <td>${r.changePercent > 0 ? `+${r.changePercent.toFixed(2)}%` : '—'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function getBadgeClass(reason) {
+            if (reason.includes('Merit')) return 'badge-merit';
+            if (reason.includes('Equity')) return 'badge-equity';
+            if (reason.includes('Market')) return 'badge-market';
+            if (reason.includes('New')) return 'badge-new';
+            return '';
+        }
+
+        function buildProjectionTable() {
+            const tbody = document.getElementById('projectionTableBody');
+            const currentSalary = getCurrentSalary();
+            const cagr = calculateCAGR() / 100;
+            const customRate = state.customRate / 100;
+            const intervals = [1, 2, 3, 5, 10, 15, 20];
+            
+            tbody.innerHTML = intervals.map(year => `
+                <tr>
+                    <td>${year} year${year > 1 ? 's' : ''}</td>
+                    <td>${formatCurrency(currentSalary * Math.pow(1 + cagr, year))}</td>
+                    <td>${formatCurrency(currentSalary * Math.pow(1.05, year))}</td>
+                    <td>${formatCurrency(currentSalary * Math.pow(1 + customRate, year))}</td>
+                    <td>${formatCurrency(currentSalary * Math.pow(1.12, year))}</td>
+                </tr>
+            `).join('');
+        }
+
+        // ========================================
+        // ANALYTICS UPDATE
+        // ========================================
+        
+        function updateAnalytics() {
+            const records = employeeData.records;
+            const startingSalary = getStartingSalary();
+            
+            const raises = records.filter(r => r.changePercent > 0);
+            if (raises.length === 0) return;
+            
+            const avgRaisePercent = raises.reduce((sum, r) => sum + r.changePercent, 0) / raises.length;
+            const sortedRaises = [...raises].sort((a, b) => a.changePercent - b.changePercent);
+            const medianRaise = sortedRaises[Math.floor(sortedRaises.length / 2)].changePercent;
+            const largestRaise = Math.max(...raises.map(r => r.changePercent));
+            const largestRaiseRecord = raises.find(r => r.changePercent === largestRaise);
+            
+            const meritCount = records.filter(r => r.reason.includes('Merit')).length;
+            
+            const dates = records.map(r => new Date(r.date)).sort((a, b) => a - b);
+            let totalDays = 0;
+            for (let i = 1; i < dates.length; i++) {
+                totalDays += (dates[i] - dates[i-1]) / (1000 * 60 * 60 * 24);
+            }
+            const avgMonths = (totalDays / (dates.length - 1)) / 30;
+            
+            document.getElementById('cagr').textContent = formatPercent(calculateCAGR());
+            document.getElementById('avgRaise').textContent = formatPercent(avgRaisePercent);
+            
+            const avgRaiseDollar = (avgRaisePercent / 100) * getCurrentSalary();
+            document.getElementById('avgRaiseDollar').textContent = state.showDollars 
+                ? `~${formatCurrency(avgRaiseDollar)} per adjustment`
+                : `~${((avgRaiseDollar / startingSalary) * 100).toFixed(1)} index points`;
+            
+            document.getElementById('medianRaise').textContent = formatPercent(medianRaise);
+            document.getElementById('largestRaise').textContent = formatPercent(largestRaise);
+            document.getElementById('largestRaiseDate').textContent = new Date(largestRaiseRecord.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            document.getElementById('avgTimeBetween').textContent = `${avgMonths.toFixed(1)} mo`;
+            document.getElementById('avgTimeDetail').textContent = `Based on ${records.length} adjustments`;
+            document.getElementById('meritCount').textContent = meritCount;
+            document.getElementById('meritPercent').textContent = `${((meritCount / records.length) * 100).toFixed(1)}% of all adjustments`;
+        }
+
+        // ========================================
+        // PROJECTION CONTROLS
+        // ========================================
+        
+        function setProjectionYears(years) {
+            state.projectionYears = years;
+            document.querySelectorAll('.interval-btn').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.years) === years);
+            });
+            buildProjectionChart();
+        }
+
+        function updateCustomRate() {
+            state.customRate = parseInt(document.getElementById('customRateSlider').value);
+            document.getElementById('customRateValue').textContent = state.customRate + '%';
+            buildProjectionChart();
+            buildProjectionTable();
+        }
+
+        function calculateTimeToTarget() {
+            const target = parseFloat(document.getElementById('targetSalary').value);
+            const growth = parseFloat(document.getElementById('targetGrowth').value) / 100;
+            const current = getCurrentSalary();
+            
+            if (target <= current) {
+                document.getElementById('timeToTarget').textContent = 'Already achieved!';
+                return;
+            }
+            
+            const years = Math.log(target / current) / Math.log(1 + growth);
+            document.getElementById('timeToTarget').textContent = `~${years.toFixed(1)} years`;
+        }
+
+        // ========================================
+        // DASHBOARD INITIALIZATION
+        // ========================================
+        
+        function initDashboard() {
+            const current = getCurrentSalary();
+            const start = getStartingSalary();
+            const growth = ((current - start) / start) * 100;
+            const years = calculateYearsOfService();
+            
+            document.getElementById('currentSalary').textContent = formatCurrency(current);
+            document.getElementById('currentSalaryIndexed').textContent = `Index: ${formatCurrency(current, false)}`;
+            document.getElementById('totalGrowth').textContent = `+${growth.toFixed(0)}%`;
+            document.getElementById('yearsService').textContent = years.toFixed(1);
+            document.getElementById('hireDateText').textContent = `Since ${new Date(employeeData.hireDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`;
+            document.getElementById('totalRaises').textContent = employeeData.records.length;
+            document.getElementById('avgRaisesPerYear').textContent = `Avg: ${(employeeData.records.length / years).toFixed(1)} per year`;
+            
+            buildHistoryTable();
+            buildMainChart();
+            updateAnalytics();
+            updateStory();
+            calculateTimeToTarget();
+        }
+    </script>
+</body>
+</html>
