@@ -4327,6 +4327,11 @@ History
         // Listen for hash changes
         window.addEventListener('hashchange', handleHashChange);
         
+        // Clear hash on initial page load (no data loaded yet)
+        if (window.location.hash) {
+            history.replaceState(null, '', window.location.pathname);
+        }
+        
         // Check hash on initial dashboard load (called from generateDashboard)
         function checkInitialHash() {
             setTimeout(handleHashChange, 100);
@@ -4853,7 +4858,6 @@ History
             buildMainChart();
             updateAnalytics();
             updateStory();
-            calculateTimeToTarget();
         }
     </script>
 </body>
