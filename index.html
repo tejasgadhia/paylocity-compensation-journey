@@ -3181,7 +3181,6 @@ History
                                     <span class="slider-label">What if raises average</span>
                                     <input type="range" min="0" max="25" value="8" id="customRateSlider" oninput="updateCustomRate()">
                                     <span class="slider-value" id="customRateValue">8%</span>
-                                    <span class="scenario-label" id="scenarioLabel">Historical</span>
                                     <span class="slider-context">(Your historical: <span id="historicalRateDisplay">--</span>)</span>
                                 </div>
                                 <div class="interval-buttons">
@@ -4576,11 +4575,6 @@ History
             slider.value = historicalCAGR;
             document.getElementById('customRateValue').textContent = historicalCAGR + '%';
             document.getElementById('historicalRateDisplay').textContent = historicalCAGR + '%';
-            
-            // Set scenario label to Historical
-            const label = document.getElementById('scenarioLabel');
-            label.textContent = 'Historical';
-            label.className = 'scenario-label historical';
         }
 
         function buildProjectionChart() {
@@ -4767,22 +4761,6 @@ History
             state.customRate = parseInt(document.getElementById('customRateSlider').value);
             document.getElementById('customRateValue').textContent = state.customRate + '%';
             
-            // Update scenario label
-            const historicalRate = state.cagr || 8;
-            const label = document.getElementById('scenarioLabel');
-            const diff = state.customRate - historicalRate;
-            
-            if (diff < -1) {
-                label.textContent = 'Conservative';
-                label.className = 'scenario-label conservative';
-            } else if (diff > 1) {
-                label.textContent = 'Aggressive';
-                label.className = 'scenario-label aggressive';
-            } else {
-                label.textContent = 'Historical';
-                label.className = 'scenario-label historical';
-            }
-            
             buildProjectionChart();
             buildProjectionTable();
         }
@@ -4790,6 +4768,7 @@ History
         function setProjectionView(view) {
             const chartWrapper = document.getElementById('projectionChartWrapper');
             const tableWrapper = document.getElementById('projectionTableWrapper');
+            const intervalButtons = document.querySelector('#tab-projections .interval-buttons');
             const buttons = document.querySelectorAll('#tab-projections .chart-type-btn');
             
             buttons.forEach(btn => {
@@ -4799,9 +4778,11 @@ History
             if (view === 'chart') {
                 chartWrapper.classList.remove('hidden');
                 tableWrapper.classList.add('hidden');
+                intervalButtons.classList.remove('hidden');
             } else {
                 chartWrapper.classList.add('hidden');
                 tableWrapper.classList.remove('hidden');
+                intervalButtons.classList.add('hidden');
             }
         }
 
