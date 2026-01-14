@@ -156,13 +156,13 @@
             max-width: 1400px;
             min-width: 320px;
             height: auto;
-            min-height: 75vh;
-            max-height: 90vh;
+            min-height: min(75vh, 600px);
+            max-height: calc(100vh - 4rem);
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-card);
-            overflow: hidden;
+            overflow: auto;
         }
 
         @media (max-width: 900px) {
@@ -178,6 +178,18 @@
         @media (min-width: 1800px) {
             .landing-container {
                 width: 75vw;
+            }
+        }
+
+        /* Handle smaller viewport heights */
+        @media (max-height: 800px) {
+            .landing-page {
+                padding: 1rem;
+                align-items: flex-start;
+            }
+            .landing-container {
+                max-height: none;
+                min-height: auto;
             }
         }
 
