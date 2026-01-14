@@ -2203,6 +2203,12 @@
             margin-top: 0.25rem;
         }
 
+        .projection-result-detail {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-top: 0.25rem;
+        }
+
         .projections-table {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -2971,18 +2977,15 @@ History
                         <div class="control-group">
                             <label class="control-label">Target Salary Goal</label>
                             <div class="input-group">
-                                <div class="input-field">
+                                <div class="input-field" style="flex: 1;">
                                     <label>Target Amount ($)</label>
                                     <input type="number" id="targetSalary" value="500000" onchange="calculateTimeToTarget()">
-                                </div>
-                                <div class="input-field">
-                                    <label>Assumed Growth (%)</label>
-                                    <input type="number" id="targetGrowth" value="8" onchange="calculateTimeToTarget()">
                                 </div>
                             </div>
                             <div class="projection-result">
                                 <div class="projection-result-title">Time to Reach Target</div>
                                 <div class="projection-result-value" id="timeToTarget">~7.5 years</div>
+                                <div class="projection-result-detail">Using custom growth rate above</div>
                             </div>
                         </div>
                     </div>
@@ -4537,15 +4540,21 @@ History
             document.getElementById('customRateValue').textContent = state.customRate + '%';
             buildProjectionChart();
             buildProjectionTable();
+            calculateTimeToTarget();
         }
 
         function calculateTimeToTarget() {
             const target = parseFloat(document.getElementById('targetSalary').value);
-            const growth = parseFloat(document.getElementById('targetGrowth').value) / 100;
+            const growth = state.customRate / 100; // Use slider value
             const current = getCurrentSalary();
             
             if (target <= current) {
                 document.getElementById('timeToTarget').textContent = 'Already achieved!';
+                return;
+            }
+            
+            if (growth === 0) {
+                document.getElementById('timeToTarget').textContent = 'Never (0% growth)';
                 return;
             }
             
