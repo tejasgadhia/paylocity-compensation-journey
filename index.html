@@ -2928,8 +2928,8 @@ History
                         <div class="toggle-switch active" id="privacyToggle" onclick="togglePrivacy()"></div>
                     </div>
                     <div class="theme-switcher">
-                        <button class="theme-btn active" data-theme="tactical" onclick="setTheme('tactical')">Tactical</button>
-                        <button class="theme-btn" data-theme="artistic" onclick="setTheme('artistic')">Artistic</button>
+                        <button class="theme-btn" data-theme="tactical" onclick="setTheme('tactical')">Tactical</button>
+                        <button class="theme-btn active" data-theme="artistic" onclick="setTheme('artistic')">Artistic</button>
                     </div>
                     <button class="btn btn-secondary" onclick="downloadData()" style="padding: 0.5rem 0.75rem; font-size: 0.65rem;">Save Data</button>
                     <button class="btn btn-secondary" onclick="resetDashboard()" style="padding: 0.5rem 0.75rem; font-size: 0.65rem;">Start Over</button>
@@ -3654,6 +3654,8 @@ History
                 showDashboard();
                 // Hide demo banner for real data
                 document.getElementById('demoBanner').classList.add('hidden');
+                // Update URL (removes demo flag)
+                updateUrlParams();
             } catch (e) {
                 console.error('Parse error:', e);
                 messageDiv.className = 'validation-message error visible';
@@ -3759,6 +3761,8 @@ History
             showDashboard();
             // Show demo banner
             document.getElementById('demoBanner').classList.remove('hidden');
+            // Update URL
+            updateUrlParams();
         }
 
         // ========================================
@@ -3780,6 +3784,8 @@ History
                     showDashboard();
                     // Hide demo banner for loaded data
                     document.getElementById('demoBanner').classList.add('hidden');
+                    // Update URL (removes demo flag)
+                    updateUrlParams();
                 } catch (err) {
                     alert('Error loading file: ' + err.message);
                 }
@@ -3824,9 +3830,12 @@ History
             
             // Reset state
             state.currentTab = 'home';
+            employeeData = null;
             
-            // Clear URL hash
-            history.replaceState(null, '', window.location.pathname);
+            // Update URL - keep theme, remove demo
+            const params = new URLSearchParams();
+            params.set('theme', state.theme);
+            history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
             
             // Show landing page
             document.getElementById('dashboardPage').classList.add('hidden');
@@ -4025,6 +4034,9 @@ History
             document.querySelectorAll('.theme-btn, .landing-theme-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.theme === theme);
             });
+            
+            // Update URL
+            updateUrlParams();
 
             if (employeeData) {
                 updateStory();
@@ -4325,12 +4337,12 @@ History
         // TAB FUNCTIONS
         // ========================================
         
-        function setTab(tabId, updateHash = true) {
+        function setTab(tabId, updateUrl = true) {
             state.currentTab = tabId;
             
-            // Update URL hash for stateful URLs
-            if (updateHash) {
-                history.replaceState(null, '', `#${tabId}`);
+            // Update URL params for stateful URLs
+            if (updateUrl) {
+                updateUrlParams();
             }
             
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -4362,19 +4374,17 @@ History
         }
 
         // ========================================
-        // URL HASH NAVIGATION
+        // URL NAVIGATION
         // ========================================
         
-        function handleHashChange() {
-            const hash = window.location.hash.slice(1); // Remove #
+        function handleTabFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const tab = params.get('tab');
             const validTabs = ['home', 'story', 'market', 'history', 'analytics', 'projections', 'help'];
-            if (hash && validTabs.includes(hash) && employeeData) {
-                setTab(hash, false); // false = don't update hash again
+            if (tab && validTabs.includes(tab) && employeeData) {
+                setTab(tab, false); // false = don't update URL again
             }
         }
-        
-        // Listen for hash changes
-        window.addEventListener('hashchange', handleHashChange);
         
         // Warn before losing unsaved data
         window.addEventListener('beforeunload', (e) => {
@@ -4384,14 +4394,9 @@ History
             }
         });
         
-        // Clear hash on initial page load (no data loaded yet)
-        if (window.location.hash) {
-            history.replaceState(null, '', window.location.pathname);
-        }
-        
-        // Check hash on initial dashboard load (called from generateDashboard)
+        // Check tab on initial dashboard load
         function checkInitialHash() {
-            setTimeout(handleHashChange, 100);
+            setTimeout(handleTabFromUrl, 100);
         }
 
         // ========================================
@@ -4886,6 +4891,65 @@ History
             updateAnalytics();
             updateStory();
         }
+
+        // ========================================
+        // URL PARAMETER HANDLING
+        // ========================================
+        
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                theme: params.get('theme'),
+                demo: params.get('demo') === 'true'
+            };
+        }
+        
+        function updateUrlParams() {
+            const params = new URLSearchParams();
+            
+            // Always include theme
+            params.set('theme', state.theme);
+            
+            // Include demo flag if in demo mode
+            if (employeeData && employeeData.isDemo) {
+                params.set('demo', 'true');
+            }
+            
+            // Include tab if on dashboard and not home
+            if (!document.getElementById('dashboardPage').classList.contains('hidden') && state.currentTab !== 'home') {
+                params.set('tab', state.currentTab);
+            }
+            
+            const newUrl = `${window.location.pathname}?${params.toString()}`;
+            history.replaceState(null, '', newUrl);
+        }
+        
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                theme: params.get('theme'),
+                demo: params.get('demo') === 'true',
+                tab: params.get('tab')
+            };
+        }
+        
+        function initFromUrl() {
+            const params = getUrlParams();
+            
+            // Apply theme from URL if specified
+            if (params.theme && (params.theme === 'tactical' || params.theme === 'artistic')) {
+                setTheme(params.theme);
+            }
+            
+            // Auto-load demo if specified
+            if (params.demo) {
+                loadDemoData();
+                // Tab will be handled by checkInitialHash called from showDashboard
+            }
+        }
+        
+        // Initialize from URL on page load
+        initFromUrl();
     </script>
 </body>
 </html>
