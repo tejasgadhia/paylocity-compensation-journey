@@ -878,6 +878,28 @@
             background: rgba(255,255,255,0.3);
         }
 
+        .demo-regenerate-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.35rem 0.75rem;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all var(--transition-speed);
+            white-space: nowrap;
+        }
+
+        .demo-regenerate-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.02);
+        }
+
         /* ========================================
            HEADER
            ======================================== */
@@ -2908,7 +2930,13 @@ History
         <!-- DEMO BANNER -->
         <div id="demoBanner" class="demo-banner hidden">
             <span class="demo-banner-icon">⚠️</span>
-            <span class="demo-banner-text"><strong>Demo Mode:</strong> You're viewing randomly generated sample data. This is not real compensation information.</span>
+            <span class="demo-banner-text">
+                <strong>Demo Mode:</strong> 
+                <span id="scenarioLabel">Scenario 1: Growth Phase (5 years)</span>
+            </span>
+            <button class="demo-regenerate-btn" onclick="cycleNextScenario()" title="Try another scenario">
+                🔄 Try Another
+            </button>
             <button class="demo-banner-close" onclick="document.getElementById('demoBanner').classList.add('hidden')">✕</button>
         </div>
 
@@ -3343,7 +3371,8 @@ History
             mainChartType: 'line',
             yoyChartType: 'bar',
             projectionYears: 5,
-            customRate: 8
+            customRate: 8,
+            currentScenarioIndex: 0
         };
 
         let charts = {
@@ -3737,32 +3766,131 @@ History
         }
 
         // ========================================
-        // DEMO DATA
+        // DEMO DATA - Multiple Scenarios
         // ========================================
-        
-        function loadDemoData() {
-            // Fake employee: 7 years, started at $60k in 2018
-            employeeData = {
-                hireDate: "2018-02-12",
+
+        const DEMO_SCENARIOS = [
+            {
+                id: 1,
+                name: "Early Career",
+                description: "2 years tenure",
+                hireDate: "2023-03-15",
                 currentDate: "2025-01-15",
                 records: [
-                    { date: "2025-01-15", reason: "Merit Increase", perCheck: 4583.33, annual: 110000.00, hourlyRate: 52.88, change: 333.33, changePercent: 7.84 },
-                    { date: "2024-02-01", reason: "Merit Increase", perCheck: 4250.00, annual: 102000.00, hourlyRate: 49.04, change: 291.67, changePercent: 7.50 },
-                    { date: "2023-03-15", reason: "Market Adjustment", perCheck: 3958.33, annual: 95000.00, hourlyRate: 45.67, change: 416.67, changePercent: 11.76 },
-                    { date: "2022-02-01", reason: "Merit Increase", perCheck: 3541.67, annual: 85000.00, hourlyRate: 40.87, change: 208.33, changePercent: 6.25 },
-                    { date: "2021-02-15", reason: "Merit Increase", perCheck: 3333.33, annual: 80000.00, hourlyRate: 38.46, change: 208.33, changePercent: 6.67 },
-                    { date: "2020-03-01", reason: "Merit Increase", perCheck: 3125.00, annual: 75000.00, hourlyRate: 36.06, change: 208.33, changePercent: 7.14 },
-                    { date: "2019-02-15", reason: "Merit Increase", perCheck: 2916.67, annual: 70000.00, hourlyRate: 33.65, change: 208.33, changePercent: 8.00 },
-                    { date: "2018-09-01", reason: "Equity", perCheck: 2708.33, annual: 65000.00, hourlyRate: 31.25, change: 208.33, changePercent: 8.33 },
-                    { date: "2018-02-12", reason: "New Hire", perCheck: 2500.00, annual: 60000.00, hourlyRate: 28.85, change: 0, changePercent: 0 }
-                ],
-                isDemo: true
+                    { date: "2025-01-15", reason: "Merit Increase", perCheck: 3125.00, annual: 75000.00, hourlyRate: 36.06, change: 208.33, changePercent: 7.14 },
+                    { date: "2024-03-01", reason: "Merit Increase", perCheck: 2916.67, annual: 70000.00, hourlyRate: 33.65, change: 208.33, changePercent: 7.69 },
+                    { date: "2023-09-01", reason: "Equity", perCheck: 2708.33, annual: 65000.00, hourlyRate: 31.25, change: 208.33, changePercent: 8.33 },
+                    { date: "2023-03-15", reason: "New Hire", perCheck: 2500.00, annual: 60000.00, hourlyRate: 28.85, change: 0, changePercent: 0 }
+                ]
+            },
+            {
+                id: 2,
+                name: "Growth Phase",
+                description: "5 years tenure",
+                hireDate: "2020-02-01",
+                currentDate: "2025-01-15",
+                records: [
+                    { date: "2025-01-15", reason: "Merit Increase", perCheck: 4166.67, annual: 100000.00, hourlyRate: 48.08, change: 375.00, changePercent: 9.89 },
+                    { date: "2024-02-15", reason: "Promotion", perCheck: 3791.67, annual: 91000.00, hourlyRate: 43.75, change: 458.33, changePercent: 13.75 },
+                    { date: "2023-02-01", reason: "Merit Increase", perCheck: 3333.33, annual: 80000.00, hourlyRate: 38.46, change: 208.33, changePercent: 6.67 },
+                    { date: "2022-03-01", reason: "Market Adjustment", perCheck: 3125.00, annual: 75000.00, hourlyRate: 36.06, change: 291.67, changePercent: 10.34 },
+                    { date: "2021-02-15", reason: "Merit Increase", perCheck: 2833.33, annual: 68000.00, hourlyRate: 32.69, change: 166.67, changePercent: 5.43 },
+                    { date: "2020-08-01", reason: "Equity", perCheck: 2666.67, annual: 64000.00, hourlyRate: 30.77, change: 166.67, changePercent: 6.67 },
+                    { date: "2020-02-01", reason: "New Hire", perCheck: 2500.00, annual: 60000.00, hourlyRate: 28.85, change: 0, changePercent: 0 }
+                ]
+            },
+            {
+                id: 3,
+                name: "Established",
+                description: "8 years tenure",
+                hireDate: "2017-06-15",
+                currentDate: "2025-01-15",
+                records: [
+                    { date: "2025-01-15", reason: "Merit Increase", perCheck: 5416.67, annual: 130000.00, hourlyRate: 62.50, change: 416.67, changePercent: 8.33 },
+                    { date: "2024-01-15", reason: "Merit Increase", perCheck: 5000.00, annual: 120000.00, hourlyRate: 57.69, change: 416.67, changePercent: 9.09 },
+                    { date: "2023-02-01", reason: "Promotion", perCheck: 4583.33, annual: 110000.00, hourlyRate: 52.88, change: 625.00, changePercent: 15.38 },
+                    { date: "2022-02-15", reason: "Merit Increase", perCheck: 3958.33, annual: 95000.00, hourlyRate: 45.67, change: 291.67, changePercent: 8.11 },
+                    { date: "2021-03-01", reason: "Merit Increase", perCheck: 3666.67, annual: 88000.00, hourlyRate: 42.31, change: 250.00, changePercent: 7.32 },
+                    { date: "2020-02-15", reason: "Market Adjustment", perCheck: 3416.67, annual: 82000.00, hourlyRate: 39.42, change: 333.33, changePercent: 10.81 },
+                    { date: "2019-02-01", reason: "Merit Increase", perCheck: 3083.33, annual: 74000.00, hourlyRate: 35.58, change: 208.33, changePercent: 7.25 },
+                    { date: "2018-06-15", reason: "Merit Increase", perCheck: 2875.00, annual: 69000.00, hourlyRate: 33.17, change: 208.33, changePercent: 7.69 },
+                    { date: "2017-12-01", reason: "Equity", perCheck: 2666.67, annual: 64000.00, hourlyRate: 30.77, change: 166.67, changePercent: 6.67 },
+                    { date: "2017-06-15", reason: "New Hire", perCheck: 2500.00, annual: 60000.00, hourlyRate: 28.85, change: 0, changePercent: 0 }
+                ]
+            },
+            {
+                id: 4,
+                name: "Senior Tenure",
+                description: "12 years tenure",
+                hireDate: "2013-01-15",
+                currentDate: "2025-01-15",
+                records: [
+                    { date: "2025-01-15", reason: "Merit Increase", perCheck: 7916.67, annual: 190000.00, hourlyRate: 91.35, change: 416.67, changePercent: 5.56 },
+                    { date: "2024-02-01", reason: "Merit Increase", perCheck: 7500.00, annual: 180000.00, hourlyRate: 86.54, change: 416.67, changePercent: 5.88 },
+                    { date: "2023-01-15", reason: "Merit Increase", perCheck: 7083.33, annual: 170000.00, hourlyRate: 81.73, change: 416.67, changePercent: 6.25 },
+                    { date: "2022-02-15", reason: "Promotion", perCheck: 6666.67, annual: 160000.00, hourlyRate: 76.92, change: 833.33, changePercent: 14.29 },
+                    { date: "2021-02-01", reason: "Merit Increase", perCheck: 5833.33, annual: 140000.00, hourlyRate: 67.31, change: 416.67, changePercent: 7.69 },
+                    { date: "2020-03-01", reason: "Market Adjustment", perCheck: 5416.67, annual: 130000.00, hourlyRate: 62.50, change: 625.00, changePercent: 12.50 },
+                    { date: "2019-02-15", reason: "Merit Increase", perCheck: 4791.67, annual: 115000.00, hourlyRate: 55.29, change: 416.67, changePercent: 9.52 },
+                    { date: "2018-02-01", reason: "Promotion", perCheck: 4375.00, annual: 105000.00, hourlyRate: 50.48, change: 625.00, changePercent: 16.22 },
+                    { date: "2017-03-01", reason: "Merit Increase", perCheck: 3750.00, annual: 90000.00, hourlyRate: 43.27, change: 291.67, changePercent: 8.43 },
+                    { date: "2016-02-15", reason: "Merit Increase", perCheck: 3458.33, annual: 83000.00, hourlyRate: 39.90, change: 208.33, changePercent: 6.49 },
+                    { date: "2015-03-01", reason: "Market Adjustment", perCheck: 3250.00, annual: 78000.00, hourlyRate: 37.50, change: 333.33, changePercent: 11.43 },
+                    { date: "2014-02-15", reason: "Merit Increase", perCheck: 2916.67, annual: 70000.00, hourlyRate: 33.65, change: 208.33, changePercent: 7.69 },
+                    { date: "2013-08-01", reason: "Equity", perCheck: 2708.33, annual: 65000.00, hourlyRate: 31.25, change: 208.33, changePercent: 8.33 },
+                    { date: "2013-01-15", reason: "New Hire", perCheck: 2500.00, annual: 60000.00, hourlyRate: 28.85, change: 0, changePercent: 0 }
+                ]
+            }
+        ];
+
+        function loadDemoData(scenarioIndex = null) {
+            // If no index provided, use current state index
+            if (scenarioIndex === null) {
+                scenarioIndex = state.currentScenarioIndex;
+            } else {
+                state.currentScenarioIndex = scenarioIndex;
+            }
+            
+            const scenario = DEMO_SCENARIOS[scenarioIndex];
+            
+            employeeData = {
+                hireDate: scenario.hireDate,
+                currentDate: scenario.currentDate,
+                records: [...scenario.records], // Clone to prevent mutation
+                isDemo: true,
+                scenarioId: scenario.id
             };
+            
             showDashboard();
-            // Show demo banner
+            
+            // Update demo banner
             document.getElementById('demoBanner').classList.remove('hidden');
+            updateScenarioLabel();
+            
             // Update URL
             updateUrlParams();
+        }
+
+        function cycleNextScenario() {
+            // Move to next scenario (wrap around)
+            state.currentScenarioIndex = (state.currentScenarioIndex + 1) % DEMO_SCENARIOS.length;
+            
+            // Destroy existing charts before regenerating
+            Object.values(charts).forEach(chart => {
+                if (chart) chart.destroy();
+            });
+            charts = { main: null, yoy: null, category: null, projection: null };
+            
+            // Load the new scenario
+            loadDemoData(state.currentScenarioIndex);
+        }
+
+        function updateScenarioLabel() {
+            const scenario = DEMO_SCENARIOS[state.currentScenarioIndex];
+            const label = document.getElementById('scenarioLabel');
+            if (label) {
+                label.textContent = `Scenario ${scenario.id}: ${scenario.name} (${scenario.description})`;
+            }
         }
 
         // ========================================
