@@ -3817,41 +3817,41 @@ History
         const storyContent = {
             tactical: {
                 title: "Mission Debrief: Compensation Trajectory",
-                subtitle: "Classification: Personnel Asset Valuation Report",
+                subtitle: "Classification: Personnel Valuation Report",
                 getText: (data) => `
-                    <p><span class="story-highlight">MISSION START:</span> Asset deployed on <span class="story-stat">${data.hireDateFormatted}</span> with initial resource allocation of <span class="story-stat">${data.startSalary}</span>. Operational status: New Hire.</p>
+                    <p><span class="story-highlight">MISSION START:</span> Specialist deployed on <span class="story-stat">${data.hireDateFormatted}</span> with initial resource allocation of <span class="story-stat">${data.startSalary}</span>. Operational status: New Hire. Initial positioning established within standard parameters for role classification.</p>
                     
-                    <p><span class="story-highlight">OPERATIONAL SUMMARY:</span> Over <span class="story-stat">${data.years} years</span> of continuous deployment, the asset has demonstrated consistent value appreciation. Total resource adjustments: <span class="story-stat">${data.totalAdjustments} modifications</span>. Current valuation stands at <span class="story-stat">${data.currentSalary}</span>, representing a <span class="story-stat">${data.growth}%</span> increase from baseline.</p>
+                    <p><span class="story-highlight">OPERATIONAL SUMMARY:</span> Over <span class="story-stat">${data.years} years</span> of continuous deployment, the specialist has demonstrated consistent value appreciation. Total resource adjustments: <span class="story-stat">${data.totalAdjustments} modifications</span>. Current valuation stands at <span class="story-stat">${data.currentSalary}</span>, representing a <span class="story-stat">${data.growth}%</span> increase from baseline. Adjustment frequency exceeds standard annual review cycles, indicating active performance recognition protocols.</p>
                     
-                    <p><span class="story-highlight">PERFORMANCE METRICS:</span> Compound Annual Growth Rate (CAGR) calculated at <span class="story-stat">${data.cagr}%</span>. Average interval between resource reallocations: <span class="story-stat">${data.avgInterval} months</span>. Primary adjustment category: Merit-based (${data.meritPercent}% of all modifications).</p>
+                    <p><span class="story-highlight">PERFORMANCE METRICS:</span> Compound Annual Growth Rate (CAGR) calculated at <span class="story-stat">${data.cagr}%</span>. Average interval between resource reallocations: <span class="story-stat">${data.avgInterval} months</span>. Primary adjustment category: Merit-based (${data.meritPercent}% of all modifications). Remaining adjustments attributed to promotions, market corrections, and role transitions. Cumulative inflation during deployment period: <span class="story-stat">${data.cumulativeInflation}%</span>. Inflation-adjusted growth rate: <span class="story-stat">${data.realGrowth}%</span>, confirming real value appreciation beyond cost-of-living factors.</p>
                     
-                    <p><span class="story-highlight">NOTABLE OPERATIONS:</span> Largest single-event appreciation occurred <span class="story-stat">${data.largestRaiseDate}</span> with a <span class="story-stat">${data.largestRaise}%</span> value increase.${data.sixFigureDate ? ` Six-figure threshold breached <span class="story-stat">${data.sixFigureDate}</span>.` : ''}</p>
+                    <p><span class="story-highlight">NOTABLE OPERATIONS:</span> Largest single-event appreciation occurred <span class="story-stat">${data.largestRaiseDate}</span> with a <span class="story-stat">${data.largestRaise}%</span> value increase.${data.sixFigureDate ? ` Six-figure threshold breached <span class="story-stat">${data.sixFigureDate}</span>, achieved within <span class="story-stat">${data.yearsToSixFigures}</span> of initial deployment.` : ''} Compensation trajectory has maintained positive momentum across all recorded intervals.</p>
                     
-                    <p><span class="story-highlight">STATUS:</span> Asset remains in active deployment. See <a href="#market" onclick="setTab('market'); return false;" class="tab-link">Market</a> tab for industry benchmarks and inflation analysis.</p>
+                    <p><span class="story-highlight">STATUS:</span> Specialist remains in active deployment. Current trajectory sustainable pending continued performance alignment. See <a href="#market" onclick="setTab('market'); return false;" class="tab-link">Market</a> tab for industry benchmarks and inflation-adjusted analysis.</p>
                     
                     <div class="story-insight">
                         <span class="story-insight-label">Advisory Note</span>
-                        Compensation metrics represent one vector in a multi-dimensional assessment matrix. Operational impact, skill acquisition, and mission value are tracked through separate channels. This system monitors resource allocation; comprehensive asset evaluation requires additional data streams.
+                        Compensation metrics represent one vector in a multi-dimensional assessment matrix. Operational impact, skill acquisition, and mission value are tracked through separate channels. This system monitors resource allocation only; comprehensive specialist evaluation requires additional data streams not captured in this report.
                     </div>
                 `
             },
             artistic: {
-                title: "Your Compensation Story",
-                subtitle: "A Chronicle of Your Earnings Over Time",
+                title: "Compensation Summary",
+                getSubtitle: (data) => data.dateRange,
                 getText: (data) => `
-                    <p>Every salary tells a story. Yours began on <span class="story-stat">${data.hireDateFormatted}</span>, with a starting compensation of <span class="story-stat">${data.startSalary}</span>—the first line in what would become a longer narrative.</p>
+                    <p>You started at <span class="story-stat">${data.startSalary}</span> on <span class="story-stat">${data.hireDateFormatted}</span>. Your current annual salary is <span class="story-stat">${data.currentSalary}</span>—an increase of <span class="story-stat">${data.dollarIncrease}</span> from your starting point.</p>
                     
-                    <p>Over <span class="story-stat">${data.years} years</span>, your compensation has been adjusted <span class="story-stat">${data.totalAdjustments} times</span>. Each change—whether a merit increase, promotion, or market adjustment—moved the numbers forward. Today, your annual salary stands at <span class="story-stat">${data.currentSalary}</span>.</p>
+                    <p>Over <span class="story-stat">${data.years} years</span>, your compensation has increased <span class="story-stat">${data.growth}%</span> through <span class="story-stat">${data.totalAdjustments} adjustments</span>. That works out to a compound annual growth rate (CAGR) of <span class="story-stat">${data.cagr}%</span>, with adjustments occurring roughly every <span class="story-stat">${data.avgInterval} months</span> on average—more frequently than the typical annual review cycle.</p>
                     
-                    <p>The math paints a clear picture: a <span class="story-stat">${data.growth}%</span> total increase from where you started. Your compound annual growth rate of <span class="story-stat">${data.cagr}%</span> captures the trajectory in a single number.</p>
+                    <p><span class="story-stat">${data.meritPercent}%</span> of your adjustments were merit-based, with the remainder coming from promotions, market adjustments, or role changes. Your largest single increase was <span class="story-stat">${data.largestRaise}%</span> in <span class="story-stat">${data.largestRaiseDate}</span>.${data.sixFigureDate ? ` You crossed the six-figure threshold in <span class="story-stat">${data.sixFigureDate}</span>, about <span class="story-stat">${data.yearsToSixFigures}</span> into your tenure.` : ''}</p>
                     
-                    <p>The most significant adjustment came on <span class="story-stat">${data.largestRaiseDate}</span>—a <span class="story-stat">${data.largestRaise}%</span> increase that stands out in the timeline.${data.sixFigureDate ? ` Crossing into six figures on <span class="story-stat">${data.sixFigureDate}</span> marked a notable threshold.` : ''}</p>
+                    <p>Accounting for <span class="story-stat">${data.cumulativeInflation}%</span> cumulative inflation over this period, your real purchasing power has grown by approximately <span class="story-stat">${data.realGrowth}%</span>. In other words, your raises have ${parseFloat(data.realGrowth) > 0 ? 'outpaced' : 'not kept pace with'} the cost of living.</p>
                     
-                    <p>This is where the numbers have brought you so far. Visit the <a href="#market" onclick="setTab('market'); return false;" class="tab-link">Market</a> tab to see how your compensation compares to industry benchmarks.</p>
+                    <p>For context on how these numbers compare to industry standards, see the <a href="#market" onclick="setTab('market'); return false;" class="tab-link">Market</a> tab. The <a href="#analytics" onclick="setTab('analytics'); return false;" class="tab-link">Analytics</a> tab provides additional breakdowns of your raise history and patterns over time.</p>
                     
                     <div class="story-insight">
-                        <span class="story-insight-label">A note on perspective</span>
-                        Compensation tells one part of your story—an important part, but not the whole picture. Professional growth, learning, impact, and fulfillment each follow their own paths. This dashboard tracks the numbers; the rest of the story is yours to write.
+                        <span class="story-insight-label">Note</span>
+                        This summary tracks compensation only. Career growth encompasses many things—skills developed, problems solved, teams built, impact made—that aren't captured in salary data alone. The numbers here tell one part of the story.
                     </div>
                 `
             }
@@ -4048,7 +4048,6 @@ History
         function updateStory() {
             const content = storyContent[state.theme];
             document.getElementById('storyTitle').textContent = content.title;
-            document.getElementById('storySubtitle').textContent = content.subtitle;
             
             const start = getStartingSalary();
             const current = getCurrentSalary();
@@ -4070,14 +4069,29 @@ History
             }
             const avgMonths = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30 : 0;
             
-            // Find six figure date
+            // Find six figure date and calculate time to reach it
             const recordsChron = [...employeeData.records].reverse();
             const sixFigures = recordsChron.find(r => r.annual >= 100000);
+            let yearsToSixFigures = null;
+            if (sixFigures) {
+                const hireDate = new Date(employeeData.hireDate);
+                const sixFigDate = new Date(sixFigures.date);
+                const diffYears = (sixFigDate - hireDate) / (1000 * 60 * 60 * 24 * 365.25);
+                yearsToSixFigures = diffYears < 1 ? `${Math.round(diffYears * 12)} months` : `${diffYears.toFixed(1)} years`;
+            }
+            
+            // Calculate inflation data
+            const startYear = new Date(employeeData.hireDate).getFullYear();
+            const endYear = new Date().getFullYear();
+            const cumulativeInflation = calculateInflationOverPeriod(startYear, endYear);
+            const realGrowth = growth - cumulativeInflation;
+            const dollarIncrease = current - start;
             
             const data = {
                 hireDateFormatted: new Date(employeeData.hireDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
                 startSalary: state.showDollars ? formatCurrency(start) : 'Index 100',
                 currentSalary: state.showDollars ? formatCurrency(current) : `Index ${formatCurrency(current, false)}`,
+                dollarIncrease: state.showDollars ? formatCurrency(dollarIncrease) : `Index ${(dollarIncrease / start * 100).toFixed(0)}`,
                 years: years.toFixed(1),
                 totalAdjustments: employeeData.records.length,
                 growth: growth.toFixed(0),
@@ -4086,8 +4100,16 @@ History
                 meritPercent,
                 largestRaiseDate: largestRaise ? new Date(largestRaise.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'N/A',
                 largestRaise: largestRaise ? largestRaise.changePercent.toFixed(1) : '0',
-                sixFigureDate: sixFigures ? new Date(sixFigures.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : null
+                sixFigureDate: sixFigures ? new Date(sixFigures.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : null,
+                yearsToSixFigures,
+                cumulativeInflation: cumulativeInflation.toFixed(1),
+                realGrowth: realGrowth.toFixed(1),
+                dateRange: new Date(employeeData.hireDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) + ' – Present'
             };
+            
+            // Set subtitle (static for tactical, dynamic for summary)
+            const subtitle = content.getSubtitle ? content.getSubtitle(data) : content.subtitle;
+            document.getElementById('storySubtitle').textContent = subtitle;
             
             document.getElementById('storyText').innerHTML = content.getText(data);
             buildMilestones();
