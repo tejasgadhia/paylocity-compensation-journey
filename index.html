@@ -986,57 +986,6 @@
             flex-wrap: wrap;
         }
 
-        .toggle-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            background: var(--bg-tertiary);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-color);
-        }
-
-        .toggle-label {
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-            font-family: var(--font-mono);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 40px;
-            height: 22px;
-            background: var(--bg-primary);
-            border-radius: 11px;
-            cursor: pointer;
-            transition: background var(--transition-speed);
-            border: 1px solid var(--border-color);
-        }
-
-        .toggle-switch.active {
-            background: var(--accent-primary);
-            border-color: var(--accent-primary);
-        }
-
-        .toggle-switch::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 16px;
-            height: 16px;
-            background: var(--text-primary);
-            border-radius: 50%;
-            transition: transform var(--transition-speed);
-        }
-
-        .toggle-switch.active::after {
-            transform: translateX(18px);
-            background: var(--bg-primary);
-        }
-
         .theme-switcher {
             display: flex;
             background: var(--bg-tertiary);
@@ -1064,6 +1013,36 @@
         }
 
         .theme-btn:hover:not(.active) {
+            background: var(--bg-hover);
+        }
+
+        .view-switcher {
+            display: flex;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .view-btn {
+            padding: 0.5rem 0.75rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .view-btn.active {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+
+        .view-btn:hover:not(.active) {
             background: var(--bg-hover);
         }
 
@@ -2951,9 +2930,9 @@ History
                     </div>
                 </div>
                 <div class="header-controls">
-                    <div class="toggle-group">
-                        <span class="toggle-label">$</span>
-                        <div class="toggle-switch active" id="privacyToggle" onclick="togglePrivacy()"></div>
+                    <div class="view-switcher">
+                        <button class="view-btn active" data-view="dollars" onclick="setViewMode('dollars')">$</button>
+                        <button class="view-btn" data-view="index" onclick="setViewMode('index')">Index</button>
                     </div>
                     <div class="theme-switcher">
                         <button class="theme-btn" data-theme="tactical" onclick="setTheme('tactical')">Tactical</button>
@@ -2967,7 +2946,7 @@ History
 
         <!-- KEYBOARD SHORTCUTS HINT -->
         <div class="keyboard-hint">
-            <kbd>1</kbd>-<kbd>7</kbd> tabs · <kbd>T</kbd> theme · <kbd>P</kbd> privacy
+            <kbd>1</kbd>-<kbd>7</kbd> tabs · <kbd>T</kbd> theme · <kbd>V</kbd> view
         </div>
 
         <!-- TAB NAVIGATION -->
@@ -3302,7 +3281,7 @@ History
                             <h3>Keyboard Shortcuts</h3>
                             <p><code>1-7</code> Switch tabs<br>
                             <code>T</code> Toggle theme<br>
-                            <code>P</code> Toggle privacy</p>
+                            <code>V</code> Toggle view ($/Index)</p>
                         </div>
                     </div>
                 </div>
@@ -4178,13 +4157,24 @@ History
         }
 
         // ========================================
-        // PRIVACY TOGGLE
+        // VIEW MODE (DOLLARS / INDEX)
         // ========================================
         
-        function togglePrivacy() {
-            state.showDollars = !state.showDollars;
-            document.getElementById('privacyToggle').classList.toggle('active', state.showDollars);
+        function setViewMode(mode) {
+            state.showDollars = (mode === 'dollars');
+            
+            // Update button states
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.view === mode);
+            });
+            
             updateAllDisplays();
+            updateUrlParams();
+        }
+        
+        function togglePrivacy() {
+            // Toggle for keyboard shortcut
+            setViewMode(state.showDollars ? 'index' : 'dollars');
         }
 
         function updateAllDisplays() {
@@ -4545,6 +4535,8 @@ History
                 case '7': setTab('help'); break;
                 case 't':
                 case 'T': setTheme(state.theme === 'tactical' ? 'artistic' : 'tactical'); break;
+                case 'v':
+                case 'V':
                 case 'p':
                 case 'P': togglePrivacy(); break;
             }
@@ -5024,19 +5016,16 @@ History
         // URL PARAMETER HANDLING
         // ========================================
         
-        function getUrlParams() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                theme: params.get('theme'),
-                demo: params.get('demo') === 'true'
-            };
-        }
-        
         function updateUrlParams() {
             const params = new URLSearchParams();
             
             // Always include theme
             params.set('theme', state.theme);
+            
+            // Include view mode (only if not default 'dollars')
+            if (!state.showDollars) {
+                params.set('view', 'index');
+            }
             
             // Include demo flag if in demo mode
             if (employeeData && employeeData.isDemo) {
@@ -5057,7 +5046,8 @@ History
             return {
                 theme: params.get('theme'),
                 demo: params.get('demo') === 'true',
-                tab: params.get('tab')
+                tab: params.get('tab'),
+                view: params.get('view')
             };
         }
         
@@ -5067,6 +5057,11 @@ History
             // Apply theme from URL if specified
             if (params.theme && (params.theme === 'tactical' || params.theme === 'artistic')) {
                 setTheme(params.theme);
+            }
+            
+            // Apply view mode from URL if specified
+            if (params.view === 'index') {
+                setViewMode('index');
             }
             
             // Auto-load demo if specified
