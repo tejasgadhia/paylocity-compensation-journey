@@ -2351,6 +2351,32 @@
             margin-top: 0.25rem;
         }
 
+        .projections-controls-row.two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .projections-controls-row.two-col .control-group {
+            min-width: unset;
+        }
+
+        .chart-header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .chart-header-controls .interval-buttons {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .chart-header-controls .interval-btn {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.8rem;
+        }
+
         .projections-table {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -3098,18 +3124,7 @@ History
                     </div>
 
                     <div class="projections-controls">
-                        <div class="projections-controls-row">
-                            <div class="control-group">
-                                <label class="control-label">How far ahead?</label>
-                                <div class="interval-buttons centered">
-                                    <button class="interval-btn" data-years="1" onclick="setProjectionYears(1)">1 yr</button>
-                                    <button class="interval-btn" data-years="3" onclick="setProjectionYears(3)">3 yr</button>
-                                    <button class="interval-btn active" data-years="5" onclick="setProjectionYears(5)">5 yr</button>
-                                    <button class="interval-btn" data-years="10" onclick="setProjectionYears(10)">10 yr</button>
-                                    <button class="interval-btn" data-years="20" onclick="setProjectionYears(20)">20 yr</button>
-                                </div>
-                            </div>
-
+                        <div class="projections-controls-row two-col">
                             <div class="control-group">
                                 <div class="slider-container">
                                     <div class="slider-header">
@@ -3122,7 +3137,7 @@ History
                                 </div>
                             </div>
 
-                            <div class="control-group target-group">
+                            <div class="control-group">
                                 <label class="control-label">When will I hit...</label>
                                 <div class="goal-input">
                                     <span class="goal-currency">$</span>
@@ -3139,9 +3154,18 @@ History
                     <div class="chart-section">
                         <div class="chart-header">
                             <h2 class="chart-title">Future Trajectory</h2>
-                            <div class="chart-controls">
-                                <button class="chart-type-btn active" data-view="chart" onclick="setProjectionView('chart')">Chart</button>
-                                <button class="chart-type-btn" data-view="table" onclick="setProjectionView('table')">Table</button>
+                            <div class="chart-header-controls">
+                                <div class="interval-buttons">
+                                    <button class="interval-btn" data-years="1" onclick="setProjectionYears(1)">1 yr</button>
+                                    <button class="interval-btn" data-years="3" onclick="setProjectionYears(3)">3 yr</button>
+                                    <button class="interval-btn active" data-years="5" onclick="setProjectionYears(5)">5 yr</button>
+                                    <button class="interval-btn" data-years="10" onclick="setProjectionYears(10)">10 yr</button>
+                                    <button class="interval-btn" data-years="20" onclick="setProjectionYears(20)">20 yr</button>
+                                </div>
+                                <div class="chart-controls">
+                                    <button class="chart-type-btn active" data-view="chart" onclick="setProjectionView('chart')">Chart</button>
+                                    <button class="chart-type-btn" data-view="table" onclick="setProjectionView('table')">Table</button>
+                                </div>
                             </div>
                         </div>
                         <div class="chart-wrapper" id="projectionChartWrapper">
