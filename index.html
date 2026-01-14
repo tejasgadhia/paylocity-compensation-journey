@@ -2377,6 +2377,56 @@
             font-size: 0.8rem;
         }
 
+        .projection-slider-inline {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .projection-slider-inline .slider-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .projection-slider-inline input[type="range"] {
+            width: 100px;
+        }
+
+        .projection-slider-inline .slider-value {
+            font-weight: 700;
+            color: var(--accent-primary);
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            min-width: 35px;
+        }
+
+        .projection-slider-inline .scenario-label {
+            font-size: 0.65rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        .projection-slider-inline .scenario-label.conservative {
+            background: rgba(0, 150, 199, 0.15);
+            color: var(--accent-secondary);
+        }
+
+        .projection-slider-inline .scenario-label.historical {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .projection-slider-inline .scenario-label.aggressive {
+            background: rgba(232, 93, 4, 0.15);
+            color: var(--accent-primary);
+        }
+
+        .projection-slider-inline .slider-context {
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+        }
+
         .projections-table {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -3120,41 +3170,20 @@ History
                 <div class="tab-content" id="tab-projections">
                     <div class="projections-intro">
                         <h2>Future Compensation Projections</h2>
-                        <p>Explore potential salary growth scenarios based on different annual raise percentages. The chart compares your historical growth rate against conservative, custom, and optimistic projections.</p>
-                    </div>
-
-                    <div class="projections-controls">
-                        <div class="projections-controls-row two-col">
-                            <div class="control-group">
-                                <div class="slider-container">
-                                    <div class="slider-header">
-                                        <label class="control-label">Scenario: Annual raise</label>
-                                        <span class="slider-value" id="customRateValue">8%</span>
-                                        <span class="scenario-label" id="scenarioLabel">Historical</span>
-                                    </div>
-                                    <input type="range" min="0" max="25" value="8" id="customRateSlider" oninput="updateCustomRate()">
-                                    <div class="slider-context">Your historical rate: <span id="historicalRateDisplay">--</span></div>
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <label class="control-label">When will I hit...</label>
-                                <div class="goal-input">
-                                    <span class="goal-currency">$</span>
-                                    <input type="number" id="targetSalary" value="500000" onchange="calculateTimeToTarget()">
-                                </div>
-                                <div class="goal-answer">
-                                    <span id="timeToTarget">~7.5 years</span>
-                                    <span class="goal-context">at current scenario rate</span>
-                                </div>
-                            </div>
-                        </div>
+                        <p>Explore potential salary growth scenarios. Adjust the raise percentage to see how different growth rates would impact your compensation over time.</p>
                     </div>
 
                     <div class="chart-section">
                         <div class="chart-header">
                             <h2 class="chart-title">Future Trajectory</h2>
                             <div class="chart-header-controls">
+                                <div class="projection-slider-inline">
+                                    <span class="slider-label">Scenario:</span>
+                                    <input type="range" min="0" max="25" value="8" id="customRateSlider" oninput="updateCustomRate()">
+                                    <span class="slider-value" id="customRateValue">8%</span>
+                                    <span class="scenario-label" id="scenarioLabel">Historical</span>
+                                    <span class="slider-context">(Your historical: <span id="historicalRateDisplay">--</span>)</span>
+                                </div>
                                 <div class="interval-buttons">
                                     <button class="interval-btn" data-years="1" onclick="setProjectionYears(1)">1 yr</button>
                                     <button class="interval-btn" data-years="3" onclick="setProjectionYears(3)">3 yr</button>
@@ -4547,9 +4576,6 @@ History
             const label = document.getElementById('scenarioLabel');
             label.textContent = 'Historical';
             label.className = 'scenario-label historical';
-            
-            // Calculate initial time to target
-            calculateTimeToTarget();
         }
 
         function buildProjectionChart() {
@@ -4652,7 +4678,20 @@ History
             const currentSalary = getCurrentSalary();
             const cagr = calculateCAGR() / 100;
             const customRate = state.customRate / 100;
-            const intervals = [1, 2, 3, 5, 10, 15, 20];
+            const years = state.projectionYears;
+            
+            // Generate appropriate intervals based on selected timeframe
+            let intervals = [];
+            if (years <= 5) {
+                // Show every year
+                for (let i = 1; i <= years; i++) intervals.push(i);
+            } else if (years <= 10) {
+                // Show 1, 2, 3, 5, 7, 10 (up to selected)
+                intervals = [1, 2, 3, 5, 7, 10].filter(y => y <= years);
+            } else {
+                // Show 1, 3, 5, 10, 15, 20 (up to selected)
+                intervals = [1, 3, 5, 10, 15, 20].filter(y => y <= years);
+            }
             
             tbody.innerHTML = intervals.map(year => `
                 <tr>
@@ -4728,6 +4767,7 @@ History
                 btn.classList.toggle('active', parseInt(btn.dataset.years) === years);
             });
             buildProjectionChart();
+            buildProjectionTable();
         }
 
         function updateCustomRate() {
@@ -4752,7 +4792,6 @@ History
             
             buildProjectionChart();
             buildProjectionTable();
-            calculateTimeToTarget();
         }
 
         function setProjectionView(view) {
