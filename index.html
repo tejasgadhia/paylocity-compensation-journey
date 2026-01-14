@@ -325,6 +325,21 @@
             font-weight: bold;
         }
 
+        .privacy-session-warning {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 4px;
+            padding: 0.5rem 0.75rem;
+            margin-top: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .privacy-session-warning strong {
+            color: var(--text-primary);
+        }
+
         /* Right Panel */
         .landing-right {
             padding: 2rem;
@@ -2810,6 +2825,7 @@
                             <span class="privacy-feature"><span class="check">✓</span> No external requests</span>
                             <span class="privacy-feature"><span class="check">✓</span> No data storage</span>
                         </div>
+                        <p class="privacy-session-warning">⚠️ Data exists only in your current session. Refreshing or closing the tab will clear everything. Use <strong>Save Data</strong> to keep a local copy.</p>
                         <div class="privacy-download">
                             <button class="btn-download-offline" onclick="downloadHtmlFile()">
                                 <span>⬇</span> Download for Offline Use
@@ -4347,6 +4363,14 @@ History
         
         // Listen for hash changes
         window.addEventListener('hashchange', handleHashChange);
+        
+        // Warn before losing unsaved data
+        window.addEventListener('beforeunload', (e) => {
+            if (employeeData && !employeeData.isDemo) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
         
         // Clear hash on initial page load (no data loaded yet)
         if (window.location.hash) {
