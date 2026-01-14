@@ -2272,6 +2272,85 @@
             font-size: 1rem;
         }
 
+        .interval-buttons.centered {
+            justify-content: center;
+        }
+
+        .scenario-label {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .scenario-label.conservative {
+            background: rgba(0, 150, 199, 0.15);
+            color: var(--accent-secondary);
+        }
+
+        .scenario-label.historical {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .scenario-label.aggressive {
+            background: rgba(232, 93, 4, 0.15);
+            color: var(--accent-primary);
+        }
+
+        .slider-context {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-top: 0.5rem;
+        }
+
+        .slider-context span {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .goal-input {
+            display: flex;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .goal-currency {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-right: 0.25rem;
+        }
+
+        .goal-input input {
+            width: 140px;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 1rem;
+        }
+
+        .goal-answer {
+            margin-top: 0.75rem;
+        }
+
+        .goal-answer span:first-child {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-secondary);
+            font-family: var(--font-mono);
+        }
+
+        .goal-context {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-top: 0.25rem;
+        }
+
         .projections-table {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -3022,13 +3101,11 @@ History
                         <div class="projections-controls-row">
                             <div class="control-group">
                                 <label class="control-label">How far ahead?</label>
-                                <div class="interval-buttons">
+                                <div class="interval-buttons centered">
                                     <button class="interval-btn" data-years="1" onclick="setProjectionYears(1)">1 yr</button>
-                                    <button class="interval-btn" data-years="2" onclick="setProjectionYears(2)">2 yr</button>
                                     <button class="interval-btn" data-years="3" onclick="setProjectionYears(3)">3 yr</button>
                                     <button class="interval-btn active" data-years="5" onclick="setProjectionYears(5)">5 yr</button>
                                     <button class="interval-btn" data-years="10" onclick="setProjectionYears(10)">10 yr</button>
-                                    <button class="interval-btn" data-years="15" onclick="setProjectionYears(15)">15 yr</button>
                                     <button class="interval-btn" data-years="20" onclick="setProjectionYears(20)">20 yr</button>
                                 </div>
                             </div>
@@ -3036,20 +3113,24 @@ History
                             <div class="control-group">
                                 <div class="slider-container">
                                     <div class="slider-header">
-                                        <label class="control-label">Custom annual raise %</label>
+                                        <label class="control-label">Scenario: Annual raise</label>
                                         <span class="slider-value" id="customRateValue">8%</span>
+                                        <span class="scenario-label" id="scenarioLabel">Historical</span>
                                     </div>
                                     <input type="range" min="0" max="25" value="8" id="customRateSlider" oninput="updateCustomRate()">
+                                    <div class="slider-context">Your historical rate: <span id="historicalRateDisplay">--</span></div>
                                 </div>
                             </div>
 
                             <div class="control-group target-group">
-                                <label class="control-label">Goal calculator</label>
-                                <div class="target-inline">
-                                    <span>Reach $</span>
+                                <label class="control-label">When will I hit...</label>
+                                <div class="goal-input">
+                                    <span class="goal-currency">$</span>
                                     <input type="number" id="targetSalary" value="500000" onchange="calculateTimeToTarget()">
-                                    <span>in</span>
-                                    <strong id="timeToTarget">~7.5 years</strong>
+                                </div>
+                                <div class="goal-answer">
+                                    <span id="timeToTarget">~7.5 years</span>
+                                    <span class="goal-context">at current scenario rate</span>
                                 </div>
                             </div>
                         </div>
@@ -4171,6 +4252,7 @@ History
             }
             if (tabId === 'projections' && !charts.projection) {
                 setTimeout(() => {
+                    initProjections();
                     buildProjectionChart();
                     buildProjectionTable();
                 }, 100);
@@ -4425,6 +4507,27 @@ History
             });
         }
 
+        function initProjections() {
+            // Set slider to historical CAGR
+            const historicalCAGR = Math.round(calculateCAGR());
+            state.cagr = historicalCAGR;
+            state.customRate = historicalCAGR;
+            
+            // Update slider and display
+            const slider = document.getElementById('customRateSlider');
+            slider.value = historicalCAGR;
+            document.getElementById('customRateValue').textContent = historicalCAGR + '%';
+            document.getElementById('historicalRateDisplay').textContent = historicalCAGR + '%';
+            
+            // Set scenario label to Historical
+            const label = document.getElementById('scenarioLabel');
+            label.textContent = 'Historical';
+            label.className = 'scenario-label historical';
+            
+            // Calculate initial time to target
+            calculateTimeToTarget();
+        }
+
         function buildProjectionChart() {
             const ctx = document.getElementById('projectionChart').getContext('2d');
             const colors = getThemeColors();
@@ -4606,6 +4709,23 @@ History
         function updateCustomRate() {
             state.customRate = parseInt(document.getElementById('customRateSlider').value);
             document.getElementById('customRateValue').textContent = state.customRate + '%';
+            
+            // Update scenario label
+            const historicalRate = state.cagr || 8;
+            const label = document.getElementById('scenarioLabel');
+            const diff = state.customRate - historicalRate;
+            
+            if (diff < -1) {
+                label.textContent = 'Conservative';
+                label.className = 'scenario-label conservative';
+            } else if (diff > 1) {
+                label.textContent = 'Aggressive';
+                label.className = 'scenario-label aggressive';
+            } else {
+                label.textContent = 'Historical';
+                label.className = 'scenario-label historical';
+            }
+            
             buildProjectionChart();
             buildProjectionTable();
             calculateTimeToTarget();
