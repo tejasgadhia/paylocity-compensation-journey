@@ -664,64 +664,46 @@
         }
 
         /* ========================================
-           MOBILE VIEW SIMULATION
+           MOBILE SPLASH SCREEN
            ======================================== */
         
-        [data-view="mobile"] .main-container {
-            max-width: 430px;
-            margin: 0 auto;
-            border-left: 1px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
-            min-height: 100vh;
-        }
-
-        [data-view="mobile"] .metrics-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 0.75rem;
-        }
-
-        [data-view="mobile"] .metric-card {
-            padding: 1rem;
-        }
-
-        [data-view="mobile"] .metric-value {
-            font-size: 1.4rem;
-        }
-
-        [data-view="mobile"] .analytics-grid {
-            grid-template-columns: 1fr !important;
-        }
-
-        [data-view="mobile"] .help-grid {
-            grid-template-columns: 1fr !important;
-        }
-
-        [data-view="mobile"] .header-content {
+        .mobile-splash {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-primary);
+            z-index: 9999;
             flex-direction: column;
-            gap: 1rem;
-            align-items: flex-start;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
         }
 
-        [data-view="mobile"] .header-controls {
-            width: 100%;
-            flex-wrap: wrap;
+        .mobile-splash.active {
+            display: flex;
         }
 
-        [data-view="mobile"] .input-group {
-            flex-direction: column;
+        .mobile-splash-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
         }
 
-        [data-view="mobile"] .chart-header {
-            flex-direction: column;
-            align-items: flex-start;
+        .mobile-splash-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
         }
 
-        [data-view="mobile"] .story-content {
-            padding: 1.5rem !important;
-        }
-
-        [data-view="mobile"] .milestone-grid {
-            grid-template-columns: 1fr !important;
+        .mobile-splash-message {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 320px;
         }
 
         /* ========================================
@@ -879,7 +861,7 @@
             padding: 1rem 2rem;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 300;
             backdrop-filter: blur(10px);
         }
 
@@ -1076,7 +1058,7 @@
         .main-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 1.5rem;
             transition: max-width 0.3s ease;
         }
 
@@ -1115,14 +1097,14 @@
            ======================================== */
         
         .hero-section {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         @media (max-width: 1024px) {
@@ -1141,7 +1123,7 @@
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            padding: 1.5rem;
+            padding: 1.25rem;
             transition: all var(--transition-speed);
             position: relative;
         }
@@ -1243,8 +1225,8 @@
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
             box-shadow: var(--shadow-card);
         }
 
@@ -1303,15 +1285,37 @@
 
         .chart-wrapper {
             position: relative;
-            height: 350px;
+            height: 300px;
         }
 
         /* ========================================
            TABS
            ======================================== */
         
+        /* ========================================
+           TAB NAVIGATION (top-level)
+           ======================================== */
+
+        .tabs-nav {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tabs-nav .tabs-header {
+            display: flex;
+            gap: 0.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            overflow-x: auto;
+            overflow-y: hidden;
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
         .tabs-container {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .tabs-header {
@@ -1324,12 +1328,13 @@
         }
 
         .tab-btn {
-            padding: 1rem 1.25rem;
+            padding: 1rem 1.5rem;
             background: transparent;
             border: none;
             color: var(--text-secondary);
             font-family: var(--font-body);
-            font-size: 0.85rem;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
             position: relative;
             transition: all var(--transition-speed);
@@ -1340,7 +1345,7 @@
             font-family: var(--font-mono);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            font-size: 0.75rem;
+            font-size: 0.9rem;
         }
 
         .tab-btn:hover {
@@ -1357,7 +1362,7 @@
             bottom: -1px;
             left: 0;
             right: 0;
-            height: 2px;
+            height: 3px;
             background: var(--accent-primary);
         }
 
@@ -1435,7 +1440,10 @@
         }
 
         .story-content {
-            padding: 2.5rem;
+            padding: 2rem;
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
         }
 
         .story-text {
@@ -1443,6 +1451,8 @@
             line-height: 1.9;
             color: var(--text-secondary);
             max-width: 800px;
+            flex: 1;
+            min-width: 0;
         }
 
         [data-theme="tactical"] .story-text {
@@ -1486,17 +1496,21 @@
 
         /* Milestones */
         .milestones-section {
-            margin-top: 2.5rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border-color);
+            width: 280px;
+            flex-shrink: 0;
+            padding: 1.25rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
         }
 
         .milestones-title {
             font-family: var(--font-display);
-            font-size: 1rem;
-            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
             display: flex;
             align-items: center;
+            flex-shrink: 0;
         }
 
         [data-theme="tactical"] .milestones-title {
@@ -1506,28 +1520,16 @@
         }
 
         .milestone-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-        }
-
-        @media (max-width: 900px) {
-            .milestone-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 600px) {
-            .milestone-grid {
-                grid-template-columns: 1fr;
-            }
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
         }
 
         .milestone-card {
-            background: var(--bg-tertiary);
+            background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
-            padding: 1.25rem;
+            padding: 0.875rem 1rem;
             position: relative;
             overflow: hidden;
         }
@@ -1543,8 +1545,8 @@
         }
 
         .milestone-icon {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+            margin-bottom: 0.35rem;
         }
 
         .milestone-title {
@@ -1586,11 +1588,11 @@
 
         /* Market Tab Container */
         .market-tab-container {
-            padding: 2rem;
+            padding: 1.5rem;
         }
 
         .market-header {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .market-header h2 {
@@ -1612,7 +1614,7 @@
 
         /* Market Summary Card */
         .market-summary-cards {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .market-summary-card {
@@ -1978,8 +1980,8 @@
         .analytics-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         @media (max-width: 900px) {
@@ -2284,6 +2286,205 @@
         }
 
         /* ========================================
+           PRIVACY CALLOUT (Right Panel)
+           ======================================== */
+        
+        .privacy-callout {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 0.875rem;
+            background: rgba(69, 212, 138, 0.1);
+            border: 1px solid var(--accent-secondary);
+            border-radius: var(--radius-md);
+            margin-bottom: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        [data-theme="artistic"] .privacy-callout {
+            background: rgba(0, 150, 199, 0.1);
+        }
+
+        .privacy-callout-icon {
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .privacy-callout-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .privacy-callout-text strong {
+            color: var(--accent-secondary);
+        }
+
+        /* ========================================
+           DOWNLOAD OFFLINE BUTTON
+           ======================================== */
+        
+        .privacy-download {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .btn-download-offline {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .btn-download-offline:hover {
+            border-color: var(--accent-secondary);
+            color: var(--accent-secondary);
+            background: rgba(69, 212, 138, 0.1);
+        }
+
+        [data-theme="artistic"] .btn-download-offline:hover {
+            background: rgba(0, 150, 199, 0.1);
+        }
+
+        .download-hint {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 0.4rem;
+            font-style: italic;
+        }
+
+        /* ========================================
+           BENCHMARK SOURCES
+           ======================================== */
+        
+        .benchmark-sources {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .benchmark-sources-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .benchmark-sources-list {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .benchmark-source-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .benchmark-source-item .source-icon {
+            flex-shrink: 0;
+            opacity: 0.6;
+        }
+
+        .benchmark-source-item .source-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .benchmark-disclaimer {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed var(--border-color);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .source-link {
+            color: var(--accent-secondary);
+            text-decoration: none;
+            border-bottom: 1px dotted var(--accent-secondary);
+            transition: all var(--transition-speed);
+        }
+
+        .source-link:hover {
+            color: var(--accent-primary);
+            border-bottom-color: var(--accent-primary);
+        }
+
+        /* ========================================
+           TAB LINK (in-content navigation)
+           ======================================== */
+        
+        .tab-link {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-style: normal;
+            border-bottom: 2px solid var(--accent-primary);
+            transition: all var(--transition-speed);
+            cursor: pointer;
+        }
+
+        .tab-link:hover {
+            color: var(--accent-secondary);
+            border-bottom-color: var(--accent-secondary);
+        }
+
+        /* ========================================
+           STORY INSIGHT
+           ======================================== */
+        
+        .story-insight {
+            margin-top: 2rem;
+            padding: 1rem 1.25rem;
+            background: var(--bg-tertiary);
+            border-left: 3px solid var(--accent-secondary);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .story-insight-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        [data-theme="tactical"] .story-insight {
+            border-left-color: var(--accent-primary);
+        }
+
+        /* ========================================
            RESPONSIVE
            ======================================== */
         
@@ -2321,6 +2522,15 @@
     </style>
 </head>
 <body>
+    <!-- ==========================================
+         MOBILE SPLASH SCREEN
+         ========================================== -->
+    <div id="mobileSplash" class="mobile-splash">
+        <div class="mobile-splash-icon">💻</div>
+        <h1 class="mobile-splash-title">Desktop Required</h1>
+        <p class="mobile-splash-message">Compensation Journey is built for desktop browsers with larger screens. Please visit this page on a laptop or desktop computer to continue.</p>
+    </div>
+
     <!-- ==========================================
          LANDING PAGE
          ========================================== -->
@@ -2376,6 +2586,12 @@
                             <span class="privacy-feature"><span class="check">✓</span> No external requests</span>
                             <span class="privacy-feature"><span class="check">✓</span> No data storage</span>
                         </div>
+                        <div class="privacy-download">
+                            <button class="btn-download-offline" onclick="downloadHtmlFile()">
+                                <span>⬇</span> Download for Offline Use
+                            </button>
+                            <p class="download-hint">Run locally with zero network access</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2403,6 +2619,11 @@
                         <li>Select all content starting from <code>Rates</code> at the top, through the History table, down to <code>items</code> at the bottom</li>
                         <li>Copy (Ctrl+C / Cmd+C) and paste below</li>
                     </ol>
+                </div>
+
+                <div class="privacy-callout">
+                    <span class="privacy-callout-icon">🔒</span>
+                    <span class="privacy-callout-text"><strong>Your data stays on your device</strong> — nothing is sent anywhere. Disconnect from the internet to verify.</span>
                 </div>
 
                 <div class="paste-area">
@@ -2454,10 +2675,6 @@ History
                         <span class="toggle-label">$</span>
                         <div class="toggle-switch active" id="privacyToggle" onclick="togglePrivacy()"></div>
                     </div>
-                    <div class="toggle-group">
-                        <span class="toggle-label">Mobile</span>
-                        <div class="toggle-switch" id="viewToggle" onclick="toggleView()"></div>
-                    </div>
                     <div class="theme-switcher">
                         <button class="theme-btn active" data-theme="tactical" onclick="setTheme('tactical')">Tactical</button>
                         <button class="theme-btn" data-theme="artistic" onclick="setTheme('artistic')">Artistic</button>
@@ -2470,11 +2687,26 @@ History
 
         <!-- KEYBOARD SHORTCUTS HINT -->
         <div class="keyboard-hint">
-            <kbd>1</kbd>-<kbd>6</kbd> tabs · <kbd>T</kbd> theme · <kbd>P</kbd> privacy
+            <kbd>1</kbd>-<kbd>7</kbd> tabs · <kbd>T</kbd> theme · <kbd>P</kbd> privacy
         </div>
+
+        <!-- TAB NAVIGATION -->
+        <nav class="tabs-nav">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="home" onclick="setTab('home')">Home<span class="tab-shortcut">1</span></button>
+                <button class="tab-btn" data-tab="story" onclick="setTab('story')">Story<span class="tab-shortcut">2</span></button>
+                <button class="tab-btn" data-tab="market" onclick="setTab('market')">Market<span class="tab-shortcut">3</span></button>
+                <button class="tab-btn" data-tab="history" onclick="setTab('history')">History<span class="tab-shortcut">4</span></button>
+                <button class="tab-btn" data-tab="analytics" onclick="setTab('analytics')">Analytics<span class="tab-shortcut">5</span></button>
+                <button class="tab-btn" data-tab="projections" onclick="setTab('projections')">Projections<span class="tab-shortcut">6</span></button>
+                <button class="tab-btn" data-tab="help" onclick="setTab('help')">Help<span class="tab-shortcut">7</span></button>
+            </div>
+        </nav>
 
         <!-- MAIN CONTENT -->
         <main class="main-container">
+            <!-- HOME TAB -->
+            <div class="tab-content active" id="tab-home">
             <!-- HERO METRICS -->
             <section class="hero-section">
                 <div class="metrics-grid">
@@ -2531,18 +2763,10 @@ History
                     <canvas id="mainChart"></canvas>
                 </div>
             </section>
+            </div>
 
             <!-- TABS -->
             <section class="tabs-container">
-                <div class="tabs-header">
-                    <button class="tab-btn active" data-tab="story" onclick="setTab('story')">Story<span class="tab-shortcut">1</span></button>
-                    <button class="tab-btn" data-tab="market" onclick="setTab('market')">Market<span class="tab-shortcut">2</span></button>
-                    <button class="tab-btn" data-tab="history" onclick="setTab('history')">History<span class="tab-shortcut">3</span></button>
-                    <button class="tab-btn" data-tab="analytics" onclick="setTab('analytics')">Analytics<span class="tab-shortcut">4</span></button>
-                    <button class="tab-btn" data-tab="projections" onclick="setTab('projections')">Projections<span class="tab-shortcut">5</span></button>
-                    <button class="tab-btn" data-tab="help" onclick="setTab('help')">Help<span class="tab-shortcut">6</span></button>
-                </div>
-
                 <!-- STORY TAB -->
                 <div class="tab-content active" id="tab-story">
                     <div class="story-container">
@@ -2598,8 +2822,27 @@ History
                             <div class="inflation-analysis" id="inflationAnalysis"></div>
                         </div>
 
-                        <div class="market-footnote" id="marketFootnote">
-                            Benchmarks based on B2B SaaS industry data. Individual results vary by role, location, and company stage.
+                        <div class="benchmark-sources">
+                            <div class="benchmark-sources-header">
+                                <span>📚</span> Data Sources & Methodology
+                            </div>
+                            <div class="benchmark-sources-list">
+                                <div class="benchmark-source-item">
+                                    <span class="source-icon">📊</span>
+                                    <span><span class="source-label">Salary Benchmarks:</span> Compiled from <a href="https://radford.aon.com/" target="_blank" rel="noopener" class="source-link">Radford Global Technology Survey</a>, <a href="https://www.mercer.com/solutions/total-rewards/compensation-benchmarking/" target="_blank" rel="noopener" class="source-link">Mercer Total Remuneration Survey</a>, <a href="https://www.levels.fyi/" target="_blank" rel="noopener" class="source-link">Levels.fyi</a>, and <a href="https://www.glassdoor.com/Salaries/" target="_blank" rel="noopener" class="source-link">Glassdoor</a> B2B SaaS compensation data (2024-2025)</span>
+                                </div>
+                                <div class="benchmark-source-item">
+                                    <span class="source-icon">📈</span>
+                                    <span><span class="source-label">Inflation Data:</span> <a href="https://www.bls.gov/cpi/" target="_blank" rel="noopener" class="source-link">U.S. Bureau of Labor Statistics</a> Consumer Price Index (CPI-U), Annual Averages</span>
+                                </div>
+                                <div class="benchmark-source-item">
+                                    <span class="source-icon">🏢</span>
+                                    <span><span class="source-label">Industry CAGR:</span> Based on 6% average compensation growth in B2B SaaS sector, derived from industry surveys and public company filings</span>
+                                </div>
+                            </div>
+                            <div class="benchmark-disclaimer">
+                                Benchmarks represent industry averages and may vary significantly by role, experience level, location, and company stage. This tool is for informational purposes only.
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2629,7 +2872,7 @@ History
                         <div class="analytics-card">
                             <div class="analytics-card-title">
                                 Compound Annual Growth Rate
-                                <span class="info-tooltip"><span class="tip-text">CAGR measures your average annual growth rate as if your salary grew at a constant rate each year.</span></span>
+                                <span class="info-tooltip"><span class="tip-text">If your salary grew by the same percentage every year, this is what that percentage would be. It smooths out the ups and downs into one number.</span></span>
                             </div>
                             <div class="analytics-card-value" id="cagr">16.4%</div>
                             <div class="analytics-card-detail">Average annual growth over career</div>
@@ -2661,10 +2904,10 @@ History
                         <div class="analytics-card">
                             <div class="analytics-card-title">
                                 Avg. Time Between Raises
-                                <span class="info-tooltip"><span class="tip-text">The average number of months between compensation adjustments.</span></span>
+                                <span class="info-tooltip"><span class="tip-text">How frequently you receive compensation adjustments. The industry standard is typically 12 months (annual review cycles).</span></span>
                             </div>
                             <div class="analytics-card-value" id="avgTimeBetween">8.1 mo</div>
-                            <div class="analytics-card-detail" id="avgTimeDetail">Based on 19 adjustments</div>
+                            <div class="analytics-card-detail" id="avgTimeDetail">Industry standard: 12 months</div>
                         </div>
                         <div class="analytics-card">
                             <div class="analytics-card-title">
@@ -2678,7 +2921,7 @@ History
 
                     <div class="chart-section">
                         <div class="chart-header">
-                            <h2 class="chart-title">Year-over-Year Growth</h2>
+                            <h2 class="chart-title">Annual Salary Change Rate</h2>
                             <div class="chart-controls">
                                 <button class="chart-type-btn active" data-chart="yoy-bar" onclick="setYoyChartType('bar')">Bar</button>
                                 <button class="chart-type-btn" data-chart="yoy-line" onclick="setYoyChartType('line')">Line</button>
@@ -2797,10 +3040,9 @@ History
                         </div>
                         <div class="help-card">
                             <h3>Keyboard Shortcuts</h3>
-                            <p><code>1-6</code> Switch tabs<br>
+                            <p><code>1-7</code> Switch tabs<br>
                             <code>T</code> Toggle theme<br>
-                            <code>P</code> Toggle privacy<br>
-                            <code>M</code> Toggle mobile view</p>
+                            <code>P</code> Toggle privacy</p>
                         </div>
                     </div>
                 </div>
@@ -2815,6 +3057,48 @@ History
 
     <script>
         // ========================================
+        // MOBILE/TABLET DETECTION
+        // ========================================
+        
+        (function() {
+            const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(navigator.userAgent);
+            const isSmallScreen = window.innerWidth < 900;
+            
+            if (isMobileUA || isSmallScreen) {
+                document.getElementById('mobileSplash').classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+            
+            // Also check on resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth < 900) {
+                    document.getElementById('mobileSplash').classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                } else if (!(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(navigator.userAgent))) {
+                    document.getElementById('mobileSplash').classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        })();
+
+        // ========================================
+        // DOWNLOAD FUNCTION
+        // ========================================
+        
+        function downloadHtmlFile() {
+            const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'compensation-journey.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // ========================================
         // STATE
         // ========================================
         
@@ -2823,8 +3107,7 @@ History
         let state = {
             theme: 'artistic',
             showDollars: true,
-            viewMode: 'desktop',
-            currentTab: 'story',
+            currentTab: 'home',
             mainChartType: 'line',
             yoyChartType: 'bar',
             projectionYears: 5,
@@ -3297,6 +3580,7 @@ History
             document.getElementById('dashboardPage').classList.remove('hidden');
             window.scrollTo(0, 0);
             initDashboard();
+            checkInitialHash(); // Check URL hash for tab navigation
         }
         
         function resetDashboard() {
@@ -3307,7 +3591,10 @@ History
             charts = { main: null, yoy: null, category: null, projection: null };
             
             // Reset state
-            state.currentTab = 'story';
+            state.currentTab = 'home';
+            
+            // Clear URL hash
+            history.replaceState(null, '', window.location.pathname);
             
             // Show landing page
             document.getElementById('dashboardPage').classList.add('hidden');
@@ -3336,22 +3623,32 @@ History
                     
                     <p><span class="story-highlight">NOTABLE OPERATIONS:</span> Largest single-event appreciation occurred <span class="story-stat">${data.largestRaiseDate}</span> with a <span class="story-stat">${data.largestRaise}%</span> value increase.${data.sixFigureDate ? ` Six-figure threshold breached <span class="story-stat">${data.sixFigureDate}</span>.` : ''}</p>
                     
-                    <p><span class="story-highlight">STATUS:</span> Asset remains in active deployment. See <strong>Market</strong> tab for industry benchmarks and inflation analysis.</p>
+                    <p><span class="story-highlight">STATUS:</span> Asset remains in active deployment. See <a href="#market" onclick="setTab('market'); return false;" class="tab-link">Market</a> tab for industry benchmarks and inflation analysis.</p>
+                    
+                    <div class="story-insight">
+                        <span class="story-insight-label">Advisory Note</span>
+                        Compensation metrics represent one vector in a multi-dimensional assessment matrix. Operational impact, skill acquisition, and mission value are tracked through separate channels. This system monitors resource allocation; comprehensive asset evaluation requires additional data streams.
+                    </div>
                 `
             },
             artistic: {
-                title: "A Journey of Growth",
-                subtitle: "A Personal Narrative of Professional Evolution",
+                title: "Your Compensation Story",
+                subtitle: "A Chronicle of Your Earnings Over Time",
                 getText: (data) => `
-                    <p>It began, as many stories do, with a single step into the unknown. On <span class="story-stat">${data.hireDateFormatted}</span>, a new chapter opened—modest in its beginnings at <span class="story-stat">${data.startSalary}</span>, yet rich with promise.</p>
+                    <p>Every salary tells a story. Yours began on <span class="story-stat">${data.hireDateFormatted}</span>, with a starting compensation of <span class="story-stat">${data.startSalary}</span>—the first line in what would become a longer narrative.</p>
                     
-                    <p>The years that followed would weave a tapestry of <span class="story-stat">${data.totalAdjustments} defining moments</span>—each raise a recognition, each adjustment a milestone. Through seasons of challenge and triumph spanning <span class="story-stat">${data.years} years</span>, the path led upward to today's summit of <span class="story-stat">${data.currentSalary}</span>.</p>
+                    <p>Over <span class="story-stat">${data.years} years</span>, your compensation has been adjusted <span class="story-stat">${data.totalAdjustments} times</span>. Each change—whether a merit increase, promotion, or market adjustment—moved the numbers forward. Today, your annual salary stands at <span class="story-stat">${data.currentSalary}</span>.</p>
                     
-                    <p>The mathematics tell their own poetry: a <span class="story-stat">${data.growth}%</span> transformation from those humble origins. A compound annual growth of <span class="story-stat">${data.cagr}%</span>—not merely numbers, but a testament to dedication rewarded.</p>
+                    <p>The math paints a clear picture: a <span class="story-stat">${data.growth}%</span> total increase from where you started. Your compound annual growth rate of <span class="story-stat">${data.cagr}%</span> captures the trajectory in a single number.</p>
                     
-                    <p>There were crescendos in this symphony. <span class="story-stat">${data.largestRaiseDate}</span> brought the most dramatic movement—a <span class="story-stat">${data.largestRaise}%</span> leap that spoke of exceptional contribution.${data.sixFigureDate ? ` The crossing into six figures in <span class="story-stat">${data.sixFigureDate}</span> marked a passage between chapters.` : ''}</p>
+                    <p>The most significant adjustment came on <span class="story-stat">${data.largestRaiseDate}</span>—a <span class="story-stat">${data.largestRaise}%</span> increase that stands out in the timeline.${data.sixFigureDate ? ` Crossing into six figures on <span class="story-stat">${data.sixFigureDate}</span> marked a notable threshold.` : ''}</p>
                     
-                    <p>And so the story continues, unfinished, with pages yet to be written. Explore the <strong>Market</strong> tab to see how this journey compares to the broader landscape.</p>
+                    <p>This is where the numbers have brought you so far. Visit the <a href="#market" onclick="setTab('market'); return false;" class="tab-link">Market</a> tab to see how your compensation compares to industry benchmarks.</p>
+                    
+                    <div class="story-insight">
+                        <span class="story-insight-label">A note on perspective</span>
+                        Compensation tells one part of your story—an important part, but not the whole picture. Professional growth, learning, impact, and fulfillment each follow their own paths. This dashboard tracks the numbers; the rest of the story is yours to write.
+                    </div>
                 `
             }
         };
@@ -3506,22 +3803,6 @@ History
                     if (charts.projection) buildProjectionChart();
                 }, 100);
             }
-        }
-
-        // ========================================
-        // VIEW TOGGLE
-        // ========================================
-        
-        function toggleView() {
-            state.viewMode = state.viewMode === 'desktop' ? 'mobile' : 'desktop';
-            document.documentElement.setAttribute('data-view', state.viewMode);
-            document.getElementById('viewToggle').classList.toggle('active', state.viewMode === 'mobile');
-            
-            setTimeout(() => {
-                Object.values(charts).forEach(chart => {
-                    if (chart) chart.resize();
-                });
-            }, 350);
         }
 
         // ========================================
@@ -3790,8 +4071,13 @@ History
         // TAB FUNCTIONS
         // ========================================
         
-        function setTab(tabId) {
+        function setTab(tabId, updateHash = true) {
             state.currentTab = tabId;
+            
+            // Update URL hash for stateful URLs
+            if (updateHash) {
+                history.replaceState(null, '', `#${tabId}`);
+            }
             
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.tab === tabId);
@@ -3821,6 +4107,26 @@ History
         }
 
         // ========================================
+        // URL HASH NAVIGATION
+        // ========================================
+        
+        function handleHashChange() {
+            const hash = window.location.hash.slice(1); // Remove #
+            const validTabs = ['home', 'story', 'market', 'history', 'analytics', 'projections', 'help'];
+            if (hash && validTabs.includes(hash) && employeeData) {
+                setTab(hash, false); // false = don't update hash again
+            }
+        }
+        
+        // Listen for hash changes
+        window.addEventListener('hashchange', handleHashChange);
+        
+        // Check hash on initial dashboard load (called from generateDashboard)
+        function checkInitialHash() {
+            setTimeout(handleHashChange, 100);
+        }
+
+        // ========================================
         // KEYBOARD SHORTCUTS
         // ========================================
         
@@ -3829,18 +4135,17 @@ History
             if (!employeeData) return;
             
             switch(e.key) {
-                case '1': setTab('story'); break;
-                case '2': setTab('market'); break;
-                case '3': setTab('history'); break;
-                case '4': setTab('analytics'); break;
-                case '5': setTab('projections'); break;
-                case '6': setTab('help'); break;
+                case '1': setTab('home'); break;
+                case '2': setTab('story'); break;
+                case '3': setTab('market'); break;
+                case '4': setTab('history'); break;
+                case '5': setTab('analytics'); break;
+                case '6': setTab('projections'); break;
+                case '7': setTab('help'); break;
                 case 't':
                 case 'T': setTheme(state.theme === 'tactical' ? 'artistic' : 'tactical'); break;
                 case 'p':
                 case 'P': togglePrivacy(); break;
-                case 'm':
-                case 'M': toggleView(); break;
             }
         });
 
@@ -4200,7 +4505,17 @@ History
             document.getElementById('largestRaise').textContent = formatPercent(largestRaise);
             document.getElementById('largestRaiseDate').textContent = new Date(largestRaiseRecord.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
             document.getElementById('avgTimeBetween').textContent = `${avgMonths.toFixed(1)} mo`;
-            document.getElementById('avgTimeDetail').textContent = `Based on ${records.length} adjustments`;
+            const benchmarkMonths = 12;
+            const timeDiff = avgMonths - benchmarkMonths;
+            let timeContext;
+            if (timeDiff < -2) {
+                timeContext = `${Math.abs(timeDiff).toFixed(1)} mo faster than typical`;
+            } else if (timeDiff > 2) {
+                timeContext = `${timeDiff.toFixed(1)} mo slower than typical`;
+            } else {
+                timeContext = `Near industry standard (12 mo)`;
+            }
+            document.getElementById('avgTimeDetail').textContent = timeContext;
             document.getElementById('meritCount').textContent = meritCount;
             document.getElementById('meritPercent').textContent = `${((meritCount / records.length) * 100).toFixed(1)}% of all adjustments`;
         }
