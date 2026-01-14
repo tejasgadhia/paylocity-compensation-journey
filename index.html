@@ -2209,6 +2209,69 @@
             margin-top: 0.25rem;
         }
 
+        .projections-intro {
+            margin-bottom: 1.5rem;
+        }
+
+        .projections-intro h2 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .projections-intro p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .projections-controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .projections-controls-row .control-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .target-group {
+            min-width: 280px !important;
+        }
+
+        .target-inline {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .target-inline span {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .target-inline input {
+            width: 120px;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+        }
+
+        .target-inline strong {
+            color: var(--accent-secondary);
+            font-family: var(--font-mono);
+            font-size: 1rem;
+        }
+
         .projections-table {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -2950,42 +3013,44 @@ History
 
                 <!-- PROJECTIONS TAB -->
                 <div class="tab-content" id="tab-projections">
+                    <div class="projections-intro">
+                        <h2>Future Compensation Projections</h2>
+                        <p>Explore potential salary growth scenarios based on different annual raise percentages. The chart compares your historical growth rate against conservative, custom, and optimistic projections.</p>
+                    </div>
+
                     <div class="projections-controls">
-                        <div class="control-group">
-                            <label class="control-label">Projection Timeline</label>
-                            <div class="interval-buttons">
-                                <button class="interval-btn" data-years="1" onclick="setProjectionYears(1)">1 yr</button>
-                                <button class="interval-btn" data-years="2" onclick="setProjectionYears(2)">2 yr</button>
-                                <button class="interval-btn" data-years="3" onclick="setProjectionYears(3)">3 yr</button>
-                                <button class="interval-btn active" data-years="5" onclick="setProjectionYears(5)">5 yr</button>
-                                <button class="interval-btn" data-years="10" onclick="setProjectionYears(10)">10 yr</button>
-                                <button class="interval-btn" data-years="15" onclick="setProjectionYears(15)">15 yr</button>
-                                <button class="interval-btn" data-years="20" onclick="setProjectionYears(20)">20 yr</button>
-                            </div>
-                        </div>
-
-                        <div class="control-group">
-                            <div class="slider-container">
-                                <div class="slider-header">
-                                    <label class="control-label">Custom Annual Growth Rate</label>
-                                    <span class="slider-value" id="customRateValue">8%</span>
+                        <div class="projections-controls-row">
+                            <div class="control-group">
+                                <label class="control-label">How far ahead?</label>
+                                <div class="interval-buttons">
+                                    <button class="interval-btn" data-years="1" onclick="setProjectionYears(1)">1 yr</button>
+                                    <button class="interval-btn" data-years="2" onclick="setProjectionYears(2)">2 yr</button>
+                                    <button class="interval-btn" data-years="3" onclick="setProjectionYears(3)">3 yr</button>
+                                    <button class="interval-btn active" data-years="5" onclick="setProjectionYears(5)">5 yr</button>
+                                    <button class="interval-btn" data-years="10" onclick="setProjectionYears(10)">10 yr</button>
+                                    <button class="interval-btn" data-years="15" onclick="setProjectionYears(15)">15 yr</button>
+                                    <button class="interval-btn" data-years="20" onclick="setProjectionYears(20)">20 yr</button>
                                 </div>
-                                <input type="range" min="0" max="25" value="8" id="customRateSlider" oninput="updateCustomRate()">
                             </div>
-                        </div>
 
-                        <div class="control-group">
-                            <label class="control-label">Target Salary Goal</label>
-                            <div class="input-group">
-                                <div class="input-field" style="flex: 1;">
-                                    <label>Target Amount ($)</label>
+                            <div class="control-group">
+                                <div class="slider-container">
+                                    <div class="slider-header">
+                                        <label class="control-label">Custom annual raise %</label>
+                                        <span class="slider-value" id="customRateValue">8%</span>
+                                    </div>
+                                    <input type="range" min="0" max="25" value="8" id="customRateSlider" oninput="updateCustomRate()">
+                                </div>
+                            </div>
+
+                            <div class="control-group target-group">
+                                <label class="control-label">Goal calculator</label>
+                                <div class="target-inline">
+                                    <span>Reach $</span>
                                     <input type="number" id="targetSalary" value="500000" onchange="calculateTimeToTarget()">
+                                    <span>in</span>
+                                    <strong id="timeToTarget">~7.5 years</strong>
                                 </div>
-                            </div>
-                            <div class="projection-result">
-                                <div class="projection-result-title">Time to Reach Target</div>
-                                <div class="projection-result-value" id="timeToTarget">~7.5 years</div>
-                                <div class="projection-result-detail">Using custom growth rate above</div>
                             </div>
                         </div>
                     </div>
@@ -2993,25 +3058,28 @@ History
                     <div class="chart-section">
                         <div class="chart-header">
                             <h2 class="chart-title">Future Trajectory</h2>
+                            <div class="chart-controls">
+                                <button class="chart-type-btn active" data-view="chart" onclick="setProjectionView('chart')">Chart</button>
+                                <button class="chart-type-btn" data-view="table" onclick="setProjectionView('table')">Table</button>
+                            </div>
                         </div>
-                        <div class="chart-wrapper">
+                        <div class="chart-wrapper" id="projectionChartWrapper">
                             <canvas id="projectionChart"></canvas>
                         </div>
-                    </div>
-
-                    <div class="projections-table">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Year</th>
-                                    <th>Historical CAGR</th>
-                                    <th>Conservative (5%)</th>
-                                    <th>Custom Rate</th>
-                                    <th>Optimistic (12%)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="projectionTableBody"></tbody>
-                        </table>
+                        <div class="projections-table hidden" id="projectionTableWrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Year</th>
+                                        <th>Historical CAGR</th>
+                                        <th>Conservative (5%)</th>
+                                        <th>Custom Rate</th>
+                                        <th>Optimistic (12%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="projectionTableBody"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -4541,6 +4609,24 @@ History
             buildProjectionChart();
             buildProjectionTable();
             calculateTimeToTarget();
+        }
+
+        function setProjectionView(view) {
+            const chartWrapper = document.getElementById('projectionChartWrapper');
+            const tableWrapper = document.getElementById('projectionTableWrapper');
+            const buttons = document.querySelectorAll('#tab-projections .chart-type-btn');
+            
+            buttons.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.view === view);
+            });
+            
+            if (view === 'chart') {
+                chartWrapper.classList.remove('hidden');
+                tableWrapper.classList.add('hidden');
+            } else {
+                chartWrapper.classList.add('hidden');
+                tableWrapper.classList.remove('hidden');
+            }
         }
 
         function calculateTimeToTarget() {
