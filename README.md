@@ -58,10 +58,6 @@ compensation-journey/
 └── LICENSE
 ```
 
-## Contributing
-
-Want to add support for other payroll systems (ADP, Workday, etc.)? PDF export? More chart types? Role-specific benchmarks? PRs welcome.
-
 ## License
 
 MIT. Use it, modify it, fork it, whatever.
