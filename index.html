@@ -3394,11 +3394,32 @@ History
         // BENCHMARK CALCULATION FUNCTIONS
         // ========================================
         
-        function calculateInflationOverPeriod(startYear, endYear) {
+        function calculateInflationOverPeriod(startYear, endYear, startMonth = 0, endMonth = 11) {
+            // Supports partial years - months are 0-indexed (0 = January, 11 = December)
             let cumulativeInflation = 1;
+            
             for (let year = startYear; year <= endYear; year++) {
                 const rate = cpiData[year] || 2.5; // Default to 2.5% if year not found
-                cumulativeInflation *= (1 + rate / 100);
+                
+                if (year === startYear && year === endYear) {
+                    // Same year - calculate partial
+                    const monthsInPeriod = endMonth - startMonth + 1;
+                    const partialRate = (rate / 12) * monthsInPeriod;
+                    cumulativeInflation *= (1 + partialRate / 100);
+                } else if (year === startYear) {
+                    // First year - partial from startMonth to December
+                    const monthsRemaining = 12 - startMonth;
+                    const partialRate = (rate / 12) * monthsRemaining;
+                    cumulativeInflation *= (1 + partialRate / 100);
+                } else if (year === endYear) {
+                    // Last year - partial from January to endMonth
+                    const monthsElapsed = endMonth + 1;
+                    const partialRate = (rate / 12) * monthsElapsed;
+                    cumulativeInflation *= (1 + partialRate / 100);
+                } else {
+                    // Full year
+                    cumulativeInflation *= (1 + rate / 100);
+                }
             }
             return (cumulativeInflation - 1) * 100; // Return as percentage
         }
@@ -3429,8 +3450,12 @@ History
             
             const userCagr = calculateCAGR();
             const years = calculateYearsOfService();
-            const startYear = new Date(employeeData.hireDate).getFullYear();
-            const endYear = new Date(employeeData.currentDate).getFullYear();
+            const hireDate = new Date(employeeData.hireDate);
+            const currentDate = new Date(employeeData.currentDate);
+            const startYear = hireDate.getFullYear();
+            const startMonth = hireDate.getMonth();
+            const endYear = currentDate.getFullYear();
+            const endMonth = currentDate.getMonth();
             
             // Calculate time between raises (exclude "New Hire" - it's the starting point)
             const adjustments = employeeData.records.filter(r => r.reason !== 'New Hire');
@@ -3439,10 +3464,10 @@ History
             for (let i = 1; i < dates.length; i++) {
                 totalDays += (dates[i] - dates[i-1]) / (1000 * 60 * 60 * 24);
             }
-            const avgMonthsBetween = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30 : 12;
+            const avgMonthsBetween = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30.44 : 12;
             
-            // Inflation calculations
-            const totalInflation = calculateInflationOverPeriod(startYear, endYear);
+            // Inflation calculations (with partial year support)
+            const totalInflation = calculateInflationOverPeriod(startYear, endYear, startMonth, endMonth);
             const startSalary = getStartingSalary();
             const currentSalary = getCurrentSalary();
             const nominalGrowth = ((currentSalary - startSalary) / startSalary) * 100;
@@ -3553,7 +3578,7 @@ History
             
             // Extract change reason
             let reason = 'Unknown';
-            const reasons = ['Merit Increase', 'Market Adjustment', 'Equity', 'New Hire'];
+            const reasons = ['Merit Increase', 'Promotion', 'Market Adjustment', 'Equity', 'New Hire'];
             for (const r of reasons) {
                 if (text.includes(r)) {
                     reason = r;
@@ -3656,6 +3681,12 @@ History
                 
                 if (employeeData.records.length < 2) {
                     throw new Error('Need at least 2 records to generate insights');
+                }
+                
+                // Check if there are any actual adjustments (not just New Hire)
+                const adjustments = employeeData.records.filter(r => r.reason !== 'New Hire');
+                if (adjustments.length === 0) {
+                    throw new Error('No salary adjustments found. You may be too new to have raise history yet');
                 }
                 
                 employeeData.isDemo = false;
@@ -4214,19 +4245,22 @@ History
             const cagr = calculateCAGR();
             const years = calculateYearsOfService();
             
+            // Exclude "New Hire" - it's the starting point, not an adjustment
+            const adjustments = employeeData.records.filter(r => r.reason !== 'New Hire');
+            
             const raises = employeeData.records.filter(r => r.changePercent > 0);
             const largestRaise = raises.length > 0 ? raises.reduce((max, r) => r.changePercent > max.changePercent ? r : max) : null;
             
-            const meritCount = employeeData.records.filter(r => r.reason.includes('Merit')).length;
-            const meritPercent = ((meritCount / employeeData.records.length) * 100).toFixed(1);
+            const meritCount = adjustments.filter(r => r.reason.includes('Merit')).length;
+            const meritPercent = adjustments.length > 0 ? ((meritCount / adjustments.length) * 100).toFixed(1) : '0';
             
-            // Calculate avg interval
-            const dates = employeeData.records.map(r => new Date(r.date)).sort((a, b) => a - b);
+            // Calculate avg interval (exclude New Hire from time calculation)
+            const dates = adjustments.map(r => new Date(r.date)).sort((a, b) => a - b);
             let totalDays = 0;
             for (let i = 1; i < dates.length; i++) {
                 totalDays += (dates[i] - dates[i-1]) / (1000 * 60 * 60 * 24);
             }
-            const avgMonths = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30 : 0;
+            const avgMonths = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30.44 : 0;
             
             // Find six figure date and calculate time to reach it
             const recordsChron = [...employeeData.records].reverse();
@@ -4239,11 +4273,13 @@ History
                 yearsToSixFigures = diffYears < 1 ? `${Math.round(diffYears * 12)} months` : `${diffYears.toFixed(1)} years`;
             }
             
-            // Calculate inflation data
+            // Calculate inflation data (use employeeData.currentDate, not current real date)
             const startYear = new Date(employeeData.hireDate).getFullYear();
-            const endYear = new Date().getFullYear();
-            const cumulativeInflation = calculateInflationOverPeriod(startYear, endYear);
-            const realGrowth = growth - cumulativeInflation;
+            const startMonth = new Date(employeeData.hireDate).getMonth();
+            const endYear = new Date(employeeData.currentDate).getFullYear();
+            const endMonth = new Date(employeeData.currentDate).getMonth();
+            const cumulativeInflation = calculateInflationOverPeriod(startYear, endYear, startMonth, endMonth);
+            const realGrowth = calculateRealGrowth(growth, cumulativeInflation);
             const dollarIncrease = current - start;
             
             const data = {
@@ -4252,7 +4288,7 @@ History
                 currentSalary: state.showDollars ? formatCurrency(current) : `Index ${formatCurrency(current, false)}`,
                 dollarIncrease: state.showDollars ? formatCurrency(dollarIncrease) : `Index ${(dollarIncrease / start * 100).toFixed(0)}`,
                 years: years.toFixed(1),
-                totalAdjustments: employeeData.records.length,
+                totalAdjustments: adjustments.length,
                 growth: growth.toFixed(0),
                 cagr: cagr.toFixed(1),
                 avgInterval: avgMonths.toFixed(1),
@@ -4657,7 +4693,7 @@ History
                 const prevYear = years[i - 1];
                 const currYear = years[i];
                 const growth = ((yoyData[currYear].end - yoyData[prevYear].end) / yoyData[prevYear].end) * 100;
-                growthRates.push({ year: currYear, growth: Math.max(0, growth) });
+                growthRates.push({ year: currYear, growth });
             }
 
             if (charts.yoy) charts.yoy.destroy();
@@ -4704,6 +4740,9 @@ History
             
             // Filter out "New Hire" - it's the starting point, not an adjustment
             const adjustments = employeeData.records.filter(r => r.reason !== 'New Hire');
+            
+            // Guard against no adjustments
+            if (adjustments.length === 0) return;
             
             const categories = {};
             adjustments.forEach(r => {
@@ -4890,6 +4929,9 @@ History
             // Filter out "New Hire" - it's the starting point, not an adjustment
             const adjustments = records.filter(r => r.reason !== 'New Hire');
             
+            // Guard against no adjustments (shouldn't happen, but be safe)
+            if (adjustments.length === 0) return;
+            
             const raises = records.filter(r => r.changePercent > 0);
             if (raises.length === 0) return;
             
@@ -4907,7 +4949,7 @@ History
             for (let i = 1; i < dates.length; i++) {
                 totalDays += (dates[i] - dates[i-1]) / (1000 * 60 * 60 * 24);
             }
-            const avgMonths = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30 : 12;
+            const avgMonths = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30.44 : 12;
             
             document.getElementById('cagr').textContent = formatPercent(calculateCAGR());
             document.getElementById('avgRaise').textContent = formatPercent(avgRaisePercent);
@@ -5006,13 +5048,17 @@ History
             const growth = ((current - start) / start) * 100;
             const years = calculateYearsOfService();
             
+            // Exclude "New Hire" from adjustment counts - it's the starting point, not an adjustment
+            const adjustments = employeeData.records.filter(r => r.reason !== 'New Hire');
+            const adjustmentCount = adjustments.length;
+            
             document.getElementById('currentSalary').textContent = formatCurrency(current);
             document.getElementById('currentSalaryIndexed').textContent = `Index: ${formatCurrency(current, false)}`;
             document.getElementById('totalGrowth').textContent = `+${growth.toFixed(0)}%`;
             document.getElementById('yearsService').textContent = years.toFixed(1);
             document.getElementById('hireDateText').textContent = `Since ${new Date(employeeData.hireDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`;
-            document.getElementById('totalRaises').textContent = employeeData.records.length;
-            document.getElementById('avgRaisesPerYear').textContent = `Avg: ${(employeeData.records.length / years).toFixed(1)} per year`;
+            document.getElementById('totalRaises').textContent = adjustmentCount;
+            document.getElementById('avgRaisesPerYear').textContent = `Avg: ${(adjustmentCount / years).toFixed(1)} per year`;
             
             buildHistoryTable();
             buildMainChart();
