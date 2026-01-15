@@ -3432,8 +3432,9 @@ History
             const startYear = new Date(employeeData.hireDate).getFullYear();
             const endYear = new Date(employeeData.currentDate).getFullYear();
             
-            // Calculate time between raises
-            const dates = employeeData.records.map(r => new Date(r.date)).sort((a, b) => a - b);
+            // Calculate time between raises (exclude "New Hire" - it's the starting point)
+            const adjustments = employeeData.records.filter(r => r.reason !== 'New Hire');
+            const dates = adjustments.map(r => new Date(r.date)).sort((a, b) => a - b);
             let totalDays = 0;
             for (let i = 1; i < dates.length; i++) {
                 totalDays += (dates[i] - dates[i-1]) / (1000 * 60 * 60 * 24);
@@ -4701,8 +4702,11 @@ History
             const ctx = document.getElementById('categoryChart').getContext('2d');
             const colors = getThemeColors();
             
+            // Filter out "New Hire" - it's the starting point, not an adjustment
+            const adjustments = employeeData.records.filter(r => r.reason !== 'New Hire');
+            
             const categories = {};
-            employeeData.records.forEach(r => {
+            adjustments.forEach(r => {
                 const reason = r.reason || 'Other';
                 if (reason !== '—') {
                     categories[reason] = (categories[reason] || 0) + 1;
@@ -4883,6 +4887,9 @@ History
             const records = employeeData.records;
             const startingSalary = getStartingSalary();
             
+            // Filter out "New Hire" - it's the starting point, not an adjustment
+            const adjustments = records.filter(r => r.reason !== 'New Hire');
+            
             const raises = records.filter(r => r.changePercent > 0);
             if (raises.length === 0) return;
             
@@ -4892,14 +4899,15 @@ History
             const largestRaise = Math.max(...raises.map(r => r.changePercent));
             const largestRaiseRecord = raises.find(r => r.changePercent === largestRaise);
             
-            const meritCount = records.filter(r => r.reason.includes('Merit')).length;
+            const meritCount = adjustments.filter(r => r.reason.includes('Merit')).length;
             
-            const dates = records.map(r => new Date(r.date)).sort((a, b) => a - b);
+            // Use adjustments (excludes New Hire) for time between raises
+            const dates = adjustments.map(r => new Date(r.date)).sort((a, b) => a - b);
             let totalDays = 0;
             for (let i = 1; i < dates.length; i++) {
                 totalDays += (dates[i] - dates[i-1]) / (1000 * 60 * 60 * 24);
             }
-            const avgMonths = (totalDays / (dates.length - 1)) / 30;
+            const avgMonths = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30 : 12;
             
             document.getElementById('cagr').textContent = formatPercent(calculateCAGR());
             document.getElementById('avgRaise').textContent = formatPercent(avgRaisePercent);
@@ -4925,7 +4933,7 @@ History
             }
             document.getElementById('avgTimeDetail').textContent = timeContext;
             document.getElementById('meritCount').textContent = meritCount;
-            document.getElementById('meritPercent').textContent = `${((meritCount / records.length) * 100).toFixed(1)}% of all adjustments`;
+            document.getElementById('meritPercent').textContent = `${((meritCount / adjustments.length) * 100).toFixed(1)}% of all adjustments`;
         }
 
         // ========================================
