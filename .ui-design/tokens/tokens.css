@@ -1,0 +1,187 @@
+/**
+ * Paylocity Compensation Journey - Design System Tokens
+ * Generated: 2026-01-21
+ *
+ * This file contains all design tokens extracted from index.html.
+ * To use: @import '.ui-design/tokens/tokens.css' or copy into your styles.
+ *
+ * Theme switching: Set data-theme="tactical" or data-theme="artistic" on <html>
+ */
+
+/* ========================================
+   GLOBAL TOKENS
+   ======================================== */
+
+:root {
+    --transition-speed: 0.3s;
+}
+
+/* ========================================
+   TACTICAL THEME (Dark - Anduril/Palantir)
+
+   Aesthetic: Defense-tech, sharp, precise
+   Primary accent: Gold (#d4a845)
+   Secondary accent: Green (#45d48a)
+   Border radius: Sharp (2-6px)
+   ======================================== */
+
+[data-theme="tactical"] {
+    /* Background Colors */
+    --bg-primary: #0a0a0b;
+    --bg-secondary: #111113;
+    --bg-tertiary: #1a1a1d;
+    --bg-card: #141416;
+    --bg-hover: #1e1e21;
+
+    /* Text Colors */
+    --text-primary: #e8e8e8;
+    --text-secondary: #a0a0a0;
+    --text-muted: #7a7a7a;  /* WCAG AA compliant: 4.7:1 */
+
+    /* Accent Colors */
+    --accent-primary: #d4a845;      /* Gold - primary actions, highlights */
+    --accent-secondary: #45d48a;    /* Green - success, positive values */
+    --accent-tertiary: #4598d4;     /* Blue - informational */
+    --accent-warning: #d45745;      /* Red - warnings, negative values */
+
+    /* Border Colors */
+    --border-color: #2a2a2d;
+    --border-accent: #3a3a3d;
+
+    /* Chart Colors */
+    --chart-grid: rgba(255, 255, 255, 0.06);
+    --chart-line-1: #d4a845;
+    --chart-line-2: #45d48a;
+    --chart-fill-1: rgba(212, 168, 69, 0.15);
+    --chart-fill-2: rgba(69, 212, 138, 0.15);
+
+    /* Typography */
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Space Grotesk', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Border Radius */
+    --radius-sm: 2px;
+    --radius-md: 4px;
+    --radius-lg: 6px;
+
+    /* Shadows */
+    --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+    --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.6);
+
+    /* Glow Effects */
+    --glow-primary: 0 0 20px rgba(212, 168, 69, 0.3);
+    --glow-secondary: 0 0 20px rgba(69, 212, 138, 0.3);
+
+    /* Tooltip */
+    --tooltip-bg: #1a1a1d;
+    --tooltip-border: #3a3a3d;
+}
+
+/* Tactical Body Background Pattern (grid lines) */
+[data-theme="tactical"] body {
+    background-image:
+        linear-gradient(rgba(212, 168, 69, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212, 168, 69, 0.02) 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+/* ========================================
+   ARTISTIC THEME (Light - Zoho)
+
+   Aesthetic: Warm, friendly, professional
+   Primary accent: Orange (#e85d04)
+   Secondary accent: Teal (#0096c7)
+   Border radius: Soft (8-16px)
+   ======================================== */
+
+[data-theme="artistic"] {
+    /* Background Colors */
+    --bg-primary: #faf8f5;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f5f2ed;
+    --bg-card: #ffffff;
+    --bg-hover: #f0ebe3;
+
+    /* Text Colors */
+    --text-primary: #2d2a26;
+    --text-secondary: #5c5650;
+    --text-muted: #706a61;  /* WCAG AA compliant: 4.8:1 */
+
+    /* Accent Colors */
+    --accent-primary: #e85d04;      /* Orange - primary actions, highlights */
+    --accent-secondary: #0096c7;    /* Teal - success, positive values */
+    --accent-tertiary: #7b2cbf;     /* Purple - informational */
+    --accent-warning: #d00000;      /* Red - warnings, negative values */
+
+    /* Border Colors */
+    --border-color: #e8e2da;
+    --border-accent: #d4cdc3;
+
+    /* Chart Colors */
+    --chart-grid: rgba(0, 0, 0, 0.06);
+    --chart-line-1: #e85d04;
+    --chart-line-2: #0096c7;
+    --chart-fill-1: rgba(232, 93, 4, 0.12);
+    --chart-fill-2: rgba(0, 150, 199, 0.12);
+
+    /* Typography */
+    --font-display: 'Libre Baskerville', serif;
+    --font-body: 'Nunito', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+
+    /* Shadows */
+    --shadow-card: 0 4px 20px rgba(45, 42, 38, 0.08);
+    --shadow-hover: 0 8px 30px rgba(45, 42, 38, 0.12);
+
+    /* Glow Effects (disabled in light theme) */
+    --glow-primary: none;
+    --glow-secondary: none;
+
+    /* Tooltip */
+    --tooltip-bg: #ffffff;
+    --tooltip-border: #e8e2da;
+}
+
+/* Artistic Body Background Pattern (radial gradients) */
+[data-theme="artistic"] body {
+    background-image:
+        radial-gradient(circle at 100% 0%, rgba(232, 93, 4, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 0% 100%, rgba(0, 150, 199, 0.03) 0%, transparent 50%);
+}
+
+/* ========================================
+   UTILITY CLASSES (Optional)
+   ======================================== */
+
+/* Text Colors */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-accent { color: var(--accent-primary); }
+.text-success { color: var(--accent-secondary); }
+.text-warning { color: var(--accent-warning); }
+
+/* Background Colors */
+.bg-primary { background-color: var(--bg-primary); }
+.bg-secondary { background-color: var(--bg-secondary); }
+.bg-card { background-color: var(--bg-card); }
+
+/* Border Radius */
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+
+/* Shadows */
+.shadow-card { box-shadow: var(--shadow-card); }
+.shadow-hover { box-shadow: var(--shadow-hover); }
+
+/* Font Families */
+.font-display { font-family: var(--font-display); }
+.font-body { font-family: var(--font-body); }
+.font-mono { font-family: var(--font-mono); }
