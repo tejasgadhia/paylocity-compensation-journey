@@ -3703,6 +3703,53 @@ History
         // ========================================
 
         /**
+         * Validates salary values are within reasonable ranges.
+         * Prevents parsing of corrupted/malicious data with extreme values.
+         *
+         * **Security Context:**
+         * Protects against:
+         * - Chart rendering failures from extreme values
+         * - Memory overflow in calculations
+         * - Misleading visualizations from unrealistic salaries
+         *
+         * @param {number} value - Salary value to validate
+         * @param {string} fieldName - Field name for error messages ('annual', 'perCheck', 'hourlyRate')
+         * @returns {number} The validated value
+         * @throws {Error} If value is outside valid range or not finite
+         *
+         * @example
+         * validateSalaryRange(65000, 'annual') // → 65000 (valid)
+         * validateSalaryRange(999999999, 'annual') // → Throws error (too high)
+         * validateSalaryRange(-5000, 'annual') // → Throws error (negative)
+         */
+        function validateSalaryRange(value, fieldName = 'salary') {
+            // Reasonable ranges for US compensation data
+            const ranges = {
+                annual: { min: 1000, max: 10000000 },      // $1K - $10M (executive cap)
+                perCheck: { min: 50, max: 400000 },         // $50 - $400K per paycheck
+                hourlyRate: { min: 1, max: 5000 },          // $1 - $5K per hour
+                change: { min: 0, max: 5000000 }            // $0 - $5M raise (one-time)
+            };
+
+            const range = ranges[fieldName] || ranges.annual;
+
+            // Check for invalid numbers (NaN, Infinity, etc.)
+            if (!Number.isFinite(value)) {
+                throw new Error(`Invalid ${fieldName}: ${value} (not a finite number)`);
+            }
+
+            // Check range
+            if (value < range.min || value > range.max) {
+                const formatted = value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+                const minFormatted = range.min.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+                const maxFormatted = range.max.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+                throw new Error(`${fieldName} ${formatted} outside valid range (${minFormatted} - ${maxFormatted})`);
+            }
+
+            return value;
+        }
+
+        /**
          * Parses raw Paylocity compensation history data into structured records.
          *
          * Handles inconsistent formatting from Paylocity's "Rates" tab by using multiple
@@ -3825,26 +3872,31 @@ History
             
             // Expected order: Per Check, Annual Salary, Amount (change)
             let perCheck = 0, annual = 0, change = 0;
-            
+
             if (dollars.length >= 2) {
                 // Find the annual salary (typically the largest reasonable number, >= 20000)
                 const annualCandidates = dollars.filter(d => d >= 20000);
                 if (annualCandidates.length > 0) {
-                    annual = annualCandidates[0];
+                    annual = validateSalaryRange(annualCandidates[0], 'annual');
                 }
-                
+
                 // Per check is usually the first dollar amount
                 perCheck = dollars[0];
                 if (perCheck >= 20000) {
                     // First one was annual, find actual per check
-                    perCheck = dollars.find(d => d < 20000 && d > 100) || 0;
+                    const perCheckCandidate = dollars.find(d => d < 20000 && d > 100) || 0;
+                    perCheck = perCheckCandidate > 0 ? validateSalaryRange(perCheckCandidate, 'perCheck') : 0;
+                } else {
+                    perCheck = perCheck > 0 ? validateSalaryRange(perCheck, 'perCheck') : 0;
                 }
-                
+
                 // Change/Amount is usually after annual salary
                 if (dollars.length >= 3) {
-                    const annualIdx = dollars.indexOf(annual);
+                    const annualIdx = dollars.indexOf(annualCandidates[0]); // Use unvalidated value for indexOf
                     const afterAnnual = dollars.slice(annualIdx + 1);
-                    change = afterAnnual.length > 0 ? afterAnnual[0] : 0;
+                    if (afterAnnual.length > 0 && afterAnnual[0] > 0) {
+                        change = validateSalaryRange(afterAnnual[0], 'change');
+                    }
                 }
             }
             
@@ -3861,7 +3913,11 @@ History
             // Matches: "31.25 / Hour", "31.25/Hour", "31 / Hour"
             const hourlyPattern = /(\d+\.?\d*)\s*\/\s*Hour/i;
             const hourlyMatch = text.match(hourlyPattern);
-            const hourlyRate = hourlyMatch ? parseFloat(hourlyMatch[1]) : 0;
+            let hourlyRate = 0;
+            if (hourlyMatch) {
+                const parsedRate = parseFloat(hourlyMatch[1]);
+                hourlyRate = parsedRate > 0 ? validateSalaryRange(parsedRate, 'hourlyRate') : 0;
+            }
             
             // Extract percentage - it's the last decimal number in the string
             // Look for pattern like "12.2807" or "0.0000" at the end (after last $X.XX amount)
