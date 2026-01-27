@@ -1,0 +1,26 @@
+{
+  "name": "paylocity-compensation-journey",
+  "version": "1.0.0",
+  "description": "Turn your Paylocity pay history into an actual useful dashboard with market benchmarks, inflation analysis, and insights you'd expect from any modern financial tool.",
+  "main": "app.js",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tejasgadhia/paylocity-compensation-journey.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/tejasgadhia/paylocity-compensation-journey/issues"
+  },
+  "homepage": "https://github.com/tejasgadhia/paylocity-compensation-journey#readme",
+  "devDependencies": {
+    "vitest": "^4.0.18"
+  }
+}

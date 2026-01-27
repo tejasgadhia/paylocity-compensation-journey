@@ -1,3 +1,11 @@
+# Node modules
+node_modules/
+package-lock.json
+
+# Testing
+coverage/
+.vitest/
+
 # macOS
 .DS_Store
 .AppleDouble

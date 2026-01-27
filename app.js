@@ -39,26 +39,29 @@ const CONSTANTS = {
 // MOBILE/TABLET DETECTION
 // ========================================
 
-(function() {
-    const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(navigator.userAgent);
-    const isSmallScreen = window.innerWidth < CONSTANTS.MOBILE_BREAKPOINT;
-    
-    if (isMobileUA || isSmallScreen) {
-        document.getElementById('mobileSplash').classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-    
-    // Also check on resize
-    window.addEventListener('resize', function() {
-        if (window.innerWidth < CONSTANTS.MOBILE_BREAKPOINT) {
+// Only run mobile detection in browser environment
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    (function() {
+        const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(navigator.userAgent);
+        const isSmallScreen = window.innerWidth < CONSTANTS.MOBILE_BREAKPOINT;
+
+        if (isMobileUA || isSmallScreen) {
             document.getElementById('mobileSplash').classList.add('active');
             document.body.style.overflow = 'hidden';
-        } else if (!(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(navigator.userAgent))) {
-            document.getElementById('mobileSplash').classList.remove('active');
-            document.body.style.overflow = '';
         }
-    });
-})();
+
+        // Also check on resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth < CONSTANTS.MOBILE_BREAKPOINT) {
+                document.getElementById('mobileSplash').classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else if (!(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(navigator.userAgent))) {
+                document.getElementById('mobileSplash').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    })();
+}
 
 // ========================================
 // DOWNLOAD FUNCTION
@@ -1790,13 +1793,15 @@ function handleTabFromUrl() {
     }
 }
 
-// Warn before losing unsaved data
-window.addEventListener('beforeunload', (e) => {
-    if (employeeData && !employeeData.isDemo) {
-        e.preventDefault();
-        e.returnValue = '';
-    }
-});
+// Warn before losing unsaved data (browser only)
+if (typeof window !== 'undefined') {
+    window.addEventListener('beforeunload', (e) => {
+        if (employeeData && !employeeData.isDemo) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+}
 
 // Check tab on initial dashboard load
 function checkInitialHash() {
@@ -1807,26 +1812,29 @@ function checkInitialHash() {
 // KEYBOARD SHORTCUTS
 // ========================================
 
-document.addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-    if (!employeeData) return;
-    
-    switch(e.key) {
-        case '1': setTab('home'); break;
-        case '2': setTab('story'); break;
-        case '3': setTab('market'); break;
-        case '4': setTab('history'); break;
-        case '5': setTab('analytics'); break;
-        case '6': setTab('projections'); break;
-        case '7': setTab('help'); break;
-        case 't':
-        case 'T': setTheme(state.theme === 'tactical' ? 'artistic' : 'tactical'); break;
-        case 'v':
-        case 'V':
-        case 'p':
-        case 'P': togglePrivacy(); break;
-    }
-});
+// Only set up keyboard shortcuts in browser environment
+if (typeof document !== 'undefined') {
+    document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (!employeeData) return;
+
+        switch(e.key) {
+            case '1': setTab('home'); break;
+            case '2': setTab('story'); break;
+            case '3': setTab('market'); break;
+            case '4': setTab('history'); break;
+            case '5': setTab('analytics'); break;
+            case '6': setTab('projections'); break;
+            case '7': setTab('help'); break;
+            case 't':
+            case 'T': setTheme(state.theme === 'tactical' ? 'artistic' : 'tactical'); break;
+            case 'v':
+            case 'V':
+            case 'p':
+            case 'P': togglePrivacy(); break;
+        }
+    });
+}
 
 // ========================================
 // CHART FUNCTIONS
@@ -2477,5 +2485,30 @@ function initFromUrl() {
     }
 }
 
-// Initialize from URL on page load
-initFromUrl();
+// Initialize from URL on page load (only in browser, not during tests)
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    initFromUrl();
+}
+
+// Export functions for testing (ES Modules)
+export {
+    // Parser functions
+    parsePaylocityData,
+    parseRecord,
+    validateSalaryRange,
+    escapeHTML,
+
+    // Calculation functions
+    calculateCAGR,
+    calculateInflationOverPeriod,
+    calculateRealGrowth,
+    calculateInflationAdjustedSalary,
+
+    // Helper functions
+    calculateYearsOfService,
+    getStartingSalary,
+    getCurrentSalary,
+
+    // Constants
+    CONSTANTS
+};
