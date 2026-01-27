@@ -717,6 +717,45 @@ function getThemeColors() {
     };
 }
 
+/**
+ * Factory function for Chart.js tooltip configuration.
+ * Eliminates DRY violation across multiple charts.
+ *
+ * @param {Object} options - Optional configuration overrides
+ * @param {Function} options.labelCallback - Custom label formatter (receives Chart.js context)
+ * @param {number} options.padding - Tooltip padding (default: 12)
+ * @param {boolean} options.displayColors - Show dataset colors (default: false)
+ * @returns {Object} Chart.js tooltip configuration object
+ *
+ * @example
+ * // Basic usage (default label)
+ * tooltip: getTooltipConfig()
+ *
+ * @example
+ * // Custom label formatter
+ * tooltip: getTooltipConfig({
+ *   labelCallback: (ctx) => `Growth: ${ctx.raw.toFixed(1)}%`
+ * })
+ */
+function getTooltipConfig(options = {}) {
+    const {
+        labelCallback = (ctx) => `${ctx.raw}`,
+        padding = 12,
+        displayColors = false
+    } = options;
+
+    return {
+        backgroundColor: state.theme === 'tactical' ? '#1a1a1d' : '#ffffff',
+        titleColor: state.theme === 'tactical' ? '#e8e8e8' : '#2d2a26',
+        bodyColor: state.theme === 'tactical' ? '#a0a0a0' : '#5c5650',
+        borderColor: state.theme === 'tactical' ? '#2a2a2d' : '#e8e2da',
+        borderWidth: 1,
+        padding,
+        displayColors,
+        callbacks: { label: labelCallback }
+    };
+}
+
 // ========================================
 // MILESTONES DETECTION
 // ========================================
@@ -1423,18 +1462,9 @@ function buildMainChart() {
             interaction: { intersect: false, mode: 'index' },
             plugins: {
                 legend: { display: false },
-                tooltip: {
-                    backgroundColor: state.theme === 'tactical' ? '#1a1a1d' : '#ffffff',
-                    titleColor: state.theme === 'tactical' ? '#e8e8e8' : '#2d2a26',
-                    bodyColor: state.theme === 'tactical' ? '#a0a0a0' : '#5c5650',
-                    borderColor: state.theme === 'tactical' ? '#2a2a2d' : '#e8e2da',
-                    borderWidth: 1,
-                    padding: 12,
-                    displayColors: false,
-                    callbacks: {
-                        label: (ctx) => state.showDollars ? `$${ctx.raw.toLocaleString()}` : `Index: ${ctx.raw.toFixed(0)}`
-                    }
-                }
+                tooltip: getTooltipConfig({
+                    labelCallback: (ctx) => state.showDollars ? `$${ctx.raw.toLocaleString()}` : `Index: ${ctx.raw.toFixed(0)}`
+                })
             },
             scales: {
                 x: {
@@ -1529,14 +1559,9 @@ function buildYoyChart() {
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                tooltip: {
-                    backgroundColor: state.theme === 'tactical' ? '#1a1a1d' : '#ffffff',
-                    titleColor: state.theme === 'tactical' ? '#e8e8e8' : '#2d2a26',
-                    bodyColor: state.theme === 'tactical' ? '#a0a0a0' : '#5c5650',
-                    borderColor: state.theme === 'tactical' ? '#2a2a2d' : '#e8e2da',
-                    borderWidth: 1,
-                    callbacks: { label: (ctx) => `${ctx.raw.toFixed(1)}% growth` }
-                }
+                tooltip: getTooltipConfig({
+                    labelCallback: (ctx) => `${ctx.raw.toFixed(1)}% growth`
+                })
             },
             scales: {
                 x: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text } },
@@ -1693,14 +1718,9 @@ function buildProjectionChart() {
             interaction: { intersect: false, mode: 'index' },
             plugins: {
                 legend: { position: 'top', labels: { color: colors.text, padding: 20, font: { family: state.theme === 'tactical' ? 'JetBrains Mono' : 'Nunito', size: 11 } } },
-                tooltip: {
-                    backgroundColor: state.theme === 'tactical' ? '#1a1a1d' : '#ffffff',
-                    titleColor: state.theme === 'tactical' ? '#e8e8e8' : '#2d2a26',
-                    bodyColor: state.theme === 'tactical' ? '#a0a0a0' : '#5c5650',
-                    borderColor: state.theme === 'tactical' ? '#2a2a2d' : '#e8e2da',
-                    borderWidth: 1,
-                    callbacks: { label: (ctx) => `${ctx.dataset.label}: $${Math.round(ctx.raw).toLocaleString()}` }
-                }
+                tooltip: getTooltipConfig({
+                    labelCallback: (ctx) => `${ctx.dataset.label}: $${Math.round(ctx.raw).toLocaleString()}`
+                })
             },
             scales: {
                 x: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text } },
