@@ -113,10 +113,11 @@ compensation-journey/
 └── LICENSE
 ```
 
+
 ## License
 
-MIT. Do what you want with it.
+This project is licensed under the [O'Saasy License Agreement](https://osaasy.dev/).
 
----
+**TL;DR**: You can use, modify, and distribute this project freely. You can self-host it for personal or commercial use. However, you cannot offer it as a competing hosted/managed SaaS product.
 
-**Disclaimer:** Benchmark data is approximate. This is for informational purposes, not financial advice. Your mileage may vary based on role, location, company stage, etc.
+See [LICENSE.md](LICENSE.md) for full details.
