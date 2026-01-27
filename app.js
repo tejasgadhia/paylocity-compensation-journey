@@ -52,6 +52,11 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
 // ========================================
 
 function downloadHtmlFile() {
+    // Privacy warning - user should understand they're downloading sensitive data
+    if (!confirm('⚠️ This file contains your compensation data. Only share with trusted people.')) {
+        return;
+    }
+
     const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
