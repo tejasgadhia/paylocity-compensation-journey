@@ -66,58 +66,41 @@ That's it! Your data is processed entirely in your browser—nothing is uploaded
 
 Save as JSON to your computer if you want. Load it later. That's it.
 
-## Don't Trust Me?
+### Don't Trust Me?
 
-Fair. Here's how to use this tool **completely offline** with zero network access:
+Fair. Here's how to verify this tool is truly private:
 
-### Download for Offline Use
-
-1. **Right-click the page** → **Save Page As** → Save as "Webpage, Complete"
-2. **Or** use your browser's built-in save: `Ctrl+S` (Windows) / `Cmd+S` (Mac)
-3. **Disconnect from the internet** (turn off Wi-Fi, unplug ethernet)
-4. **Open the saved HTML file** in your browser
-5. **Paste your Paylocity data** and generate your dashboard
+**Download for offline use:**
+1. Click the **"Download this tool"** button on the splash screen (or right-click → Save Page As)
+2. **Disconnect from the internet** (turn off Wi-Fi, unplug ethernet)
+3. **Open the downloaded HTML file** in your browser
+4. **Paste your Paylocity data** and generate your dashboard
 
 The tool works entirely offline. Open your browser's DevTools (F12) → **Network tab** → you'll see zero outgoing requests after the initial page load.
 
-### Verify the Code
-
+**Verify the code:**
 - **Inspect the source**: All ~5,000 lines of code are in one HTML file
 - **Check network activity**: No API calls, no tracking, no external requests (except Chart.js CDN on initial load)
 - **Audit it yourself**: The code is unminified and readable—search for `fetch(`, `XMLHttpRequest`, or `navigator.sendBeacon` to confirm no data leaves your browser
 
 **Privacy promise**: Your salary data never touches a server. It processes in your browser tab and disappears when you close it (unless you explicitly save it).
 
-## Technical
-
-**Stack:**
-- Vanilla JavaScript (no frameworks, no build step)
-- Chart.js for visualizations
-- CSS custom properties for theme switching
-- Single HTML file (~5,000 lines)
-
-**Architecture:**
-- Client-side only, zero backend
-- Hash-based navigation for stateful URLs
-- Desktop-first design (removes mobile responsive code entirely)
-- Parser handles Paylocity's inconsistent formatting (concatenated values, variable date formats, hourly rates, etc.)
-
-**Browser support:** Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
-
 ## File Structure
 
 ```
 compensation-journey/
-├── index.html    # Entire app in one file
+├── index.html       # Entire app in one file (~5,000 lines)
+├── screenshots/     # UI screenshots (16 images, 2 themes)
 ├── README.md
-└── LICENSE
+├── CLAUDE.md        # Developer documentation
+├── LICENSE
+└── .gitignore
 ```
-
 
 ## License
 
-This project is licensed under the [O'Saasy License Agreement](https://osaasy.dev/).
+MIT. Do what you want with it.
 
-**TL;DR**: You can use, modify, and distribute this project freely. You can self-host it for personal or commercial use. However, you cannot offer it as a competing hosted/managed SaaS product.
+---
 
-See [LICENSE.md](LICENSE.md) for full details.
+**Disclaimer:** Benchmark data is approximate. This is for informational purposes, not financial advice. Your mileage may vary based on role, location, company stage, etc.
