@@ -4605,6 +4605,87 @@ History
         // THEME FUNCTIONS
         // ========================================
         
+        function updateChartTheme(chart) {
+            if (!chart) return;
+
+            const colors = getThemeColors();
+
+            // Update dataset colors
+            chart.data.datasets.forEach((dataset) => {
+                // Update border colors
+                if (dataset.borderColor) {
+                    // Check if it's using a theme-specific color that needs updating
+                    const isDynamicColor = dataset.borderColor.includes('rgb') ||
+                                          dataset.borderColor.includes('#');
+                    if (isDynamicColor) {
+                        // For main datasets, use primary colors
+                        if (dataset.label?.includes('Annual Salary') || dataset.label?.includes('Index Value')) {
+                            dataset.borderColor = colors.line1;
+                            dataset.pointBackgroundColor = colors.line1;
+                            dataset.pointBorderColor = colors.line1;
+                        } else if (dataset.label?.includes('YoY Growth')) {
+                            dataset.borderColor = colors.line2;
+                        } else if (dataset.label?.includes('Historical CAGR')) {
+                            dataset.borderColor = colors.line1;
+                        } else if (dataset.label?.includes('Custom')) {
+                            dataset.borderColor = colors.line2;
+                        } else if (dataset.label?.includes('Conservative')) {
+                            dataset.borderColor = state.theme === 'tactical' ? '#666' : '#8a837a';
+                        } else if (dataset.label?.includes('Optimistic')) {
+                            dataset.borderColor = state.theme === 'tactical' ? '#4598d4' : '#7b2cbf';
+                        }
+                    }
+                }
+
+                // Update background colors for bar/area charts
+                if (dataset.backgroundColor && dataset.backgroundColor !== 'transparent') {
+                    if (state.mainChartType === 'area') {
+                        dataset.backgroundColor = colors.fill1;
+                    } else if (state.mainChartType === 'bar') {
+                        dataset.backgroundColor = colors.line1;
+                    } else if (state.yoyChartType === 'bar') {
+                        dataset.backgroundColor = colors.line2;
+                    }
+                }
+            });
+
+            // Update grid and axis colors
+            if (chart.options.scales) {
+                Object.keys(chart.options.scales).forEach(scaleKey => {
+                    const scale = chart.options.scales[scaleKey];
+                    if (scale.grid) {
+                        scale.grid.color = colors.grid;
+                    }
+                    if (scale.ticks) {
+                        scale.ticks.color = colors.text;
+                    }
+                });
+            }
+
+            // Update tooltip colors
+            if (chart.options.plugins?.tooltip) {
+                chart.options.plugins.tooltip.backgroundColor = state.theme === 'tactical' ? '#1a1a1d' : '#ffffff';
+                chart.options.plugins.tooltip.titleColor = state.theme === 'tactical' ? '#e8e8e8' : '#2d2a26';
+                chart.options.plugins.tooltip.bodyColor = state.theme === 'tactical' ? '#a0a0a0' : '#5c5650';
+                chart.options.plugins.tooltip.borderColor = state.theme === 'tactical' ? '#2a2a2d' : '#e8e2da';
+            }
+
+            // Update legend colors
+            if (chart.options.plugins?.legend?.labels) {
+                chart.options.plugins.legend.labels.color = colors.text;
+            }
+
+            // Update category chart border color
+            if (chart.config.type === 'doughnut') {
+                chart.data.datasets.forEach(dataset => {
+                    dataset.borderColor = state.theme === 'tactical' ? '#141416' : '#ffffff';
+                });
+            }
+
+            // Fast update without animation
+            chart.update('none');
+        }
+
         function setTheme(theme) {
             state.theme = theme;
             document.documentElement.setAttribute('data-theme', theme);
@@ -4621,12 +4702,11 @@ History
 
             if (employeeData) {
                 updateStory();
-                setTimeout(() => {
-                    buildMainChart();
-                    if (charts.yoy) buildYoyChart();
-                    if (charts.category) buildCategoryChart();
-                    if (charts.projection) buildProjectionChart();
-                }, 100);
+                // Instantly update chart colors without rebuilding (performance optimization)
+                updateChartTheme(charts.main);
+                updateChartTheme(charts.yoy);
+                updateChartTheme(charts.category);
+                updateChartTheme(charts.projection);
             }
         }
 
