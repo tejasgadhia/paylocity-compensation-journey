@@ -7,6 +7,22 @@ export const CONSTANTS = {
     MIN_REALISTIC_SALARY: 1000,         // $1K minimum (sanity check)
     MAX_REALISTIC_SALARY: 10000000,     // $10M maximum (executive cap)
 
+    // Salary milestones
+    SALARY_SIX_FIGURES: 100000,         // $100K milestone
+    SALARY_200K_MILESTONE: 200000,      // $200K milestone
+    YEARS_DECADE_SERVICE: 10,           // 10-year service milestone
+
+    // Time conversion constants
+    MILLISECONDS_PER_SECOND: 1000,
+    SECONDS_PER_MINUTE: 60,
+    MINUTES_PER_HOUR: 60,
+    HOURS_PER_DAY: 24,
+    DAYS_PER_MONTH_AVG: 30,             // Approximate (used for rough calculations)
+    DAYS_PER_YEAR: 365.25,              // Accounts for leap years
+
+    // Paycheck calculations
+    PAY_PERIODS_PER_YEAR: 24,           // Used in Paylocity data conversions
+
     // Time intervals
     TYPICAL_RAISE_INTERVAL_MONTHS: 12,  // Annual review cycle
     CAGR_MIN_YEARS_THRESHOLD: 0.1,      // ~36 days minimum for CAGR calculation
@@ -14,6 +30,10 @@ export const CONSTANTS = {
 
     // Inflation defaults
     DEFAULT_CPI_RATE: 2.5,              // Default CPI when data missing (%)
+
+    // Projection rates
+    PROJECTION_RATE_CONSERVATIVE: 0.05,  // 5% conservative growth
+    PROJECTION_RATE_OPTIMISTIC: 0.12,    // 12% optimistic growth
 
     // Chart configuration
     CHART_ANIMATION_DURATION: 300,      // ms for smooth transitions

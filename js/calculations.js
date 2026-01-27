@@ -140,7 +140,7 @@ export function getCurrentSalary(employeeData) {
 export function calculateYearsOfService(employeeData) {
     const hire = new Date(employeeData.hireDate);
     const current = new Date(employeeData.currentDate);
-    return (current - hire) / (1000 * 60 * 60 * 24 * 365.25);
+    return (current - hire) / (CONSTANTS.MILLISECONDS_PER_SECOND * CONSTANTS.SECONDS_PER_MINUTE * CONSTANTS.MINUTES_PER_HOUR * CONSTANTS.HOURS_PER_DAY * CONSTANTS.DAYS_PER_YEAR);
 }
 
 /**
@@ -228,7 +228,7 @@ export function getBenchmarkComparisons(employeeData, benchmarks) {
     const dates = adjustments.map(r => new Date(r.date)).sort((a, b) => a - b);
     let totalDays = 0;
     for (let i = 1; i < dates.length; i++) {
-        totalDays += (dates[i] - dates[i-1]) / (1000 * 60 * 60 * 24);
+        totalDays += (dates[i] - dates[i-1]) / (CONSTANTS.MILLISECONDS_PER_SECOND * CONSTANTS.SECONDS_PER_MINUTE * CONSTANTS.MINUTES_PER_HOUR * CONSTANTS.HOURS_PER_DAY);
     }
     const avgMonthsBetween = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30.44 : 12;
 

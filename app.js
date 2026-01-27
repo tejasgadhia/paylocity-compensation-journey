@@ -727,7 +727,7 @@ function detectMilestones() {
     const startingSalary = getStartingSalary(employeeData);
     
     // Six figures
-    const sixFigures = records.find(r => r.annual >= 100000);
+    const sixFigures = records.find(r => r.annual >= CONSTANTS.SALARY_SIX_FIGURES);
     if (sixFigures) {
         milestones.push({
             icon: '💯',
@@ -742,7 +742,7 @@ function detectMilestones() {
     if (doubled) {
         const doubledDate = new Date(doubled.date);
         const hireDate = new Date(employeeData.hireDate);
-        const monthsToDouble = Math.round((doubledDate - hireDate) / (1000 * 60 * 60 * 24 * 30));
+        const monthsToDouble = Math.round((doubledDate - hireDate) / (CONSTANTS.MILLISECONDS_PER_SECOND * CONSTANTS.SECONDS_PER_MINUTE * CONSTANTS.MINUTES_PER_HOUR * CONSTANTS.HOURS_PER_DAY * CONSTANTS.DAYS_PER_MONTH_AVG));
         milestones.push({
             icon: '📈',
             title: 'Salary Doubled',
@@ -752,7 +752,7 @@ function detectMilestones() {
     }
 
     // $200k milestone
-    const twoHundredK = records.find(r => r.annual >= 200000);
+    const twoHundredK = records.find(r => r.annual >= CONSTANTS.SALARY_200K_MILESTONE);
     if (twoHundredK) {
         milestones.push({
             icon: '🎯',
@@ -774,14 +774,14 @@ function detectMilestones() {
         });
     }
 
-    // 10 year mark
+    // Decade of service milestone
     const years = calculateYearsOfService(employeeData);
-    if (years >= 10) {
+    if (years >= CONSTANTS.YEARS_DECADE_SERVICE) {
         milestones.push({
             icon: '🏆',
             title: 'Decade of Service',
             detail: '10+ years with the organization',
-            date: new Date(new Date(employeeData.hireDate).getTime() + 10 * 365.25 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+            date: new Date(new Date(employeeData.hireDate).getTime() + CONSTANTS.YEARS_DECADE_SERVICE * CONSTANTS.DAYS_PER_YEAR * CONSTANTS.HOURS_PER_DAY * CONSTANTS.MINUTES_PER_HOUR * CONSTANTS.SECONDS_PER_MINUTE * CONSTANTS.MILLISECONDS_PER_SECOND).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
         });
     }
 
@@ -969,7 +969,7 @@ function updateStory() {
     const dates = adjustments.map(r => new Date(r.date)).sort((a, b) => a - b);
     let totalDays = 0;
     for (let i = 1; i < dates.length; i++) {
-        totalDays += (dates[i] - dates[i-1]) / (1000 * 60 * 60 * 24);
+        totalDays += (dates[i] - dates[i-1]) / (CONSTANTS.MILLISECONDS_PER_SECOND * CONSTANTS.SECONDS_PER_MINUTE * CONSTANTS.MINUTES_PER_HOUR * CONSTANTS.HOURS_PER_DAY);
     }
     const avgMonths = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30.44 : 0;
     
@@ -980,7 +980,7 @@ function updateStory() {
     if (sixFigures) {
         const hireDate = new Date(employeeData.hireDate);
         const sixFigDate = new Date(sixFigures.date);
-        const diffYears = (sixFigDate - hireDate) / (1000 * 60 * 60 * 24 * 365.25);
+        const diffYears = (sixFigDate - hireDate) / (CONSTANTS.MILLISECONDS_PER_SECOND * CONSTANTS.SECONDS_PER_MINUTE * CONSTANTS.MINUTES_PER_HOUR * CONSTANTS.HOURS_PER_DAY * CONSTANTS.DAYS_PER_YEAR);
         yearsToSixFigures = diffYears < 1 ? `${Math.round(diffYears * 12)} months` : `${diffYears.toFixed(1)} years`;
     }
     
@@ -1669,9 +1669,9 @@ function buildProjectionChart() {
         for (let i = 1; i <= years; i++) {
             labels.push(`+${i}yr`);
             historical.push(currentSalary * Math.pow(1 + cagr, i));
-            conservative.push(currentSalary * Math.pow(1.05, i));
+            conservative.push(currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_CONSERVATIVE, i));
             custom.push(currentSalary * Math.pow(1 + customRate, i));
-            optimistic.push(currentSalary * Math.pow(1.12, i));
+            optimistic.push(currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_OPTIMISTIC, i));
         }
 
         if (charts.projection) charts.projection.destroy();
@@ -1726,7 +1726,7 @@ function buildHistoryTable() {
         const badgeClass = getBadgeClass(r.reason);
         const index = ((r.annual / startingSalary) * 100).toFixed(0);
         const changeDisplay = r.change > 0
-            ? (state.showDollars ? `+${formatCurrency(r.change * 24)}` : `+${((r.change * 24 / startingSalary) * 100).toFixed(1)}`)
+            ? (state.showDollars ? `+${formatCurrency(r.change * CONSTANTS.PAY_PERIODS_PER_YEAR)}` : `+${((r.change * CONSTANTS.PAY_PERIODS_PER_YEAR / startingSalary) * 100).toFixed(1)}`)
             : '—';
 
         return `
@@ -1763,9 +1763,9 @@ function buildProjectionTable() {
         <tr>
             <td>${year} year${year > 1 ? 's' : ''}</td>
             <td>${formatCurrency(currentSalary * Math.pow(1 + cagr, year))}</td>
-            <td>${formatCurrency(currentSalary * Math.pow(1.05, year))}</td>
+            <td>${formatCurrency(currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_CONSERVATIVE, year))}</td>
             <td>${formatCurrency(currentSalary * Math.pow(1 + customRate, year))}</td>
-            <td>${formatCurrency(currentSalary * Math.pow(1.12, year))}</td>
+            <td>${formatCurrency(currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_OPTIMISTIC, year))}</td>
         </tr>
     `).join('');
 }
@@ -1799,7 +1799,7 @@ function updateAnalytics() {
     const dates = adjustments.map(r => new Date(r.date)).sort((a, b) => a - b);
     let totalDays = 0;
     for (let i = 1; i < dates.length; i++) {
-        totalDays += (dates[i] - dates[i-1]) / (1000 * 60 * 60 * 24);
+        totalDays += (dates[i] - dates[i-1]) / (CONSTANTS.MILLISECONDS_PER_SECOND * CONSTANTS.SECONDS_PER_MINUTE * CONSTANTS.MINUTES_PER_HOUR * CONSTANTS.HOURS_PER_DAY);
     }
     const avgMonths = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30.44 : 12;
     
