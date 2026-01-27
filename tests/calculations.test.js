@@ -9,11 +9,11 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { CONSTANTS, benchmarks } from '../js/constants.js';
 import {
     calculateInflationOverPeriod,
     calculateRealGrowth,
-    calculateInflationAdjustedSalary,
-    CONSTANTS
+    calculateInflationAdjustedSalary
 } from '../app.js';
 
 // We need to mock the global state that these functions depend on
@@ -248,9 +248,9 @@ describe('CONSTANTS Validation', () => {
     });
 
     it('has benchmark ranges', () => {
-        expect(CONSTANTS.BENCHMARKS).toBeDefined();
-        expect(CONSTANTS.BENCHMARKS.typicalRaise).toBeDefined();
-        expect(CONSTANTS.BENCHMARKS.typicalRaise.min).toBeGreaterThan(0);
-        expect(CONSTANTS.BENCHMARKS.typicalRaise.max).toBeGreaterThan(CONSTANTS.BENCHMARKS.typicalRaise.min);
+        expect(benchmarks).toBeDefined();
+        expect(benchmarks.typicalRaise).toBeDefined();
+        expect(benchmarks.typicalRaise.min).toBeGreaterThan(0);
+        expect(benchmarks.typicalRaise.max).toBeGreaterThan(benchmarks.typicalRaise.min);
     });
 });
