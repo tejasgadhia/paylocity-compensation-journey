@@ -6,6 +6,17 @@ Paylocity gives you raw pay history tables. It doesn't show you CAGR, market com
 
 **[Live Demo](https://tejasgadhia.github.io/paylocity-compensation-journey/)**
 
+## Screenshots
+
+### Home Dashboard (Artistic Theme)
+![Home Dashboard - Light Mode](screenshots/01-home-artistic.png)
+
+### Market Benchmarks (Tactical Theme)
+![Market Comparison - Dark Mode](screenshots/10-market-tactical.png)
+
+### Analytics View (Artistic Theme)
+![Analytics Dashboard](screenshots/05-analytics-artistic.png)
+
 ## What This Does
 
 Paste your Paylocity pay history, get seven tabs of analysis:
@@ -20,6 +31,21 @@ Paste your Paylocity pay history, get seven tabs of analysis:
 Includes CPI data from Bureau of Labor Statistics for real purchasing power analysis. Two themes (Artistic and Tactical), privacy mode for screenshots, keyboard shortcuts, the works.
 
 Desktop-only. Mobile is intentionally blocked because responsive complexity isn't worth it for a financial dashboard.
+
+## How to Use
+
+1. **Open Paylocity** - Go to **My Information** → **Compensation**
+2. **Access your pay history** - Click the **"Rates"** tab
+3. **Enable private data** - Toggle **"Show Private Data"** (top right corner)
+4. **Select all data** - Highlight from the "Rates" header row down to your last history entry
+   - **Mac**: `Cmd + A` to select all
+   - **Windows**: `Ctrl + A` to select all
+5. **Copy the data** - `Cmd + C` (Mac) or `Ctrl + C` (Windows)
+6. **Paste into this tool** - Return to Compensation Journey, paste into the text area, and click **"Generate Dashboard"**
+
+That's it! Your data is processed entirely in your browser—nothing is uploaded anywhere.
+
+**Pro tip:** Save your dashboard as JSON using the "Save Data" button. You can reload it anytime without re-pasting from Paylocity.
 
 ## Privacy
 
