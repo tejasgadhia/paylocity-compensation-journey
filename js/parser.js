@@ -83,86 +83,77 @@ export function validateSalaryRange(value, fieldName = 'salary') {
  * const record = parseRecord("06/12/2022", "Merit Increase$1,166.6712.2807");
  * // Correctly parses: perCheck=$1,166.67, annual=12.28 (uses exactly 2 decimals)
  */
-export function parseRecord(dateStr, text) {
-    // Convert date format from MM/DD/YYYY to YYYY-MM-DD
-    const [month, day, year] = dateStr.split('/');
-    const date = `${year}-${month}-${day}`;
-
-    // Extract change reason (whitelist approach for security)
-    let reason = 'Unknown';
+/**
+ * Extract change reason from record text (Closes #25 - complexity reduction)
+ */
+function extractReason(text) {
     const reasons = ['Merit Increase', 'Promotion', 'Market Adjustment', 'Equity', 'New Hire'];
     for (const r of reasons) {
         if (text.includes(r)) {
-            reason = r;
-            break;
+            return r.replace(/<[^>]*>/g, '');
         }
     }
-    if (text.includes('—') && reason === 'Unknown') {
-        reason = '—';
+    if (text.includes('—')) {
+        return '—';
     }
+    return 'Unknown';
+}
 
-    // Security: Strip any HTML-like patterns from reason (defense in depth)
-    // This protects against malicious input even though we escape at display time
-    reason = reason.replace(/<[^>]*>/g, '');
-
-    // Extract dollar amounts - use exactly 2 decimal places to handle concatenated values
-    // e.g., "$1,166.6712.2807" should parse as $1,166.67 (not $1,166.6712)
-    // Pattern breakdown:
-    //   \$ - Literal dollar sign
-    //   ([0-9,]+\.\d{2}) - Captured group:
-    //     [0-9,]+ - One or more digits or commas (e.g., "1,166" or "65000")
-    //     \. - Literal decimal point
-    //     \d{2} - Exactly 2 decimal digits (prevents capturing extra decimals from concatenated values)
-    // Why exactly 2 decimals? Paylocity concatenates values like "$1,166.6712.2807"
-    // Using \d{2} stops at "$1,166.67" instead of greedily taking "$1,166.6712"
+/**
+ * Extract and parse dollar amounts from text (Closes #25 - complexity reduction)
+ */
+function extractDollarAmounts(text) {
     const dollarPattern = /\$([0-9,]+\.\d{2})/g;
     const dollars = [];
-    let dollarMatch;
-    while ((dollarMatch = dollarPattern.exec(text)) !== null) {
-        dollars.push(parseFloat(dollarMatch[1].replace(/,/g, '')));
+    let match;
+    while ((match = dollarPattern.exec(text)) !== null) {
+        dollars.push(parseFloat(match[1].replace(/,/g, '')));
     }
+    return dollars;
+}
 
-    // Expected order: Per Check, Annual Salary, Amount (change)
+/**
+ * Determine annual, perCheck, and change from dollar amounts (Closes #25 - complexity reduction)
+ */
+function parseSalaryValues(dollars) {
     let perCheck = 0, annual = 0, change = 0;
 
-    if (dollars.length >= 2) {
-        // Find the annual salary (typically the largest reasonable number, >= 20000)
-        const annualCandidates = dollars.filter(d => d >= 20000);
-        if (annualCandidates.length > 0) {
-            annual = validateSalaryRange(annualCandidates[0], 'annual');
-        }
+    if (dollars.length < 2) {
+        return { perCheck, annual, change };
+    }
 
-        // Per check is usually the first dollar amount
-        perCheck = dollars[0];
-        if (perCheck >= 20000) {
-            // First one was annual, find actual per check
-            const perCheckCandidate = dollars.find(d => d < 20000 && d > 100) || 0;
-            perCheck = perCheckCandidate > 0 ? validateSalaryRange(perCheckCandidate, 'perCheck') : 0;
-        } else {
-            perCheck = perCheck > 0 ? validateSalaryRange(perCheck, 'perCheck') : 0;
-        }
+    // Find annual salary (largest reasonable number, >= 20000)
+    const annualCandidates = dollars.filter(d => d >= 20000);
+    if (annualCandidates.length > 0) {
+        annual = validateSalaryRange(annualCandidates[0], 'annual');
+    }
 
-        // Change/Amount is usually after annual salary
-        if (dollars.length >= 3) {
-            const annualIdx = dollars.indexOf(annualCandidates[0]); // Use unvalidated value for indexOf
-            const afterAnnual = dollars.slice(annualIdx + 1);
-            if (afterAnnual.length > 0 && afterAnnual[0] > 0) {
-                change = validateSalaryRange(afterAnnual[0], 'change');
-            }
+    // Determine per check value
+    perCheck = dollars[0];
+    if (perCheck >= 20000) {
+        const perCheckCandidate = dollars.find(d => d < 20000 && d > 100) || 0;
+        perCheck = perCheckCandidate > 0 ? validateSalaryRange(perCheckCandidate, 'perCheck') : 0;
+    } else {
+        perCheck = perCheck > 0 ? validateSalaryRange(perCheck, 'perCheck') : 0;
+    }
+
+    // Extract change amount if present
+    if (dollars.length >= 3 && annualCandidates.length > 0) {
+        const annualIdx = dollars.indexOf(annualCandidates[0]);
+        const afterAnnual = dollars.slice(annualIdx + 1);
+        if (afterAnnual.length > 0 && afterAnnual[0] > 0) {
+            change = validateSalaryRange(afterAnnual[0], 'change');
         }
     }
 
-    // Extract hourly rate (XXX.XXXX / Hour)
-    // Pattern breakdown:
-    //   (\d+\.?\d*) - Captured group for the rate:
-    //     \d+ - One or more digits (required)
-    //     \.? - Optional decimal point
-    //     \d* - Zero or more decimal digits (allows "31.25" or "31")
-    //   \s* - Zero or more whitespace characters
-    //   \/ - Literal forward slash
-    //   \s* - Zero or more whitespace characters
-    //   Hour - Literal text "Hour" (case-insensitive due to 'i' flag)
-    // Matches: "31.25 / Hour", "31.25/Hour", "31 / Hour"
+    return { perCheck, annual, change };
+}
+
+/**
+ * Extract hourly rate and change percentage (Closes #25 - complexity reduction)
+ */
+function extractRateAndPercent(text) {
+    // Extract hourly rate
     const hourlyPattern = /(\d+\.?\d*)\s*\/\s*Hour/i;
     const hourlyMatch = text.match(hourlyPattern);
     let hourlyRate = 0;
@@ -171,30 +162,13 @@ export function parseRecord(dateStr, text) {
         hourlyRate = parsedRate > 0 ? validateSalaryRange(parsedRate, 'hourlyRate') : 0;
     }
 
-    // Extract percentage - it's the last decimal number in the string
-    // Look for pattern like "12.2807" or "0.0000" at the end (after last $X.XX amount)
-    // Pattern breakdown:
-    //   (\d+\.\d{4}) - Captured group:
-    //     \d+ - One or more digits (e.g., "12" or "0")
-    //     \. - Literal decimal point
-    //     \d{4} - Exactly 4 decimal digits (Paylocity uses 4 decimals for percentages: "12.2807")
-    //   \s* - Zero or more whitespace characters
-    //   $ - End of string anchor (ensures we match the last number only)
-    // Example: "01/15/2023 Merit Increase $2,500.0065,000.0031.2512.2807" matches "12.2807"
+    // Extract percentage (last decimal at end of string)
     const percentPattern = /(\d+\.\d{4})\s*$/;
     const percentMatch = text.trim().match(percentPattern);
     let changePercent = 0;
     if (percentMatch) {
         changePercent = parseFloat(percentMatch[1]);
     } else {
-        // Fallback: try to find any percentage-like number at end
-        // Pattern: (\d+\.?\d*)\s*$ matches any decimal number at the end
-        //   \d+ - One or more digits (required)
-        //   \.? - Optional decimal point
-        //   \d* - Zero or more decimal digits (allows "12.28" or "12")
-        //   \s* - Zero or more whitespace
-        //   $ - End of string anchor
-        // Used when main percentPattern fails (e.g., percentage has fewer than 4 decimals)
         const fallbackMatch = text.trim().match(/(\d+\.?\d*)\s*$/);
         if (fallbackMatch) {
             const potential = parseFloat(fallbackMatch[1]);
@@ -203,6 +177,19 @@ export function parseRecord(dateStr, text) {
             }
         }
     }
+
+    return { hourlyRate, changePercent };
+}
+
+export function parseRecord(dateStr, text) {
+    // Convert date format from MM/DD/YYYY to YYYY-MM-DD
+    const [month, day, year] = dateStr.split('/');
+    const date = `${year}-${month}-${day}`;
+
+    const reason = extractReason(text);
+    const dollars = extractDollarAmounts(text);
+    const { perCheck, annual, change } = parseSalaryValues(dollars);
+    const { hourlyRate, changePercent } = extractRateAndPercent(text);
 
     // Validate we have minimum required data
     if (annual === 0) {
