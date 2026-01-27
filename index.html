@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compensation Journey</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
+            integrity="sha384-qZNq/5/1NeHjv7pH5hE6Fw4Y7qW13k1kE2pQDQDQtQWNKBBIrN9Hh9RdjW9VgDjG"
+            crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Optimized: Reduced from 4 families to 2, removed unused weight 500 -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         /* ========================================
            CSS CUSTOM PROPERTIES - THEMES
@@ -68,27 +71,28 @@
             --bg-tertiary: #f5f2ed;
             --bg-card: #ffffff;
             --bg-hover: #f0ebe3;
-            
+
             --text-primary: #2d2a26;
             --text-secondary: #5c5650;
             --text-muted: #706a61;  /* Improved contrast: 4.8:1 on #faf8f5 */
-            
+
             --accent-primary: #e85d04;
             --accent-secondary: #0096c7;
             --accent-tertiary: #7b2cbf;
             --accent-warning: #d00000;
-            
+
             --border-color: #e8e2da;
             --border-accent: #d4cdc3;
-            
+
             --chart-grid: rgba(0, 0, 0, 0.06);
             --chart-line-1: #e85d04;
             --chart-line-2: #0096c7;
             --chart-fill-1: rgba(232, 93, 4, 0.12);
             --chart-fill-2: rgba(0, 150, 199, 0.12);
-            
-            --font-display: 'Libre Baskerville', serif;
-            --font-body: 'Nunito', sans-serif;
+
+            /* Font optimization: Use Space Grotesk for both display and body (was Libre Baskerville + Nunito) */
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'Space Grotesk', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
             
             --radius-sm: 8px;
@@ -565,8 +569,12 @@
         }
 
         .paste-area textarea:focus {
-            outline: none;
             border-color: var(--accent-primary);
+        }
+
+        .paste-area textarea:focus-visible {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 0;
         }
 
         .paste-area textarea::placeholder {
@@ -2184,6 +2192,11 @@
             -webkit-appearance: none;
         }
 
+        input[type="range"]:focus-visible {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 4px;
+        }
+
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 18px;
@@ -2238,8 +2251,12 @@
         }
 
         .input-field input:focus {
-            outline: none;
             border-color: var(--accent-primary);
+        }
+
+        .input-field input:focus-visible {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 0;
         }
 
         .projection-result {
@@ -3528,6 +3545,22 @@ History
             return (cumulativeInflation - 1) * 100; // Return as percentage
         }
 
+        /**
+         * Calculates inflation-adjusted (real) growth rate.
+         *
+         * Uses the formula: Real Growth = ((1 + Nominal) / (1 + Inflation)) - 1
+         *
+         * This shows how much purchasing power actually increased after accounting
+         * for inflation. A 5% nominal raise with 3% inflation = 1.94% real growth.
+         *
+         * @param {number} nominalGrowthPercent - Nominal growth rate as percentage (e.g., 5 for 5%)
+         * @param {number} inflationPercent - Inflation rate as percentage (e.g., 3 for 3%)
+         * @returns {number} Real growth rate as percentage
+         *
+         * @example
+         * const realGrowth = calculateRealGrowth(5, 3);
+         * console.log(realGrowth); // 1.94 (approximately)
+         */
         function calculateRealGrowth(nominalGrowthPercent, inflationPercent) {
             // Real growth = ((1 + nominal) / (1 + inflation)) - 1
             const nominal = nominalGrowthPercent / 100;
@@ -3620,7 +3653,32 @@ History
         // ========================================
         // PARSER
         // ========================================
-        
+
+        /**
+         * Parses raw Paylocity compensation history data into structured records.
+         *
+         * Handles inconsistent formatting from Paylocity's "Rates" tab by using multiple
+         * fallback strategies to extract dates, dollar amounts, and hourly rates. Robust
+         * against concatenated values (e.g., "$1,166.6712.2807") and missing fields.
+         *
+         * @param {string} rawText - Raw text copied from Paylocity "Rates" tab
+         * @returns {Object} Parsed compensation data
+         * @returns {string} returns.hireDate - Earliest record date (YYYY-MM-DD format)
+         * @returns {string} returns.currentDate - Most recent record date (YYYY-MM-DD format)
+         * @returns {Array<Object>} returns.records - Array of compensation records, sorted descending by date
+         * @returns {string} returns.records[].date - Record date (YYYY-MM-DD)
+         * @returns {string} returns.records[].reason - Change reason ('Merit Increase', 'Promotion', etc.)
+         * @returns {number} returns.records[].perCheck - Per-paycheck amount (bi-weekly)
+         * @returns {number} returns.records[].annual - Annual salary
+         * @returns {number} returns.records[].hourlyRate - Hourly rate (may be null)
+         * @returns {number} returns.records[].change - Dollar change from previous record
+         * @returns {number} returns.records[].changePercent - Percentage change from previous record
+         * @throws {Error} If no valid dates found or no records could be parsed
+         *
+         * @example
+         * const data = parsePaylocityData("01/15/2023   Merit Increase   $2,500.0065,000.0031.25");
+         * console.log(data.records[0].annual); // 65000
+         */
         function parsePaylocityData(rawText) {
             const records = [];
             
@@ -3628,6 +3686,9 @@ History
             let text = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
             
             // Find all date patterns (MM/DD/YYYY) which start each record
+            // Pattern: \d{2}\/\d{2}\/\d{4} matches MM/DD/YYYY (e.g., "01/15/2023")
+            // Captured group (\d{2}\/\d{2}\/\d{4}) extracts the full date
+            // Global flag 'g' finds all occurrences (one per compensation record)
             const datePattern = /(\d{2}\/\d{2}\/\d{4})/g;
             const dates = [];
             let match;
@@ -3695,6 +3756,14 @@ History
             
             // Extract dollar amounts - use exactly 2 decimal places to handle concatenated values
             // e.g., "$1,166.6712.2807" should parse as $1,166.67 (not $1,166.6712)
+            // Pattern breakdown:
+            //   \$ - Literal dollar sign
+            //   ([0-9,]+\.\d{2}) - Captured group:
+            //     [0-9,]+ - One or more digits or commas (e.g., "1,166" or "65000")
+            //     \. - Literal decimal point
+            //     \d{2} - Exactly 2 decimal digits (prevents capturing extra decimals from concatenated values)
+            // Why exactly 2 decimals? Paylocity concatenates values like "$1,166.6712.2807"
+            // Using \d{2} stops at "$1,166.67" instead of greedily taking "$1,166.6712"
             const dollarPattern = /\$([0-9,]+\.\d{2})/g;
             const dollars = [];
             let dollarMatch;
@@ -3728,12 +3797,30 @@ History
             }
             
             // Extract hourly rate (XXX.XXXX / Hour)
+            // Pattern breakdown:
+            //   (\d+\.?\d*) - Captured group for the rate:
+            //     \d+ - One or more digits (required)
+            //     \.? - Optional decimal point
+            //     \d* - Zero or more decimal digits (allows "31.25" or "31")
+            //   \s* - Zero or more whitespace characters
+            //   \/ - Literal forward slash
+            //   \s* - Zero or more whitespace characters
+            //   Hour - Literal text "Hour" (case-insensitive due to 'i' flag)
+            // Matches: "31.25 / Hour", "31.25/Hour", "31 / Hour"
             const hourlyPattern = /(\d+\.?\d*)\s*\/\s*Hour/i;
             const hourlyMatch = text.match(hourlyPattern);
             const hourlyRate = hourlyMatch ? parseFloat(hourlyMatch[1]) : 0;
             
             // Extract percentage - it's the last decimal number in the string
             // Look for pattern like "12.2807" or "0.0000" at the end (after last $X.XX amount)
+            // Pattern breakdown:
+            //   (\d+\.\d{4}) - Captured group:
+            //     \d+ - One or more digits (e.g., "12" or "0")
+            //     \. - Literal decimal point
+            //     \d{4} - Exactly 4 decimal digits (Paylocity uses 4 decimals for percentages: "12.2807")
+            //   \s* - Zero or more whitespace characters
+            //   $ - End of string anchor (ensures we match the last number only)
+            // Example: "01/15/2023 Merit Increase $2,500.0065,000.0031.2512.2807" matches "12.2807"
             const percentPattern = /(\d+\.\d{4})\s*$/;
             const percentMatch = text.trim().match(percentPattern);
             let changePercent = 0;
@@ -3741,6 +3828,13 @@ History
                 changePercent = parseFloat(percentMatch[1]);
             } else {
                 // Fallback: try to find any percentage-like number at end
+                // Pattern: (\d+\.?\d*)\s*$ matches any decimal number at the end
+                //   \d+ - One or more digits (required)
+                //   \.? - Optional decimal point
+                //   \d* - Zero or more decimal digits (allows "12.28" or "12")
+                //   \s* - Zero or more whitespace
+                //   $ - End of string anchor
+                // Used when main percentPattern fails (e.g., percentage has fewer than 4 decimals)
                 const fallbackMatch = text.trim().match(/(\d+\.?\d*)\s*$/);
                 if (fallbackMatch) {
                     const potential = parseFloat(fallbackMatch[1]);
@@ -4176,6 +4270,19 @@ History
             return employeeData.records[0].annual;
         }
 
+        /**
+         * Calculates Compound Annual Growth Rate (CAGR) for total compensation.
+         *
+         * CAGR represents the mean annual growth rate over the entire tenure,
+         * smoothing out year-to-year variations. Formula: ((End / Start)^(1/Years)) - 1
+         *
+         * @returns {number} CAGR as percentage (e.g., 8.5 for 8.5%)
+         *
+         * @example
+         * // Starting salary: $60,000, Current: $100,000, Years: 5
+         * const cagr = calculateCAGR();
+         * console.log(cagr); // ~10.8% annual growth
+         */
         function calculateCAGR() {
             const start = getStartingSalary();
             const end = getCurrentSalary();
@@ -4427,6 +4534,21 @@ History
             buildMilestones();
         }
 
+        /**
+         * Updates the Market tab with benchmark comparisons and performance analysis.
+         *
+         * Compares user's CAGR, average raises, and real growth against B2B SaaS
+         * industry benchmarks. Generates performance tier (high/solid/low) and
+         * theme-appropriate headline. Renders comparison cards and inflation analysis.
+         *
+         * @global {Object} benchmarks - Industry benchmark data (CAGR, typical raises)
+         * @global {Object} state - UI state (theme for tactical vs artistic styling)
+         * @returns {void}
+         *
+         * @example
+         * // After parsing data, call to render market comparison
+         * updateMarket(); // Populates #marketSummaryCard with performance analysis
+         */
         function updateMarket() {
             const bench = getBenchmarkComparisons();
             if (!bench) return;
@@ -4718,6 +4840,24 @@ History
             buildYoyChart();
         }
 
+        /**
+         * Builds the main compensation timeline chart with theme-aware styling.
+         *
+         * Supports 4 chart types (line, bar, area, step) and 2 view modes (dollars vs indexed).
+         * Destroys previous chart instance before creating new one to prevent memory leaks.
+         * Automatically adjusts colors, tooltips, and formatting based on current theme.
+         *
+         * @global {Object} employeeData - Compensation records (from parsePaylocityData)
+         * @global {Object} state - UI state (theme, showDollars, mainChartType)
+         * @global {Object} charts - Chart.js instances storage
+         * @returns {void}
+         *
+         * @example
+         * // After parsing data and setting state
+         * state.mainChartType = 'area';
+         * state.showDollars = true;
+         * buildMainChart(); // Creates new area chart with dollar values
+         */
         function buildMainChart() {
             const ctx = document.getElementById('mainChart').getContext('2d');
             const colors = getThemeColors();
