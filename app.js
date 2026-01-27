@@ -2121,27 +2121,132 @@ function initFromUrl() {
     }
 }
 
+/**
+ * Initialize event listeners (CSP Hardening - Closes #28)
+ * Replace all inline onclick handlers with addEventListener
+ */
+function initEventListeners() {
+    // Landing page theme buttons
+    document.querySelectorAll('.landing-theme-btn').forEach(btn => {
+        btn.addEventListener('click', () => setTheme(btn.dataset.theme));
+    });
+
+    // Download offline button
+    const btnDownloadOffline = document.querySelector('.btn-download-offline');
+    if (btnDownloadOffline) {
+        btnDownloadOffline.addEventListener('click', downloadHtmlFile);
+    }
+
+    // Demo button
+    const btnDemo = document.querySelector('.btn-demo');
+    if (btnDemo) {
+        btnDemo.addEventListener('click', loadDemoData);
+    }
+
+    // Generate button
+    const btnGenerate = document.getElementById('generateBtn');
+    if (btnGenerate) {
+        btnGenerate.addEventListener('click', parseAndGenerate);
+    }
+
+    // Load JSON text button
+    const btnLoadJsonText = document.querySelector('.btn-text-alt');
+    if (btnLoadJsonText) {
+        btnLoadJsonText.addEventListener('click', () => {
+            document.getElementById('jsonFileInput').click();
+        });
+    }
+
+    // Demo regenerate button
+    const btnDemoRegen = document.querySelector('.demo-regenerate-btn');
+    if (btnDemoRegen) {
+        btnDemoRegen.addEventListener('click', cycleNextScenario);
+    }
+
+    // Demo banner close button
+    const btnDemoBannerClose = document.querySelector('.demo-banner-close');
+    if (btnDemoBannerClose) {
+        btnDemoBannerClose.addEventListener('click', () => {
+            document.getElementById('demoBanner').classList.add('hidden');
+        });
+    }
+
+    // Dashboard view mode buttons
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', () => setViewMode(btn.dataset.view));
+    });
+
+    // Dashboard theme buttons
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.addEventListener('click', () => setTheme(btn.dataset.theme));
+    });
+
+    // Save data button
+    const btnSaveData = document.querySelector('.btn-save-data');
+    if (btnSaveData) {
+        btnSaveData.addEventListener('click', downloadData);
+    }
+
+    // Start over button
+    const btnStartOver = document.querySelector('.btn-start-over');
+    if (btnStartOver) {
+        btnStartOver.addEventListener('click', resetDashboard);
+    }
+
+    // JSON file input
+    const jsonFileInput = document.getElementById('jsonFileInput');
+    if (jsonFileInput) {
+        jsonFileInput.addEventListener('change', loadJsonFile);
+    }
+
+    // Custom rate slider
+    const customRateSlider = document.getElementById('customRateSlider');
+    if (customRateSlider) {
+        customRateSlider.addEventListener('input', updateCustomRate);
+    }
+
+    // Tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => setTab(btn.dataset.tab));
+    });
+
+    // Main chart type buttons
+    document.querySelectorAll('.chart-type-btn[data-chart]').forEach(btn => {
+        const chartType = btn.dataset.chart;
+        if (chartType && ['line', 'area', 'bar', 'step'].includes(chartType)) {
+            btn.addEventListener('click', () => setChartType(chartType));
+        } else if (chartType && ['yoy-bar', 'yoy-line'].includes(chartType)) {
+            btn.addEventListener('click', () => setYoyChartType(chartType.replace('yoy-', '')));
+        }
+    });
+
+    // Projection years buttons
+    document.querySelectorAll('.interval-btn[data-years]').forEach(btn => {
+        btn.addEventListener('click', () => setProjectionYears(parseInt(btn.dataset.years)));
+    });
+
+    // Projection view buttons
+    document.querySelectorAll('.chart-type-btn[data-view]').forEach(btn => {
+        btn.addEventListener('click', () => setProjectionView(btn.dataset.view));
+    });
+
+    // Paste input textarea
+    const pasteInput = document.getElementById('pasteInput');
+    if (pasteInput) {
+        pasteInput.addEventListener('input', validatePasteInput);
+    }
+}
+
 // Initialize from URL on page load (only in browser, not during tests)
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     initFromUrl();
 
-    // Expose functions to window for onclick handlers (ES6 module functions are not global by default)
-    window.setTheme = setTheme;
-    window.setViewMode = setViewMode;
-    window.loadDemoData = loadDemoData;
-    window.downloadHtmlFile = downloadHtmlFile;
-    window.validatePasteInput = validatePasteInput;
-    window.parseAndGenerate = parseAndGenerate;
-    window.loadJsonFile = loadJsonFile;
-    window.cycleNextScenario = cycleNextScenario;
-    window.downloadData = downloadData;
-    window.resetDashboard = resetDashboard;
-    window.setTab = setTab;
-    window.setChartType = setChartType;
-    window.setYoyChartType = setYoyChartType;
-    window.updateCustomRate = updateCustomRate;
-    window.setProjectionYears = setProjectionYears;
-    window.setProjectionView = setProjectionView;
+    // Initialize event listeners when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initEventListeners);
+    } else {
+        initEventListeners();
+    }
 }
 
 // Export functions for testing (ES Modules)
