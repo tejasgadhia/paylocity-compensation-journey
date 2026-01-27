@@ -211,6 +211,44 @@ function escapeHTML(str) {
     return str.replace(/[&<>"'\/]/g, char => htmlEscapeMap[char]);
 }
 
+/**
+ * Validates that dynamic data used in HTML templates contains only safe types.
+ *
+ * Defense-in-depth security check: Ensures template interpolations receive only
+ * safe values (numbers, dates, formatted strings) and not malicious payloads.
+ *
+ * @param {Object} data - Data object to validate
+ * @throws {Error} If data contains unsafe types or suspicious patterns
+ */
+function validateTemplateData(data) {
+    for (const [key, value] of Object.entries(data)) {
+        // Allow null (often used for optional fields like sixFigureDate)
+        if (value === null) continue;
+
+        // Check type is safe (string, number, boolean - no objects, functions, symbols)
+        const type = typeof value;
+        if (!['string', 'number', 'boolean'].includes(type)) {
+            throw new Error(`Unsafe data type for template: ${key} is ${type}`);
+        }
+
+        // For strings, check for suspicious patterns (script tags, event handlers)
+        if (type === 'string') {
+            const suspiciousPatterns = [
+                /<script/i,
+                /javascript:/i,
+                /on\w+\s*=/i,  // onclick=, onerror=, etc.
+                /<iframe/i
+            ];
+
+            for (const pattern of suspiciousPatterns) {
+                if (pattern.test(value)) {
+                    throw new Error(`Suspicious pattern in template data: ${key} contains ${pattern}`);
+                }
+            }
+        }
+    }
+}
+
 // ========================================
 // PARSER
 // ========================================
@@ -592,7 +630,7 @@ const storyContent = {
         title: "Mission Debrief: Compensation Trajectory",
         subtitle: "Classification: Personnel Valuation Report",
         getText: (data) => `
-            <p><span class="story-highlight">MISSION START:</span> Specialist deployed on <span class="story-stat">${data.hireDateFormatted}</span> with initial resource allocation of <span class="story-stat">${data.startSalary}</span>. Operational status: New Hire. Initial positioning established within standard parameters for role classification.</p>
+            <p><span class="story-highlight">MISSION START:</span> Specialist deployed on <span class="story-stat">${escapeHTML(data.hireDateFormatted)}</span> with initial resource allocation of <span class="story-stat">${escapeHTML(data.startSalary)}</span>. Operational status: New Hire. Initial positioning established within standard parameters for role classification.</p>
             
             <p><span class="story-highlight">OPERATIONAL SUMMARY:</span> Over <span class="story-stat">${data.years} years</span> of continuous deployment, the specialist has demonstrated consistent value appreciation. Total resource adjustments: <span class="story-stat">${data.totalAdjustments} modifications</span>. Current valuation stands at <span class="story-stat">${data.currentSalary}</span>, representing a <span class="story-stat">${data.growth}%</span> increase from baseline. Adjustment frequency exceeds standard annual review cycles, indicating active performance recognition protocols.</p>
             
@@ -1100,11 +1138,19 @@ function updateStory() {
         realGrowth: realGrowth.toFixed(1),
         dateRange: new Date(employeeData.hireDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) + ' – Present'
     };
-    
+
+    // Security: Validate data types before template interpolation (defense-in-depth)
+    validateTemplateData(data);
+
     // Set subtitle (static for tactical, dynamic for summary)
     const subtitle = content.getSubtitle ? content.getSubtitle(data) : content.subtitle;
     document.getElementById('storySubtitle').textContent = subtitle;
-    
+
+    // Security Note: innerHTML is safe here because all dynamic values come from safe sources:
+    // - Dates: toLocaleDateString() (browser API, produces safe strings)
+    // - Numbers: toFixed(), formatCurrency() (numeric methods, produce safe strings)
+    // - Parser validates all inputs: parser.js:25-50 (validateSalaryRange) and parser.js:106 (HTML stripping)
+    // No user-controlled strings are interpolated without sanitization.
     document.getElementById('storyText').innerHTML = content.getText(data);
     buildMilestones();
 }
@@ -1157,6 +1203,7 @@ function updateMarket() {
     }
     
     document.getElementById('marketSummaryHeadline').textContent = headline;
+    // Security Note: innerHTML safe - 'detail' contains only <strong> tags around numeric values from toFixed()
     document.getElementById('marketSummaryDetail').innerHTML = detail;
     
     // Build comparison cards
@@ -1169,7 +1216,9 @@ function updateMarket() {
 function buildInflationAnalysis(bench, start, current, years) {
     const container = document.getElementById('inflationAnalysis');
     const nominalGrowth = ((current - start) / start) * 100;
-    
+
+    // Security Note: innerHTML safe - all dynamic values are numeric (toFixed, formatCurrency, Math.round)
+    // No user-controlled strings. Data originates from validated parser (parser.js:25-50).
     container.innerHTML = `
         <div class="inflation-card">
             <div class="inflation-card-title">Cumulative Inflation</div>
@@ -1286,7 +1335,12 @@ function buildMarketComparison() {
             badge: bench.vsIndustryPercent > 5 ? 'above' : bench.vsIndustryPercent < -5 ? 'below' : 'at'
         }
     ];
-    
+
+    // Security Note: innerHTML safe - 'cards' array contains only:
+    // - Static labels (hardcoded strings)
+    // - Numeric values (toFixed, formatCurrency, Math.round - all produce safe strings)
+    // - Badge strings (conditional on 'above'/'below'/'at' - all hardcoded safe values)
+    // No user-controlled data interpolated without validation.
     grid.innerHTML = cards.map(card => `
         <div class="market-card ${card.diff > 0 ? 'positive' : card.diff < 0 ? 'negative' : 'neutral'}">
             <div class="market-card-header">
