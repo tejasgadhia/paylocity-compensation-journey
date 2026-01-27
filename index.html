@@ -3556,7 +3556,35 @@ History
         // ========================================
         // BENCHMARK CALCULATION FUNCTIONS
         // ========================================
-        
+
+        /**
+         * Calculates cumulative inflation over a specific time period.
+         *
+         * Supports partial-year calculations with month-level precision using CPI data.
+         * Handles three scenarios: same year (partial), multi-year with partial start/end,
+         * and full years. Uses compounding to accurately reflect cumulative inflation.
+         *
+         * @param {number} startYear - Starting year (e.g., 2020)
+         * @param {number} endYear - Ending year (e.g., 2023)
+         * @param {number} [startMonth=0] - Starting month (0-indexed: 0=January, 11=December)
+         * @param {number} [endMonth=11] - Ending month (0-indexed: 0=January, 11=December)
+         * @returns {number} Cumulative inflation as percentage (e.g., 12.5 for 12.5%)
+         *
+         * @example
+         * // Full year inflation (2020 to 2023)
+         * const inflation = calculateInflationOverPeriod(2020, 2023);
+         * console.log(inflation); // ~19.5% (cumulative over 4 years)
+         *
+         * @example
+         * // Partial year (March 2023 to October 2023)
+         * const inflation = calculateInflationOverPeriod(2023, 2023, 2, 9);
+         * console.log(inflation); // ~2.73% (8 months of 2023's 4.1% annual rate)
+         *
+         * @example
+         * // Multi-year with partial start and end
+         * const inflation = calculateInflationOverPeriod(2021, 2023, 6, 5);
+         * // July 2021 through May 2023
+         */
         function calculateInflationOverPeriod(startYear, endYear, startMonth = 0, endMonth = 11) {
             // Supports partial years - months are 0-indexed (0 = January, 11 = December)
             let cumulativeInflation = 1;
@@ -3873,7 +3901,41 @@ History
                 records
             };
         }
-        
+
+        /**
+         * Parses a single Paylocity compensation record from raw text.
+         *
+         * Extracts structured data from concatenated values using multiple regex strategies.
+         * Handles Paylocity's inconsistent formatting: concatenated dollar amounts without spaces,
+         * variable decimal places, and missing hourly rates. Uses whitelist approach for
+         * security and defensive parsing for robustness.
+         *
+         * @param {string} dateStr - Date string in MM/DD/YYYY format (e.g., "01/15/2023")
+         * @param {string} text - Raw record text containing reason and dollar amounts
+         * @returns {Object} Parsed compensation record
+         * @returns {string} returns.date - Record date in YYYY-MM-DD format
+         * @returns {string} returns.reason - Change reason ('Merit Increase', 'Promotion', etc.)
+         * @returns {number} returns.perCheck - Per-paycheck amount (bi-weekly)
+         * @returns {number} returns.annual - Annual salary
+         * @returns {number|null} returns.hourlyRate - Hourly rate (null if missing, derived if possible)
+         *
+         * @example
+         * // Normal format with all values
+         * const record = parseRecord("01/15/2023", "Merit Increase   $2,500.0065,000.0031.25");
+         * console.log(record);
+         * // { date: "2023-01-15", reason: "Merit Increase",
+         * //   perCheck: 2500.00, annual: 65000.00, hourlyRate: 31.25 }
+         *
+         * @example
+         * // Missing hourly rate (auto-calculated from annual)
+         * const record = parseRecord("01/15/2023", "Promotion   $3,000.0078,000.00");
+         * console.log(record.hourlyRate); // 37.50 (derived: 78000 / 2080)
+         *
+         * @example
+         * // Concatenated values without spaces
+         * const record = parseRecord("06/12/2022", "Merit Increase$1,166.6712.2807");
+         * // Correctly parses: perCheck=$1,166.67, annual=12.28 (uses exactly 2 decimals)
+         */
         function parseRecord(dateStr, text) {
             // Convert date format from MM/DD/YYYY to YYYY-MM-DD
             const [month, day, year] = dateStr.split('/');
