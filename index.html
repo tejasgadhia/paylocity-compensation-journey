@@ -5183,32 +5183,46 @@ History
         }
 
         function buildYoyChart() {
-            const ctx = document.getElementById('yoyChart').getContext('2d');
-            const colors = getThemeColors();
-            
-            const yoyData = {};
-            employeeData.records.forEach(r => {
-                const year = new Date(r.date).getFullYear();
-                if (!yoyData[year]) {
-                    yoyData[year] = { start: r.annual, end: r.annual };
-                } else {
-                    yoyData[year].start = r.annual;
+            try {
+                const canvas = document.getElementById('yoyChart');
+                if (!canvas) {
+                    console.error('buildYoyChart: Canvas element not found');
+                    showUserMessage('YoY chart rendering failed. Please refresh the page.', 'error');
+                    return;
                 }
-            });
 
-            const years = Object.keys(yoyData).sort();
-            const growthRates = [];
-            
-            for (let i = 1; i < years.length; i++) {
-                const prevYear = years[i - 1];
-                const currYear = years[i];
-                const growth = ((yoyData[currYear].end - yoyData[prevYear].end) / yoyData[prevYear].end) * 100;
-                growthRates.push({ year: currYear, growth });
-            }
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                    console.error('buildYoyChart: Canvas 2D context not available');
+                    showUserMessage('YoY chart rendering failed. Your browser may not support this feature.', 'error');
+                    return;
+                }
 
-            if (charts.yoy) charts.yoy.destroy();
+                const colors = getThemeColors();
 
-            charts.yoy = new Chart(ctx, {
+                const yoyData = {};
+                employeeData.records.forEach(r => {
+                    const year = new Date(r.date).getFullYear();
+                    if (!yoyData[year]) {
+                        yoyData[year] = { start: r.annual, end: r.annual };
+                    } else {
+                        yoyData[year].start = r.annual;
+                    }
+                });
+
+                const years = Object.keys(yoyData).sort();
+                const growthRates = [];
+
+                for (let i = 1; i < years.length; i++) {
+                    const prevYear = years[i - 1];
+                    const currYear = years[i];
+                    const growth = ((yoyData[currYear].end - yoyData[prevYear].end) / yoyData[prevYear].end) * 100;
+                    growthRates.push({ year: currYear, growth });
+                }
+
+                if (charts.yoy) charts.yoy.destroy();
+
+                charts.yoy = new Chart(ctx, {
                 type: state.yoyChartType,
                 data: {
                     labels: growthRates.map(d => d.year),
@@ -5242,36 +5256,54 @@ History
                     }
                 }
             });
+            } catch (error) {
+                console.error('Failed to build YoY chart:', error);
+                showUserMessage('YoY chart rendering failed. Try refreshing the page.', 'error');
+            }
         }
 
         function buildCategoryChart() {
-            const ctx = document.getElementById('categoryChart').getContext('2d');
-            const colors = getThemeColors();
-            
-            // Filter out "New Hire" - it's the starting point, not an adjustment
-            const adjustments = employeeData.records.filter(r => r.reason !== 'New Hire');
-            
-            // Guard against no adjustments
-            if (adjustments.length === 0) return;
-            
-            const categories = {};
-            adjustments.forEach(r => {
-                const reason = r.reason || 'Other';
-                if (reason !== '—') {
-                    categories[reason] = (categories[reason] || 0) + 1;
+            try {
+                const canvas = document.getElementById('categoryChart');
+                if (!canvas) {
+                    console.error('buildCategoryChart: Canvas element not found');
+                    showUserMessage('Category chart rendering failed. Please refresh the page.', 'error');
+                    return;
                 }
-            });
 
-            const labels = Object.keys(categories);
-            const data = Object.values(categories);
-            
-            const categoryColors = [colors.line1, colors.line2, 
-                state.theme === 'tactical' ? '#4598d4' : '#7b2cbf',
-                state.theme === 'tactical' ? '#d45745' : '#d00000'];
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                    console.error('buildCategoryChart: Canvas 2D context not available');
+                    showUserMessage('Category chart rendering failed. Your browser may not support this feature.', 'error');
+                    return;
+                }
 
-            if (charts.category) charts.category.destroy();
+                const colors = getThemeColors();
 
-            charts.category = new Chart(ctx, {
+                // Filter out "New Hire" - it's the starting point, not an adjustment
+                const adjustments = employeeData.records.filter(r => r.reason !== 'New Hire');
+
+                // Guard against no adjustments
+                if (adjustments.length === 0) return;
+
+                const categories = {};
+                adjustments.forEach(r => {
+                    const reason = r.reason || 'Other';
+                    if (reason !== '—') {
+                        categories[reason] = (categories[reason] || 0) + 1;
+                    }
+                });
+
+                const labels = Object.keys(categories);
+                const data = Object.values(categories);
+
+                const categoryColors = [colors.line1, colors.line2,
+                    state.theme === 'tactical' ? '#4598d4' : '#7b2cbf',
+                    state.theme === 'tactical' ? '#d45745' : '#d00000'];
+
+                if (charts.category) charts.category.destroy();
+
+                charts.category = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels,
@@ -5298,6 +5330,10 @@ History
                     }
                 }
             });
+            } catch (error) {
+                console.error('Failed to build category chart:', error);
+                showUserMessage('Category chart rendering failed. Try refreshing the page.', 'error');
+            }
         }
 
         function initProjections() {
@@ -5314,31 +5350,45 @@ History
         }
 
         function buildProjectionChart() {
-            const ctx = document.getElementById('projectionChart').getContext('2d');
-            const colors = getThemeColors();
-            
-            const currentSalary = getCurrentSalary();
-            const cagr = calculateCAGR() / 100;
-            const years = state.projectionYears;
-            const customRate = state.customRate / 100;
+            try {
+                const canvas = document.getElementById('projectionChart');
+                if (!canvas) {
+                    console.error('buildProjectionChart: Canvas element not found');
+                    showUserMessage('Projection chart rendering failed. Please refresh the page.', 'error');
+                    return;
+                }
 
-            const labels = ['Now'];
-            const historical = [currentSalary];
-            const conservative = [currentSalary];
-            const custom = [currentSalary];
-            const optimistic = [currentSalary];
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                    console.error('buildProjectionChart: Canvas 2D context not available');
+                    showUserMessage('Projection chart rendering failed. Your browser may not support this feature.', 'error');
+                    return;
+                }
 
-            for (let i = 1; i <= years; i++) {
-                labels.push(`+${i}yr`);
-                historical.push(currentSalary * Math.pow(1 + cagr, i));
-                conservative.push(currentSalary * Math.pow(1.05, i));
-                custom.push(currentSalary * Math.pow(1 + customRate, i));
-                optimistic.push(currentSalary * Math.pow(1.12, i));
-            }
+                const colors = getThemeColors();
 
-            if (charts.projection) charts.projection.destroy();
+                const currentSalary = getCurrentSalary();
+                const cagr = calculateCAGR() / 100;
+                const years = state.projectionYears;
+                const customRate = state.customRate / 100;
 
-            charts.projection = new Chart(ctx, {
+                const labels = ['Now'];
+                const historical = [currentSalary];
+                const conservative = [currentSalary];
+                const custom = [currentSalary];
+                const optimistic = [currentSalary];
+
+                for (let i = 1; i <= years; i++) {
+                    labels.push(`+${i}yr`);
+                    historical.push(currentSalary * Math.pow(1 + cagr, i));
+                    conservative.push(currentSalary * Math.pow(1.05, i));
+                    custom.push(currentSalary * Math.pow(1 + customRate, i));
+                    optimistic.push(currentSalary * Math.pow(1.12, i));
+                }
+
+                if (charts.projection) charts.projection.destroy();
+
+                charts.projection = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels,
@@ -5370,6 +5420,10 @@ History
                     }
                 }
             });
+            } catch (error) {
+                console.error('Failed to build projection chart:', error);
+                showUserMessage('Projection chart rendering failed. Try refreshing the page.', 'error');
+            }
         }
 
         // ========================================
