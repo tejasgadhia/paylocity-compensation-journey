@@ -3422,12 +3422,49 @@ History
 
     <script>
         // ========================================
+        // CONSTANTS
+        // ========================================
+
+        const CONSTANTS = {
+            // Salary validation
+            MIN_REALISTIC_SALARY: 1000,         // $1K minimum (sanity check)
+            MAX_REALISTIC_SALARY: 10000000,     // $10M maximum (executive cap)
+
+            // Time intervals
+            TYPICAL_RAISE_INTERVAL_MONTHS: 12,  // Annual review cycle
+            CAGR_MIN_YEARS_THRESHOLD: 0.1,      // ~36 days minimum for CAGR calculation
+            CAGR_MIN_YEARS_WARNING: 1,          // Warn if <1 year of data
+
+            // Inflation defaults
+            DEFAULT_CPI_RATE: 2.5,              // Default CPI when data missing (%)
+
+            // Chart configuration
+            CHART_ANIMATION_DURATION: 300,      // ms for smooth transitions
+            CHART_UPDATE_MODE: 'none',          // No animation on theme updates
+            CHART_REBUILD_DELAY: 100,           // ms delay for rebuilds (if needed)
+
+            // UI delays
+            ERROR_MESSAGE_AUTO_DISMISS: 5000,   // ms before auto-removing error banners
+            THEME_SWITCH_DELAY: 100,            // ms delay after theme change
+
+            // LocalStorage keys
+            STORAGE_KEY_THEME: 'theme',
+            STORAGE_KEY_DEMO_BANNER: 'demoBannerDismissed',
+
+            // Screen size breakpoints
+            MOBILE_BREAKPOINT: 900,             // px - below this shows mobile splash
+
+            // Demo scenarios
+            DEMO_SCENARIO_COUNT: 4,             // Number of demo scenarios available
+        };
+
+        // ========================================
         // MOBILE/TABLET DETECTION
         // ========================================
         
         (function() {
             const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(navigator.userAgent);
-            const isSmallScreen = window.innerWidth < 900;
+            const isSmallScreen = window.innerWidth < CONSTANTS.MOBILE_BREAKPOINT;
             
             if (isMobileUA || isSmallScreen) {
                 document.getElementById('mobileSplash').classList.add('active');
@@ -3436,7 +3473,7 @@ History
             
             // Also check on resize
             window.addEventListener('resize', function() {
-                if (window.innerWidth < 900) {
+                if (window.innerWidth < CONSTANTS.MOBILE_BREAKPOINT) {
                     document.getElementById('mobileSplash').classList.add('active');
                     document.body.style.overflow = 'hidden';
                 } else if (!(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(navigator.userAgent))) {
@@ -3525,7 +3562,7 @@ History
             let cumulativeInflation = 1;
             
             for (let year = startYear; year <= endYear; year++) {
-                const rate = cpiData[year] || 2.5; // Default to 2.5% if year not found
+                const rate = cpiData[year] || CONSTANTS.DEFAULT_CPI_RATE; // Default to 2.5% if year not found
                 
                 if (year === startYear && year === endYear) {
                     // Same year - calculate partial
@@ -3576,7 +3613,7 @@ History
         function calculateInflationAdjustedSalary(salary, fromYear, toYear) {
             let adjustedSalary = salary;
             for (let year = fromYear; year < toYear; year++) {
-                const rate = cpiData[year] || 2.5;
+                const rate = cpiData[year] || CONSTANTS.DEFAULT_CPI_RATE;
                 adjustedSalary *= (1 + rate / 100);
             }
             return adjustedSalary;
@@ -4536,7 +4573,7 @@ History
 
             // For very short tenure (<~36 days), use simple percentage instead of CAGR
             // This avoids extreme CAGR values from compounding over very short periods
-            if (years < 0.1) {
+            if (years < CONSTANTS.CAGR_MIN_YEARS_THRESHOLD) {
                 return ((end - start) / start) * 100;
             }
 
@@ -5639,7 +5676,7 @@ History
             document.getElementById('largestRaise').textContent = formatPercent(largestRaise);
             document.getElementById('largestRaiseDate').textContent = new Date(largestRaiseRecord.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
             document.getElementById('avgTimeBetween').textContent = `${avgMonths.toFixed(1)} mo`;
-            const benchmarkMonths = 12;
+            const benchmarkMonths = CONSTANTS.TYPICAL_RAISE_INTERVAL_MONTHS;
             const timeDiff = avgMonths - benchmarkMonths;
             let timeContext;
             if (timeDiff < -2) {
