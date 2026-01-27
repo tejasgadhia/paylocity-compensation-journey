@@ -8,14 +8,21 @@ Paylocity gives you raw pay history tables. It doesn't show you CAGR, market com
 
 ## Screenshots
 
-### Splash Screen (Artistic Theme)
+**Artistic Theme (Light Mode)**
+
 ![Splash Screen - Import Your Data](screenshots/splash-artistic.png)
+*Splash screen with data import instructions*
 
-### Home Dashboard (Artistic Theme)
-![Home Dashboard - Light Mode](screenshots/home-artistic.png)
+![Home Dashboard - KPIs and Timeline](screenshots/home-artistic.png)
+*Dashboard with compensation timeline and key metrics*
 
-### Market Benchmarks (Tactical Theme)
-![Market Comparison - Dark Mode](screenshots/market-tactical.png)
+**Tactical Theme (Dark Mode)**
+
+![Home Dashboard - Dark Mode](screenshots/home-tactical.png)
+*Same dashboard in tactical (dark) theme*
+
+![Market Benchmarks - Industry Comparison](screenshots/market-tactical.png)
+*Benchmark analysis against B2B SaaS industry standards*
 
 ## What This Does
 
@@ -59,6 +66,28 @@ That's it! Your data is processed entirely in your browser—nothing is uploaded
 
 Save as JSON to your computer if you want. Load it later. That's it.
 
+## Don't Trust Me?
+
+Fair. Here's how to use this tool **completely offline** with zero network access:
+
+### Download for Offline Use
+
+1. **Right-click the page** → **Save Page As** → Save as "Webpage, Complete"
+2. **Or** use your browser's built-in save: `Ctrl+S` (Windows) / `Cmd+S` (Mac)
+3. **Disconnect from the internet** (turn off Wi-Fi, unplug ethernet)
+4. **Open the saved HTML file** in your browser
+5. **Paste your Paylocity data** and generate your dashboard
+
+The tool works entirely offline. Open your browser's DevTools (F12) → **Network tab** → you'll see zero outgoing requests after the initial page load.
+
+### Verify the Code
+
+- **Inspect the source**: All ~5,000 lines of code are in one HTML file
+- **Check network activity**: No API calls, no tracking, no external requests (except Chart.js CDN on initial load)
+- **Audit it yourself**: The code is unminified and readable—search for `fetch(`, `XMLHttpRequest`, or `navigator.sendBeacon` to confirm no data leaves your browser
+
+**Privacy promise**: Your salary data never touches a server. It processes in your browser tab and disappears when you close it (unless you explicitly save it).
+
 ## Technical
 
 **Stack:**
@@ -86,7 +115,7 @@ compensation-journey/
 
 ## License
 
-MIT. Use it, modify it, fork it, whatever.
+MIT. Do what you want with it.
 
 ---
 
