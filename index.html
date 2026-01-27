@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compensation Journey</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
-            integrity="sha384-qZNq/5/1NeHjv7pH5hE6Fw4Y7qW13k1kE2pQDQDQtQWNKBBIrN9Hh9RdjW9VgDjG"
             crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -3651,6 +3650,55 @@ History
         }
 
         // ========================================
+        // SECURITY HELPERS
+        // ========================================
+
+        /**
+         * Escapes HTML special characters to prevent XSS attacks.
+         * Converts characters that have special meaning in HTML to their entity equivalents.
+         *
+         * **Security Context:**
+         * This function protects against XSS (Cross-Site Scripting) attacks by escaping
+         * user-provided data before inserting it into HTML via innerHTML. Even though the
+         * parser uses a whitelist approach for the 'reason' field, this provides defense
+         * in depth at the display layer.
+         *
+         * **When to Use:**
+         * - Always escape user-provided strings before inserting via innerHTML
+         * - Especially important for the 'reason' field from Paylocity data
+         * - Use for any data that could potentially contain malicious input
+         *
+         * **Where Used:**
+         * - buildHistoryTable() - Escapes r.reason before display
+         * - buildMilestones() - Escapes milestone text fields
+         *
+         * @param {string} str - The string to escape
+         * @returns {string} The escaped string safe for insertion into HTML
+         *
+         * @example
+         * escapeHTML('<script>alert("XSS")</script>')
+         * // Returns: '&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;'
+         *
+         * @example
+         * // Safe usage in template literal
+         * element.innerHTML = `<span>${escapeHTML(userInput)}</span>`;
+         */
+        function escapeHTML(str) {
+            if (typeof str !== 'string') return str;
+
+            const htmlEscapeMap = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#x27;',
+                '/': '&#x2F;'
+            };
+
+            return str.replace(/[&<>"'\/]/g, char => htmlEscapeMap[char]);
+        }
+
+        // ========================================
         // PARSER
         // ========================================
 
@@ -3741,7 +3789,7 @@ History
             const [month, day, year] = dateStr.split('/');
             const date = `${year}-${month}-${day}`;
             
-            // Extract change reason
+            // Extract change reason (whitelist approach for security)
             let reason = 'Unknown';
             const reasons = ['Merit Increase', 'Promotion', 'Market Adjustment', 'Equity', 'New Hire'];
             for (const r of reasons) {
@@ -3753,6 +3801,10 @@ History
             if (text.includes('—') && reason === 'Unknown') {
                 reason = '—';
             }
+
+            // Security: Strip any HTML-like patterns from reason (defense in depth)
+            // This protects against malicious input even though we escape at display time
+            reason = reason.replace(/<[^>]*>/g, '');
             
             // Extract dollar amounts - use exactly 2 decimal places to handle concatenated values
             // e.g., "$1,166.6712.2807" should parse as $1,166.67 (not $1,166.6712)
@@ -4640,13 +4692,13 @@ History
         function buildMilestones() {
             const milestones = detectMilestones();
             const grid = document.getElementById('milestonesGrid');
-            
+
             grid.innerHTML = milestones.map(m => `
                 <div class="milestone-card">
-                    <div class="milestone-icon">${m.icon}</div>
-                    <div class="milestone-title">${m.title}</div>
-                    <div class="milestone-detail">${m.detail}</div>
-                    <div class="milestone-date">${m.date}</div>
+                    <div class="milestone-icon">${escapeHTML(m.icon)}</div>
+                    <div class="milestone-title">${escapeHTML(m.title)}</div>
+                    <div class="milestone-detail">${escapeHTML(m.detail)}</div>
+                    <div class="milestone-date">${escapeHTML(m.date)}</div>
                 </div>
             `).join('');
         }
@@ -5132,18 +5184,18 @@ History
         function buildHistoryTable() {
             const tbody = document.getElementById('historyTableBody');
             const startingSalary = getStartingSalary();
-            
+
             tbody.innerHTML = employeeData.records.map(r => {
                 const badgeClass = getBadgeClass(r.reason);
                 const index = ((r.annual / startingSalary) * 100).toFixed(0);
-                const changeDisplay = r.change > 0 
+                const changeDisplay = r.change > 0
                     ? (state.showDollars ? `+${formatCurrency(r.change * 24)}` : `+${((r.change * 24 / startingSalary) * 100).toFixed(1)}`)
                     : '—';
-                
+
                 return `
                     <tr>
                         <td>${new Date(r.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                        <td><span class="badge ${badgeClass}">${r.reason}</span></td>
+                        <td><span class="badge ${badgeClass}">${escapeHTML(r.reason)}</span></td>
                         <td>${state.showDollars ? formatCurrency(r.annual) : `Index: ${index}`}</td>
                         <td>${index}</td>
                         <td>${changeDisplay}</td>
