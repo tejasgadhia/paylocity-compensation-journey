@@ -8,14 +8,14 @@ Paylocity gives you raw pay history tables. It doesn't show you CAGR, market com
 
 ## Screenshots
 
+### Splash Screen (Artistic Theme)
+![Splash Screen - Import Your Data](screenshots/splash-artistic.png)
+
 ### Home Dashboard (Artistic Theme)
-![Home Dashboard - Light Mode](screenshots/01-home-artistic.png)
+![Home Dashboard - Light Mode](screenshots/home-artistic.png)
 
 ### Market Benchmarks (Tactical Theme)
-![Market Comparison - Dark Mode](screenshots/10-market-tactical.png)
-
-### Analytics View (Artistic Theme)
-![Analytics Dashboard](screenshots/05-analytics-artistic.png)
+![Market Comparison - Dark Mode](screenshots/market-tactical.png)
 
 ## What This Does
 
