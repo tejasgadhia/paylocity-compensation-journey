@@ -227,6 +227,7 @@ async function loadChartJS() {
     return new Promise((resolve, reject) => {
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';
+        script.integrity = 'sha384-6qM4b9YlReaR+UStB0y5L7X4NPhTc2/4OfIUsSNn4jTrYE6EcjJNFqxAGBINx+9w';
         script.crossOrigin = 'anonymous';
         script.onload = () => {
             console.info('Chart.js loaded successfully');
