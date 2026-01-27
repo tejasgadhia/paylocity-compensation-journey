@@ -6,7 +6,12 @@ import { CONSTANTS, cpiData, benchmarks } from './js/constants.js';
 import {
     calculateInflationOverPeriod,
     calculateRealGrowth,
-    calculateInflationAdjustedSalary
+    calculateInflationAdjustedSalary,
+    getStartingSalary,
+    getCurrentSalary,
+    calculateYearsOfService,
+    calculateCAGR,
+    getBenchmarkComparisons
 } from './js/calculations.js';
 import {
     validateSalaryRange,
@@ -87,80 +92,7 @@ let charts = {
 // ========================================
 // BENCHMARK CALCULATION FUNCTIONS
 // ========================================
-// (Moved to js/calculations.js - imported above)
-
-function getBenchmarkComparisons() {
-    if (!employeeData) return null;
-    
-    const raises = employeeData.records.filter(r => r.changePercent > 0);
-    const avgRaise = raises.length > 0 
-        ? raises.reduce((sum, r) => sum + r.changePercent, 0) / raises.length 
-        : 0;
-    
-    const userCagr = calculateCAGR();
-    const years = calculateYearsOfService();
-    const hireDate = new Date(employeeData.hireDate);
-    const currentDate = new Date(employeeData.currentDate);
-    const startYear = hireDate.getFullYear();
-    const startMonth = hireDate.getMonth();
-    const endYear = currentDate.getFullYear();
-    const endMonth = currentDate.getMonth();
-    
-    // Calculate time between raises (exclude "New Hire" - it's the starting point)
-    const adjustments = employeeData.records.filter(r => r.reason !== 'New Hire');
-    const dates = adjustments.map(r => new Date(r.date)).sort((a, b) => a - b);
-    let totalDays = 0;
-    for (let i = 1; i < dates.length; i++) {
-        totalDays += (dates[i] - dates[i-1]) / (1000 * 60 * 60 * 24);
-    }
-    const avgMonthsBetween = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30.44 : 12;
-    
-    // Inflation calculations (with partial year support)
-    const totalInflation = calculateInflationOverPeriod(startYear, endYear, startMonth, endMonth);
-    const startSalary = getStartingSalary();
-    const currentSalary = getCurrentSalary();
-    const nominalGrowth = ((currentSalary - startSalary) / startSalary) * 100;
-    const realGrowth = calculateRealGrowth(nominalGrowth, totalInflation);
-    
-    // What starting salary would be worth today (inflation-adjusted)
-    const inflationAdjustedStart = calculateInflationAdjustedSalary(startSalary, startYear, endYear);
-    const purchasingPowerGain = currentSalary - inflationAdjustedStart;
-    
-    // Industry comparison: what would salary be at industry CAGR?
-    const industryProjectedSalary = startSalary * Math.pow(1 + benchmarks.industryCagr / 100, years);
-    
-    return {
-        // User metrics
-        avgRaise,
-        userCagr,
-        avgMonthsBetween,
-        totalRaises: raises.length,
-        
-        // Growth comparisons
-        nominalGrowth,
-        totalInflation,
-        realGrowth,
-        inflationAdjustedStart,
-        purchasingPowerGain,
-        
-        // Industry comparisons
-        industryProjectedSalary,
-        vsIndustrySalary: currentSalary - industryProjectedSalary,
-        vsIndustryPercent: ((currentSalary / industryProjectedSalary) - 1) * 100,
-        
-        // Raise comparisons
-        raiseVsTypical: avgRaise - benchmarks.typicalRaise.avg,
-        raiseVsHighPerformer: avgRaise - benchmarks.highPerformerRaise.avg,
-        cagrVsIndustry: userCagr - benchmarks.industryCagr,
-        
-        // Timing comparisons
-        raisesMoreFrequent: benchmarks.avgMonthsBetweenRaises - avgMonthsBetween,
-        
-        // Performance tier
-        performanceTier: avgRaise >= benchmarks.highPerformerRaise.min ? 'high' :
-                         avgRaise >= benchmarks.typicalRaise.avg ? 'solid' : 'below'
-    };
-}
+// All calculation functions moved to js/calculations.js for better modularity and testability
 
 // ========================================
 // SECURITY HELPERS
@@ -761,7 +693,7 @@ function formatCurrency(amount, showDollars = state.showDollars) {
             maximumFractionDigits: 0
         }).format(amount);
     }
-    const startingSalary = getStartingSalary();
+    const startingSalary = getStartingSalary(employeeData);
     const index = (amount / startingSalary) * 100;
     return index.toFixed(0);
 }
@@ -770,65 +702,7 @@ function formatPercent(value) {
     return value.toFixed(1) + '%';
 }
 
-function getStartingSalary() {
-    return employeeData.records[employeeData.records.length - 1].annual;
-}
-
-function getCurrentSalary() {
-    return employeeData.records[0].annual;
-}
-
-/**
- * Calculates Compound Annual Growth Rate (CAGR) for total compensation.
- *
- * CAGR represents the mean annual growth rate over the entire tenure,
- * smoothing out year-to-year variations. Formula: ((End / Start)^(1/Years)) - 1
- *
- * **Security/Stability Protection:**
- * - Guards against division by zero (years = 0, start = 0)
- * - Returns 0 for invalid inputs (negative salaries, zero tenure)
- * - Uses simple percentage for very short tenure (<36 days)
- * - Prevents NaN/Infinity propagation that would crash UI
- *
- * @returns {number} CAGR as percentage (e.g., 8.5 for 8.5%)
- *
- * @example
- * // Starting salary: $60,000, Current: $100,000, Years: 5
- * const cagr = calculateCAGR();
- * console.log(cagr); // ~10.8% annual growth
- *
- * @example
- * // Edge case: Same-day hire and export (years = 0)
- * const cagr = calculateCAGR();
- * console.log(cagr); // 0 (graceful fallback)
- */
-function calculateCAGR() {
-    const start = getStartingSalary();
-    const end = getCurrentSalary();
-    const years = calculateYearsOfService();
-
-    // Validation: Prevent division by zero and NaN propagation
-    if (years <= 0 || start <= 0 || end <= 0) {
-        if (years <= 0 || start <= 0 || end <= 0) {
-            console.warn('calculateCAGR: Invalid inputs, returning 0', { start, end, years });
-        }
-        return 0; // Graceful fallback
-    }
-
-    // For very short tenure (<~36 days), use simple percentage instead of CAGR
-    // This avoids extreme CAGR values from compounding over very short periods
-    if (years < CONSTANTS.CAGR_MIN_YEARS_THRESHOLD) {
-        return ((end - start) / start) * 100;
-    }
-
-    return (Math.pow(end / start, 1 / years) - 1) * 100;
-}
-
-function calculateYearsOfService() {
-    const hire = new Date(employeeData.hireDate);
-    const current = new Date(employeeData.currentDate);
-    return (current - hire) / (1000 * 60 * 60 * 24 * 365.25);
-}
+// Helper functions moved to js/calculations.js (imported above)
 
 function getThemeColors() {
     const style = getComputedStyle(document.documentElement);
@@ -850,7 +724,7 @@ function getThemeColors() {
 function detectMilestones() {
     const milestones = [];
     const records = [...employeeData.records].reverse();
-    const startingSalary = getStartingSalary();
+    const startingSalary = getStartingSalary(employeeData);
     
     // Six figures
     const sixFigures = records.find(r => r.annual >= 100000);
@@ -901,7 +775,7 @@ function detectMilestones() {
     }
 
     // 10 year mark
-    const years = calculateYearsOfService();
+    const years = calculateYearsOfService(employeeData);
     if (years >= 10) {
         milestones.push({
             icon: '🏆',
@@ -1047,8 +921,8 @@ function togglePrivacy() {
 }
 
 function updateAllDisplays() {
-    const current = getCurrentSalary();
-    const start = getStartingSalary();
+    const current = getCurrentSalary(employeeData);
+    const start = getStartingSalary(employeeData);
     
     document.getElementById('currentSalary').textContent = state.showDollars 
         ? formatCurrency(current) 
@@ -1075,12 +949,12 @@ function updateAllDisplays() {
 function updateStory() {
     const content = storyContent[state.theme];
     document.getElementById('storyTitle').textContent = content.title;
-    
-    const start = getStartingSalary();
-    const current = getCurrentSalary();
+
+    const start = getStartingSalary(employeeData);
+    const current = getCurrentSalary(employeeData);
     const growth = ((current - start) / start) * 100;
-    const cagr = calculateCAGR();
-    const years = calculateYearsOfService();
+    const cagr = calculateCAGR(employeeData);
+    const years = calculateYearsOfService(employeeData);
     
     // Exclude "New Hire" - it's the starting point, not an adjustment
     const adjustments = employeeData.records.filter(r => r.reason !== 'New Hire');
@@ -1171,12 +1045,12 @@ function updateStory() {
  * updateMarket(); // Populates #marketSummaryCard with performance analysis
  */
 function updateMarket() {
-    const bench = getBenchmarkComparisons();
+    const bench = getBenchmarkComparisons(employeeData, benchmarks);
     if (!bench) return;
 
-    const start = getStartingSalary();
-    const current = getCurrentSalary();
-    const years = calculateYearsOfService();
+    const start = getStartingSalary(employeeData);
+    const current = getCurrentSalary(employeeData);
+    const years = calculateYearsOfService(employeeData);
     
     // Update header based on theme
     const isOutperforming = bench.cagrVsIndustry > 0 && bench.realGrowth > 0;
@@ -1277,15 +1151,15 @@ function buildMilestones() {
 
 function buildMarketComparison() {
     const grid = document.getElementById('marketComparisonGrid');
-    const bench = getBenchmarkComparisons();
-    
+    const bench = getBenchmarkComparisons(employeeData, benchmarks);
+
     if (!bench) {
         grid.innerHTML = '<p style="color: var(--text-muted);">Unable to calculate market comparisons.</p>';
         return;
     }
-    
-    const start = getStartingSalary();
-    const current = getCurrentSalary();
+
+    const start = getStartingSalary(employeeData);
+    const current = getCurrentSalary(employeeData);
     
     const cards = [
         {
@@ -1517,7 +1391,7 @@ function buildMainChart() {
             return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
         });
 
-        const values = data.map(r => state.showDollars ? r.annual : (r.annual / getStartingSalary()) * 100);
+        const values = data.map(r => state.showDollars ? r.annual : (r.annual / getStartingSalary(employeeData)) * 100);
 
         if (charts.main) {
             charts.main.destroy();
@@ -1752,7 +1626,7 @@ function buildCategoryChart() {
 
 function initProjections() {
     // Set slider to historical CAGR
-    const historicalCAGR = Math.round(calculateCAGR());
+    const historicalCAGR = Math.round(calculateCAGR(employeeData));
     state.cagr = historicalCAGR;
     state.customRate = historicalCAGR;
     
@@ -1781,8 +1655,8 @@ function buildProjectionChart() {
 
         const colors = getThemeColors();
 
-        const currentSalary = getCurrentSalary();
-        const cagr = calculateCAGR() / 100;
+        const currentSalary = getCurrentSalary(employeeData);
+        const cagr = calculateCAGR(employeeData) / 100;
         const years = state.projectionYears;
         const customRate = state.customRate / 100;
 
