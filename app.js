@@ -65,28 +65,136 @@ function downloadHtmlFile() {
 }
 
 // ========================================
-// STATE
+// STATE MANAGEMENT (Closes #26)
 // ========================================
 
+/**
+ * Centralized state manager for encapsulated state management.
+ * Provides controlled access to application state through getters/setters.
+ */
+const AppState = {
+    // Private state (accessed through getters/setters)
+    _employeeData: null,
+    _ui: {
+        theme: 'artistic',
+        showDollars: true,
+        currentTab: 'home',
+        mainChartType: 'line',
+        yoyChartType: 'bar',
+        projectionYears: 5,
+        customRate: 8,
+        currentScenarioIndex: 0
+    },
+    _charts: {
+        main: null,
+        yoy: null,
+        category: null,
+        projection: null
+    },
+
+    // Employee Data Getters/Setters
+    getEmployeeData() {
+        return this._employeeData;
+    },
+    setEmployeeData(data) {
+        this._employeeData = data;
+    },
+    hasEmployeeData() {
+        return this._employeeData !== null;
+    },
+
+    // Chart Getters/Setters
+    getChart(chartName) {
+        return this._charts[chartName];
+    },
+    setChart(chartName, chartInstance) {
+        this._charts[chartName] = chartInstance;
+    },
+    destroyChart(chartName) {
+        if (this._charts[chartName]) {
+            this._charts[chartName].destroy();
+            this._charts[chartName] = null;
+        }
+    },
+    destroyAllCharts() {
+        Object.keys(this._charts).forEach(name => this.destroyChart(name));
+    },
+
+    // UI State Getters/Setters
+    getTheme() {
+        return this._ui.theme;
+    },
+    setTheme(theme) {
+        this._ui.theme = theme;
+    },
+    getShowDollars() {
+        return this._ui.showDollars;
+    },
+    setShowDollars(value) {
+        this._ui.showDollars = value;
+    },
+    getCurrentTab() {
+        return this._ui.currentTab;
+    },
+    setCurrentTab(tab) {
+        this._ui.currentTab = tab;
+    },
+    getMainChartType() {
+        return this._ui.mainChartType;
+    },
+    setMainChartType(type) {
+        this._ui.mainChartType = type;
+    },
+    getYoyChartType() {
+        return this._ui.yoyChartType;
+    },
+    setYoyChartType(type) {
+        this._ui.yoyChartType = type;
+    },
+    getProjectionYears() {
+        return this._ui.projectionYears;
+    },
+    setProjectionYears(years) {
+        this._ui.projectionYears = years;
+    },
+    getCustomRate() {
+        return this._ui.customRate;
+    },
+    setCustomRate(rate) {
+        this._ui.customRate = rate;
+    },
+    getCurrentScenarioIndex() {
+        return this._ui.currentScenarioIndex;
+    },
+    setCurrentScenarioIndex(index) {
+        this._ui.currentScenarioIndex = index;
+    }
+};
+
+// Legacy global state (will be migrated to AppState during refactor)
+// For now, keep these for backward compatibility with existing code
 let employeeData = null;
+let state = AppState._ui;  // Direct reference to maintain reactivity
+let charts = AppState._charts;  // Direct reference to maintain reactivity
 
-let state = {
-    theme: 'artistic',
-    showDollars: true,
-    currentTab: 'home',
-    mainChartType: 'line',
-    yoyChartType: 'bar',
-    projectionYears: 5,
-    customRate: 8,
-    currentScenarioIndex: 0
-};
+/**
+ * Helper function to set employee data and keep AppState in sync.
+ * Use this instead of direct assignment to employeeData.
+ *
+ * @param {Object|null} data - Employee compensation data
+ */
+function setEmployeeData(data) {
+    employeeData = data;
+    AppState.setEmployeeData(data);
+}
 
-let charts = {
-    main: null,
-    yoy: null,
-    category: null,
-    projection: null
-};
+/**
+ * Helper function to clear all application state.
+ */
+function clearAppState() {
+    setEmployeeData(null);
+    AppState.destroyAllCharts();
+}
 
 
 // ========================================
@@ -836,41 +944,50 @@ function updateChartTheme(chart) {
 
     const colors = getThemeColors();
 
-    // Update dataset colors
+    // Update dataset colors using metadata (closes #29)
     chart.data.datasets.forEach((dataset) => {
-        // Update border colors
-        if (dataset.borderColor) {
-            // Check if it's using a theme-specific color that needs updating
-            const isDynamicColor = dataset.borderColor.includes('rgb') ||
-                                  dataset.borderColor.includes('#');
-            if (isDynamicColor) {
-                // For main datasets, use primary colors
-                if (dataset.label?.includes('Annual Salary') || dataset.label?.includes('Index Value')) {
+        // Update border colors based on dataset type (metadata-driven, not label-matching)
+        if (dataset.borderColor && dataset.datasetType) {
+            switch (dataset.datasetType) {
+                case 'mainSalary':
                     dataset.borderColor = colors.line1;
                     dataset.pointBackgroundColor = colors.line1;
                     dataset.pointBorderColor = colors.line1;
-                } else if (dataset.label?.includes('YoY Growth')) {
+                    break;
+                case 'yoyGrowth':
                     dataset.borderColor = colors.line2;
-                } else if (dataset.label?.includes('Historical CAGR')) {
+                    break;
+                case 'historicalCAGR':
                     dataset.borderColor = colors.line1;
-                } else if (dataset.label?.includes('Custom')) {
+                    break;
+                case 'custom':
                     dataset.borderColor = colors.line2;
-                } else if (dataset.label?.includes('Conservative')) {
+                    break;
+                case 'conservative':
                     dataset.borderColor = state.theme === 'tactical' ? '#666' : '#8a837a';
-                } else if (dataset.label?.includes('Optimistic')) {
+                    break;
+                case 'optimistic':
                     dataset.borderColor = state.theme === 'tactical' ? '#4598d4' : '#7b2cbf';
-                }
+                    break;
             }
         }
 
         // Update background colors for bar/area charts
         if (dataset.backgroundColor && dataset.backgroundColor !== 'transparent') {
-            if (state.mainChartType === 'area') {
-                dataset.backgroundColor = colors.fill1;
-            } else if (state.mainChartType === 'bar') {
-                dataset.backgroundColor = colors.line1;
-            } else if (state.yoyChartType === 'bar') {
-                dataset.backgroundColor = colors.line2;
+            // Use dataset type for precise color matching
+            switch (dataset.datasetType) {
+                case 'mainSalary':
+                    if (state.mainChartType === 'area') {
+                        dataset.backgroundColor = colors.fill1;
+                    } else if (state.mainChartType === 'bar') {
+                        dataset.backgroundColor = colors.line1;
+                    }
+                    break;
+                case 'yoyGrowth':
+                    if (state.yoyChartType === 'bar') {
+                        dataset.backgroundColor = colors.line2;
+                    }
+                    break;
             }
         }
     });
@@ -1443,8 +1560,9 @@ function buildMainChart() {
             datasets: [{
                 label: state.showDollars ? 'Annual Salary' : 'Index Value',
                 data: values,
+                datasetType: 'mainSalary', // Metadata for theme updates (closes #29)
                 borderColor: colors.line1,
-                backgroundColor: state.mainChartType === 'area' ? colors.fill1 : 
+                backgroundColor: state.mainChartType === 'area' ? colors.fill1 :
                                 state.mainChartType === 'bar' ? colors.line1 : 'transparent',
                 fill: state.mainChartType === 'area',
                 tension: state.mainChartType === 'step' ? 0 : 0.3,
@@ -1547,6 +1665,7 @@ function buildYoyChart() {
             datasets: [{
                 label: 'YoY Growth %',
                 data: growthRates.map(d => d.growth),
+                datasetType: 'yoyGrowth', // Metadata for theme updates (closes #29)
                 borderColor: colors.line2,
                 backgroundColor: state.yoyChartType === 'bar' ? colors.line2 : 'transparent',
                 borderWidth: 2,
@@ -1706,10 +1825,10 @@ function buildProjectionChart() {
         data: {
             labels,
             datasets: [
-                { label: `Historical CAGR (${(cagr * 100).toFixed(1)}%)`, data: historical, borderColor: colors.line1, backgroundColor: 'transparent', borderWidth: 3, tension: 0.3, pointRadius: 4 },
-                { label: 'Conservative (5%)', data: conservative, borderColor: state.theme === 'tactical' ? '#666' : '#8a837a', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5,5], tension: 0.3, pointRadius: 3 },
-                { label: `Custom (${state.customRate}%)`, data: custom, borderColor: colors.line2, backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 4 },
-                { label: 'Optimistic (12%)', data: optimistic, borderColor: state.theme === 'tactical' ? '#4598d4' : '#7b2cbf', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5,5], tension: 0.3, pointRadius: 3 }
+                { label: `Historical CAGR (${(cagr * 100).toFixed(1)}%)`, data: historical, datasetType: 'historicalCAGR', borderColor: colors.line1, backgroundColor: 'transparent', borderWidth: 3, tension: 0.3, pointRadius: 4 },
+                { label: 'Conservative (5%)', data: conservative, datasetType: 'conservative', borderColor: state.theme === 'tactical' ? '#666' : '#8a837a', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5,5], tension: 0.3, pointRadius: 3 },
+                { label: `Custom (${state.customRate}%)`, data: custom, datasetType: 'custom', borderColor: colors.line2, backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 4 },
+                { label: 'Optimistic (12%)', data: optimistic, datasetType: 'optimistic', borderColor: state.theme === 'tactical' ? '#4598d4' : '#7b2cbf', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5,5], tension: 0.3, pointRadius: 3 }
             ]
         },
         options: {
