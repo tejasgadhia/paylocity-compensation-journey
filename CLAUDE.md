@@ -325,29 +325,42 @@ Keep it self-contained, performant, and privacy-first!
 
 ---
 
-## Next Steps (2026-01-27)
+## Project Status (2026-01-27)
 
-**Phase 2 COMPLETE** ✅ All code organization issues resolved!
-- ✅ #30: Move calculation helper functions to calculations.js
-- ✅ #31: Replace magic numbers with named constants
-- ✅ #27: Extract tooltip config factory function
-- ✅ #29: Fix chart theme brittleness (use metadata instead of label matching)
-- ✅ #26: Encapsulate global state management (AppState with getters/setters)
+**Phases 2-4 COMPLETE** ✅ Production-ready!
 
-**Phase 3 (Polish)**:
-- #20 🟡 MEDIUM: Differentiate "Start Over"/"Save Data" buttons (design back-and-forth)
+**18 issues closed** across code organization, security hardening, and privacy enhancements:
 
-**Phase 4 (Nice-to-Have)**:
-- #25 🔴 HIGH/hard: Reduce cyclomatic complexity in parseRecord()
-- #28 🟡 MEDIUM: Strengthen CSP (remove unsafe-inline)
-- #34 🟢 LOW/easy: Add download warning modal (data privacy UX)
-- #33 🟢 LOW/easy: Self-host Google Fonts (privacy)
-- #32 🟢 LOW/hard: Consider app.js decomposition (future refactor)
+**Phase 2 - Code Organization:**
+- ✅ #30: Calculation helpers → calculations.js
+- ✅ #31: Magic numbers → named constants
+- ✅ #27: Tooltip factory pattern
+- ✅ #29: Chart theme metadata (robust switching)
+- ✅ #26: State management encapsulation (AppState)
 
-**Comprehensive Refactor Plan**: See `REFACTOR_PLAN.md` - scheduled for next week after usage reset
+**Phase 3 - Security:**
+- ✅ #23: Subresource Integrity (SRI)
+- ✅ #24: XSS prevention (escapeHTML)
+- ✅ #28: CSP hardened (no unsafe-inline)
+
+**Phase 4 - Privacy & Quality:**
+- ✅ #25: parseRecord() complexity reduced (<10)
+- ✅ #33: Google Fonts self-hosted
+- ✅ #34: Download warning modal
+- ✅ #14-#19: Various improvements
+
+**Remaining (Optional):**
+- #20 🟢 LOW: Button differentiation (UX polish, deferred)
+- #32 🟢 LOW: app.js decomposition (future refactor)
+
+**Next Steps**:
+- **Option A**: Use as-is (production-ready)
+- **Option B**: Major refactor (see REFACTOR_PLAN.md - React + TypeScript)
+- **Option C**: Optional UX polish (#20)
 
 **Recent commits**:
-- 1578af5 (fix chart theme + state management - closes #29, #26)
-- f0a5463 (move calculations)
-- 4aa05c2 (constants)
-- dfaec63 (tooltip factory)
+- dec7b1a (reduce parseRecord complexity - closes #25)
+- 532c062 (strengthen CSP - closes #28)
+- 602cda8 (self-host fonts - closes #33)
+- fa959f4 (download warning - closes #34)
+- 1578af5 (chart theme + state - closes #29, #26)
