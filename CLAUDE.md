@@ -327,20 +327,27 @@ Keep it self-contained, performant, and privacy-first!
 
 ## Next Steps (2026-01-27)
 
-**Phase 2 Complete** ✅ Issues #30, #31, #27 - Code organization improvements done
+**Phase 2 COMPLETE** ✅ All code organization issues resolved!
+- ✅ #30: Move calculation helper functions to calculations.js
+- ✅ #31: Replace magic numbers with named constants
+- ✅ #27: Extract tooltip config factory function
+- ✅ #29: Fix chart theme brittleness (use metadata instead of label matching)
+- ✅ #26: Encapsulate global state management (AppState with getters/setters)
 
-**Continue with remaining Phase 2 (Code Organization)**:
-- #29 🟡 MEDIUM: Fix chart theme brittleness (use metadata instead of rebuilding)
-- #26 🟡 MEDIUM: Encapsulate global state management (state object pattern)
-
-**Then Phase 3 (Polish)**:
+**Phase 3 (Polish)**:
 - #20 🟡 MEDIUM: Differentiate "Start Over"/"Save Data" buttons (design back-and-forth)
 
-**Then Phase 4 (Nice-to-Have)**:
+**Phase 4 (Nice-to-Have)**:
 - #25 🔴 HIGH/hard: Reduce cyclomatic complexity in parseRecord()
 - #28 🟡 MEDIUM: Strengthen CSP (remove unsafe-inline)
 - #34 🟢 LOW/easy: Add download warning modal (data privacy UX)
 - #33 🟢 LOW/easy: Self-host Google Fonts (privacy)
 - #32 🟢 LOW/hard: Consider app.js decomposition (future refactor)
 
-**Recent commits**: f0a5463 (move calculations), 4aa05c2 (constants), dfaec63 (tooltip factory)
+**Comprehensive Refactor Plan**: See `REFACTOR_PLAN.md` - scheduled for next week after usage reset
+
+**Recent commits**:
+- 1578af5 (fix chart theme + state management - closes #29, #26)
+- f0a5463 (move calculations)
+- 4aa05c2 (constants)
+- dfaec63 (tooltip factory)
