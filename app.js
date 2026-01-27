@@ -2051,6 +2051,24 @@ function initFromUrl() {
 // Initialize from URL on page load (only in browser, not during tests)
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     initFromUrl();
+
+    // Expose functions to window for onclick handlers (ES6 module functions are not global by default)
+    window.setTheme = setTheme;
+    window.setViewMode = setViewMode;
+    window.loadDemoData = loadDemoData;
+    window.downloadHtmlFile = downloadHtmlFile;
+    window.validatePasteInput = validatePasteInput;
+    window.parseAndGenerate = parseAndGenerate;
+    window.loadJsonFile = loadJsonFile;
+    window.cycleNextScenario = cycleNextScenario;
+    window.downloadData = downloadData;
+    window.resetDashboard = resetDashboard;
+    window.setTab = setTab;
+    window.setChartType = setChartType;
+    window.setYoyChartType = setYoyChartType;
+    window.updateCustomRate = updateCustomRate;
+    window.setProjectionYears = setProjectionYears;
+    window.setProjectionView = setProjectionView;
 }
 
 // Export functions for testing (ES Modules)
