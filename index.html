@@ -11,8 +11,7 @@
                    img-src 'self' data:;
                    connect-src 'none';">
     <title>Compensation Journey</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
-            crossorigin="anonymous"></script>
+    <!-- Chart.js lazy-loaded dynamically when needed for faster landing page -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Optimized: Reduced from 4 families to 2, removed unused weight 500 -->
@@ -3976,10 +3975,36 @@ History
         }
 
         // ========================================
+        // CHART.JS LAZY LOADING
+        // ========================================
+
+        async function loadChartJS() {
+            // If Chart.js already loaded, return immediately
+            if (window.Chart) return;
+
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';
+                script.crossOrigin = 'anonymous';
+                script.onload = () => {
+                    console.info('Chart.js loaded successfully');
+                    resolve();
+                };
+                script.onerror = () => {
+                    const error = 'Failed to load Chart.js library';
+                    console.error(error);
+                    showUserMessage('Failed to load charting library. Please refresh and try again.', 'error');
+                    reject(new Error(error));
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        // ========================================
         // PARSE AND GENERATE
         // ========================================
-        
-        function parseAndGenerate() {
+
+        async function parseAndGenerate() {
             const input = document.getElementById('pasteInput').value.trim();
             const messageDiv = document.getElementById('validationMessage');
             
@@ -4004,6 +4029,10 @@ History
                 
                 employeeData.isDemo = false;
                 messageDiv.className = 'validation-message';
+
+                // Lazy-load Chart.js before showing dashboard (performance optimization)
+                await loadChartJS();
+
                 showDashboard();
                 // Hide demo banner for real data
                 document.getElementById('demoBanner').classList.add('hidden');
@@ -4167,16 +4196,16 @@ History
             }
         ];
 
-        function loadDemoData(scenarioIndex = null) {
+        async function loadDemoData(scenarioIndex = null) {
             // If no index provided, use current state index
             if (scenarioIndex === null) {
                 scenarioIndex = state.currentScenarioIndex;
             } else {
                 state.currentScenarioIndex = scenarioIndex;
             }
-            
+
             const scenario = DEMO_SCENARIOS[scenarioIndex];
-            
+
             employeeData = {
                 hireDate: scenario.hireDate,
                 currentDate: scenario.currentDate,
@@ -4184,7 +4213,10 @@ History
                 isDemo: true,
                 scenarioId: scenario.id
             };
-            
+
+            // Lazy-load Chart.js before showing dashboard (performance optimization)
+            await loadChartJS();
+
             showDashboard();
             
             // Update demo banner
@@ -4195,18 +4227,18 @@ History
             updateUrlParams();
         }
 
-        function cycleNextScenario() {
+        async function cycleNextScenario() {
             // Move to next scenario (wrap around)
             state.currentScenarioIndex = (state.currentScenarioIndex + 1) % DEMO_SCENARIOS.length;
-            
+
             // Destroy existing charts before regenerating
             Object.values(charts).forEach(chart => {
                 if (chart) chart.destroy();
             });
             charts = { main: null, yoy: null, category: null, projection: null };
-            
+
             // Load the new scenario
-            loadDemoData(state.currentScenarioIndex);
+            await loadDemoData(state.currentScenarioIndex);
         }
 
         function updateScenarioLabel() {
