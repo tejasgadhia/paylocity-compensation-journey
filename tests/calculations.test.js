@@ -14,7 +14,7 @@ import {
     calculateInflationOverPeriod,
     calculateRealGrowth,
     calculateInflationAdjustedSalary
-} from '../app.js';
+} from '../js/calculations.js';
 
 // We need to mock the global state that these functions depend on
 // For now, we'll test them indirectly or create wrapper tests

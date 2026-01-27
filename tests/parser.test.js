@@ -12,9 +12,9 @@ import { describe, it, expect } from 'vitest';
 import {
     parsePaylocityData,
     parseRecord,
-    validateSalaryRange,
-    escapeHTML
-} from '../app.js';
+    validateSalaryRange
+} from '../js/parser.js';
+import { escapeHTML } from '../app.js';
 
 describe('parsePaylocityData', () => {
     describe('Valid Input Handling', () => {
