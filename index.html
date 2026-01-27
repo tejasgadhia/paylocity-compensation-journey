@@ -6,16 +6,60 @@
     <meta http-equiv="Content-Security-Policy"
           content="default-src 'self';
                    script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline';
-                   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-                   font-src 'self' https://fonts.gstatic.com;
+                   style-src 'self' 'unsafe-inline';
+                   font-src 'self';
                    img-src 'self' data:;
                    connect-src 'none';">
     <title>Compensation Journey</title>
     <!-- Chart.js lazy-loaded dynamically when needed for faster landing page -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Optimized: Reduced from 4 families to 2, removed unused weight 500 -->
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ========================================
+           SELF-HOSTED FONTS (Closes #33)
+           ======================================== */
+
+        @font-face {
+            font-family: 'JetBrains Mono';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('assets/fonts/jetbrains-mono-400.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'JetBrains Mono';
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+            src: url('assets/fonts/jetbrains-mono-600.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'JetBrains Mono';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: url('assets/fonts/jetbrains-mono-700.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'Space Grotesk';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('assets/fonts/space-grotesk-400.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'Space Grotesk';
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+            src: url('assets/fonts/space-grotesk-600.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'Space Grotesk';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: url('assets/fonts/space-grotesk-700.ttf') format('truetype');
+        }
+    </style>
     <style>
         /* ========================================
            CSS CUSTOM PROPERTIES - THEMES
