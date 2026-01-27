@@ -4358,6 +4358,86 @@ History
         // ========================================
         // UTILITY FUNCTIONS
         // ========================================
+
+        /**
+         * Wraps chart build functions with error handling.
+         * Prevents chart rendering failures from crashing the entire app.
+         *
+         * @param {Function} buildFn - The chart build function to wrap
+         * @param {string} chartName - Name of the chart for error messages
+         * @returns {Function} Wrapped function with error handling
+         *
+         * @example
+         * const safeBuildChart = withChartErrorHandling(buildMainChart, 'Main Chart');
+         * safeBuildChart(); // Catches and logs any errors
+         */
+        function withChartErrorHandling(buildFn, chartName) {
+            return function() {
+                try {
+                    return buildFn.apply(this, arguments);
+                } catch (error) {
+                    console.error(`${chartName} rendering failed:`, error);
+                    showUserMessage(`${chartName} could not be rendered. Please refresh the page.`, 'warning');
+                }
+            };
+        }
+
+        /**
+         * Displays a user-facing message banner at the top of the page.
+         * Automatically removes after 5 seconds.
+         *
+         * @param {string} message - The message to display
+         * @param {string} type - Message type: 'error', 'warning', 'success', 'info'
+         *
+         * @example
+         * showUserMessage('Chart rendering failed. Try refreshing.', 'error');
+         * showUserMessage('Data saved successfully!', 'success');
+         */
+        function showUserMessage(message, type = 'error') {
+            // Remove any existing messages
+            document.querySelectorAll('.user-message').forEach(el => el.remove());
+
+            const banner = document.createElement('div');
+            banner.className = `user-message user-message-${type}`;
+            banner.innerHTML = `
+                <span>${escapeHTML(message)}</span>
+                <button onclick="this.parentElement.remove()" aria-label="Dismiss message">✕</button>
+            `;
+            banner.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 10000;
+                padding: 1rem 2rem;
+                background: ${type === 'error' ? '#d32f2f' : type === 'warning' ? '#f57c00' : type === 'success' ? '#388e3c' : '#1976d2'};
+                color: white;
+                text-align: center;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            `;
+            banner.querySelector('button').style.cssText = `
+                background: transparent;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                padding: 0 0.5rem;
+                margin-left: 1rem;
+            `;
+
+            document.body.prepend(banner);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (banner.parentElement) {
+                    banner.remove();
+                }
+            }, 5000);
+        }
         
         function formatCurrency(amount, showDollars = state.showDollars) {
             if (showDollars) {
@@ -4999,23 +5079,37 @@ History
          * buildMainChart(); // Creates new area chart with dollar values
          */
         function buildMainChart() {
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            const colors = getThemeColors();
-            
-            const data = [...employeeData.records].reverse();
-            
-            const labels = data.map(r => {
-                const date = new Date(r.date);
-                return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-            });
-            
-            const values = data.map(r => state.showDollars ? r.annual : (r.annual / getStartingSalary()) * 100);
+            try {
+                const canvas = document.getElementById('mainChart');
+                if (!canvas) {
+                    console.error('buildMainChart: Canvas element not found');
+                    showUserMessage('Chart rendering failed. Please refresh the page.', 'error');
+                    return;
+                }
 
-            if (charts.main) {
-                charts.main.destroy();
-            }
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                    console.error('buildMainChart: Canvas 2D context not available');
+                    showUserMessage('Chart rendering failed. Your browser may not support this feature.', 'error');
+                    return;
+                }
 
-            charts.main = new Chart(ctx, {
+                const colors = getThemeColors();
+
+                const data = [...employeeData.records].reverse();
+
+                const labels = data.map(r => {
+                    const date = new Date(r.date);
+                    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                });
+
+                const values = data.map(r => state.showDollars ? r.annual : (r.annual / getStartingSalary()) * 100);
+
+                if (charts.main) {
+                    charts.main.destroy();
+                }
+
+                charts.main = new Chart(ctx, {
                 type: state.mainChartType === 'bar' ? 'bar' : 'line',
                 data: {
                     labels,
@@ -5070,9 +5164,22 @@ History
                 }
             });
 
-            // Hide loading state
-            const loading = document.getElementById('mainChartLoading');
-            if (loading) loading.classList.add('hidden');
+                // Hide loading state
+                const loading = document.getElementById('mainChartLoading');
+                if (loading) loading.classList.add('hidden');
+            } catch (error) {
+                console.error('buildMainChart: Chart creation failed', error);
+                showUserMessage('Chart rendering failed. Please try refreshing the page.', 'error');
+
+                // Attempt to show a fallback message in the chart container
+                const canvas = document.getElementById('mainChart');
+                if (canvas && canvas.parentElement) {
+                    const fallback = document.createElement('div');
+                    fallback.style.cssText = 'padding: 2rem; text-align: center; color: var(--text-muted);';
+                    fallback.textContent = 'Chart could not be rendered. Please refresh the page or try a different browser.';
+                    canvas.parentElement.appendChild(fallback);
+                }
+            }
         }
 
         function buildYoyChart() {
