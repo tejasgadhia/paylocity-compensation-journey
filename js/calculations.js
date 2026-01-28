@@ -239,12 +239,7 @@ export function getBenchmarkComparisons(employeeData, benchmarks) {
 
     // Calculate time between raises (exclude "New Hire" - it's the starting point)
     const adjustments = employeeData.records.filter(r => r.reason !== 'New Hire');
-    const dates = adjustments.map(r => new Date(r.date)).sort((a, b) => a - b);
-    let totalDays = 0;
-    for (let i = 1; i < dates.length; i++) {
-        totalDays += (dates[i] - dates[i-1]) / CONSTANTS.MS_PER_DAY;
-    }
-    const avgMonthsBetween = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30.44 : 12;
+    const avgMonthsBetween = calculateAverageMonthsBetweenDates(adjustments);
 
     // Inflation calculations (with partial year support)
     const totalInflation = calculateInflationOverPeriod(startYear, endYear, startMonth, endMonth);
@@ -296,4 +291,30 @@ export function getBenchmarkComparisons(employeeData, benchmarks) {
     // Cache the result on the employeeData object
     employeeData._cachedBenchmarks = result;
     return result;
+}
+
+/**
+ * Calculates average months between adjustment dates.
+ *
+ * Useful for determining raise frequency. Excludes the initial hire date
+ * by accepting pre-filtered records (typically excluding "New Hire" entries).
+ *
+ * @param {Array<{date: string}>} records - Records with date field (should exclude New Hire)
+ * @param {number} [defaultValue=12] - Default value if insufficient records
+ * @returns {number} Average months between adjustments
+ *
+ * @example
+ * const adjustments = records.filter(r => r.reason !== 'New Hire');
+ * const avgMonths = calculateAverageMonthsBetweenDates(adjustments);
+ * console.log(avgMonths); // 8.5 (raises every ~8.5 months)
+ */
+export function calculateAverageMonthsBetweenDates(records, defaultValue = 12) {
+    const dates = records.map(r => new Date(r.date)).sort((a, b) => a - b);
+    if (dates.length < 2) return defaultValue;
+
+    let totalDays = 0;
+    for (let i = 1; i < dates.length; i++) {
+        totalDays += (dates[i] - dates[i-1]) / CONSTANTS.MS_PER_DAY;
+    }
+    return (totalDays / (dates.length - 1)) / 30.44;
 }

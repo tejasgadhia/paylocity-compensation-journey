@@ -18,7 +18,8 @@ import {
     getCurrentSalary,
     calculateYearsOfService,
     calculateCAGR,
-    getBenchmarkComparisons
+    getBenchmarkComparisons,
+    calculateAverageMonthsBetweenDates
 } from './js/calculations.js';
 import {
     validateSalaryRange,
@@ -599,7 +600,7 @@ function loadJsonFile(event) {
             // Update URL (removes demo flag)
             updateUrlParams();
         } catch (err) {
-            alert('Error loading file: ' + err.message);
+            showUserMessage('Error loading file: ' + err.message, 'error');
         }
     };
     reader.readAsText(file);
@@ -1166,12 +1167,7 @@ function updateStory() {
     const meritPercent = adjustments.length > 0 ? ((meritCount / adjustments.length) * 100).toFixed(1) : '0';
     
     // Calculate avg interval (exclude New Hire from time calculation)
-    const dates = adjustments.map(r => new Date(r.date)).sort((a, b) => a - b);
-    let totalDays = 0;
-    for (let i = 1; i < dates.length; i++) {
-        totalDays += (dates[i] - dates[i-1]) / CONSTANTS.MS_PER_DAY;
-    }
-    const avgMonths = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30.44 : 0;
+    const avgMonths = adjustments.length > 0 ? calculateAverageMonthsBetweenDates(adjustments, 0) : 0;
 
     // Find six figure date and calculate time to reach it
     const recordsChron = [...employeeData.records].reverse();
@@ -1853,7 +1849,7 @@ function buildCategoryChart() {
         const categories = {};
         adjustments.forEach(r => {
             const reason = r.reason || 'Other';
-            if (reason !== '—') {
+            if (reason !== CONSTANTS.EMPTY_REASON_PLACEHOLDER) {
                 categories[reason] = (categories[reason] || 0) + 1;
             }
         });
@@ -2127,12 +2123,7 @@ function updateAnalytics() {
     const meritCount = adjustments.filter(r => r.reason.includes('Merit')).length;
     
     // Use adjustments (excludes New Hire) for time between raises
-    const dates = adjustments.map(r => new Date(r.date)).sort((a, b) => a - b);
-    let totalDays = 0;
-    for (let i = 1; i < dates.length; i++) {
-        totalDays += (dates[i] - dates[i-1]) / CONSTANTS.MS_PER_DAY;
-    }
-    const avgMonths = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30.44 : 12;
+    const avgMonths = calculateAverageMonthsBetweenDates(adjustments);
     
     document.getElementById('cagr').textContent = formatPercent(calculateCAGR(employeeData));
     document.getElementById('avgRaise').textContent = formatPercent(avgRaisePercent);
@@ -2168,7 +2159,7 @@ function updateAnalytics() {
 function setProjectionYears(years) {
     state.projectionYears = years;
     document.querySelectorAll('.interval-btn').forEach(btn => {
-        btn.classList.toggle('active', parseInt(btn.dataset.years) === years);
+        btn.classList.toggle('active', parseInt(btn.dataset.years, 10) === years);
     });
     // Use efficient update instead of full rebuild
     updateProjectionChartData();
@@ -2425,7 +2416,7 @@ function initEventListeners() {
 
     // Projection years buttons
     document.querySelectorAll('.interval-btn[data-years]').forEach(btn => {
-        btn.addEventListener('click', () => setProjectionYears(parseInt(btn.dataset.years)));
+        btn.addEventListener('click', () => setProjectionYears(parseInt(btn.dataset.years, 10)));
     });
 
     // Projection view buttons
@@ -2442,6 +2433,13 @@ function initEventListeners() {
 
 // Initialize from URL on page load (only in browser, not during tests)
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    // Global error handler for unhandled promise rejections (#56)
+    window.addEventListener('unhandledrejection', (event) => {
+        console.error('Unhandled promise rejection:', event.reason);
+        showUserMessage('An unexpected error occurred. Please refresh the page.', 'error');
+        event.preventDefault();
+    });
+
     initFromUrl();
 
     // Initialize event listeners when DOM is ready

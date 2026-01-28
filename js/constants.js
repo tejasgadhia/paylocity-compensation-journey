@@ -59,6 +59,9 @@ export const CONSTANTS = {
 
     // Demo scenarios
     DEMO_SCENARIO_COUNT: 4,             // Number of demo scenarios available
+
+    // UI display constants
+    EMPTY_REASON_PLACEHOLDER: '—',      // Em-dash for missing/empty reason values
 };
 
 // ========================================
