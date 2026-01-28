@@ -182,6 +182,13 @@ let employeeData = null;
 let state = AppState._ui;  // Direct reference to maintain reactivity
 let charts = AppState._charts;  // Direct reference to maintain reactivity
 
+// Expose for E2E tests (allows Playwright to access state/charts/data)
+if (typeof window !== 'undefined') {
+    window.state = state;
+    window.charts = charts;
+    window.employeeData = () => employeeData; // Function to get current value
+}
+
 /**
  * Helper function to set employee data and keep AppState in sync.
  * Use this instead of direct assignment to employeeData.

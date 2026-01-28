@@ -101,16 +101,20 @@ export async function loadDemoScenario(page, scenarioIndex) {
   // Navigate to home
   await page.goto('/');
 
-  // Click "Try Example Data" button to load first scenario
-  await page.getByRole('button', { name: 'Try Example Data' }).click();
+  // Wait for landing page to be visible
+  await page.locator('#landingPage').waitFor({ state: 'visible' });
+
+  // Click "View Demo Dashboard" button to load first scenario
+  await page.getByRole('button', { name: 'View Demo Dashboard' }).click();
 
   // Wait for dashboard to appear
-  await page.locator('#mainChart').waitFor({ state: 'visible' });
+  await page.locator('#mainChart').waitFor({ state: 'visible', timeout: 15000 });
+  await page.waitForTimeout(500);
 
-  // Click "Regenerate Demo" button (scenarioIndex - 1) times to cycle
+  // Click regenerate button (scenarioIndex) times to cycle to the desired scenario
   for (let i = 0; i < scenarioIndex; i++) {
-    await page.getByRole('button', { name: 'Regenerate Demo' }).click();
-    await page.waitForTimeout(500); // Wait for charts to update
+    await page.locator('button.demo-regenerate-btn').click();
+    await page.waitForTimeout(800); // Wait for charts to update and data to regenerate
   }
 }
 
@@ -202,18 +206,21 @@ export async function selectYoYChartType(page, chartType) {
  * @param {number} params.raiseRate - Custom raise rate (3-8%)
  */
 export async function setProjectionParams(page, { years, raiseRate }) {
-  // Switch to Projection tab
-  await switchTab(page, 'projection');
+  // Switch to Projections tab
+  await switchTab(page, 'projections');
 
-  // Select year range
+  // Select year range (click interval button)
   if (years) {
-    await page.locator('#proj-years').selectOption(years.toString());
+    await page.locator(`button.interval-btn[data-years="${years}"]`).click();
+    await page.waitForTimeout(300);
   }
 
-  // Set custom raise rate
+  // Set custom raise rate (use slider)
   if (raiseRate) {
-    await page.locator('#custom-rate').fill(raiseRate.toString());
-    await page.locator('#custom-rate').press('Enter');
+    await page.locator('#customRateSlider').fill(raiseRate.toString());
+    // Trigger change event
+    await page.locator('#customRateSlider').dispatchEvent('input');
+    await page.waitForTimeout(300);
   }
 
   // Wait for projection chart to update
