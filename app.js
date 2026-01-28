@@ -456,8 +456,9 @@ const DEMO_SCENARIOS = [
 ];
 
 async function loadDemoData(scenarioIndex = null) {
-    // If no index provided, use current state index
-    if (scenarioIndex === null) {
+    // If no valid index provided, use current state index
+    // Note: When used as event handler, scenarioIndex receives Event object
+    if (typeof scenarioIndex !== 'number') {
         scenarioIndex = state.currentScenarioIndex;
     } else {
         state.currentScenarioIndex = scenarioIndex;
