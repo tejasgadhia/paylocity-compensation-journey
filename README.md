@@ -89,20 +89,20 @@ The tool works entirely offline. Open your browser's DevTools (F12) → **Networ
 
 ```
 compensation-journey/
-├── index.html           # HTML + CSS (~3,500 lines)
-├── app.js               # Main application logic (1,776 lines)
+├── index.html           # HTML + CSS (~4,300 lines)
+├── app.js               # Main application logic (~1,950 lines)
 ├── js/
-│   ├── charts.js        # Chart.js functions (667 lines)
-│   ├── calculations.js  # Financial calculation helpers (320 lines)
-│   ├── constants.js     # Named constants (104 lines)
-│   ├── parser.js        # Paylocity data parser (303 lines)
-│   └── security.js      # Template validation (50 lines)
+│   ├── charts.js        # Chart.js functions (~670 lines)
+│   ├── calculations.js  # Financial calculation helpers (~320 lines)
+│   ├── constants.js     # Named constants (~100 lines)
+│   ├── parser.js        # Paylocity data parser (~300 lines)
+│   └── security.js      # Template validation (~50 lines)
 ├── assets/
 │   ├── js/              # Self-hosted Chart.js
 │   └── fonts/           # Self-hosted JetBrains Mono, Space Grotesk
 ├── docs/
 │   └── API.md           # Comprehensive API reference
-├── screenshots/         # UI screenshots (16 images, 2 themes)
+├── screenshots/         # UI screenshots
 ├── tests/               # Playwright E2E + Vitest unit tests
 ├── README.md
 ├── CLAUDE.md            # Developer documentation

@@ -5,6 +5,28 @@ All notable changes to Paylocity Compensation Journey will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] - 2026-01-28
+
+**Focus: New Landing Page & Accessibility Polish**
+
+This release introduces a completely redesigned landing page with an interactive before/after comparison slider, comprehensive accessibility fixes, and print-optimized styles.
+
+### Added
+- **Landing Page Redesign**: New hero section with interactive before/after comparison slider showcasing Paylocity vs this dashboard
+- **Before/After Slider**: Drag-to-compare visual demonstration of the value proposition
+- **Print Styles**: Optimized print stylesheet for all dashboard views
+
+### Changed
+- **Touch Targets**: All interactive elements now meet WCAG 44px minimum touch target requirement
+- **Theme Refinement**: Sage & Ember themes refined for better contrast and visual hierarchy
+- **UX Polish**: 45 minor issues fixed across the interface for smoother user experience
+
+### Fixed
+- **Demo Button Crash**: Fixed TypeError when Event object passed as scenarioIndex parameter
+- **Theme Consistency**: Improved color token consistency across Sage and Ember themes
+
+---
+
 ## [3.1.0] - 2026-01-28
 
 **Focus: Architecture, UX Polish & Documentation**
