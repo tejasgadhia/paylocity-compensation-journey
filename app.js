@@ -272,6 +272,26 @@ function escapeHTML(str) {
 // (Moved to js/parser.js - imported above)
 
 // ========================================
+// UTILITY FUNCTIONS
+// ========================================
+
+/**
+ * Creates a debounced version of a function that delays execution
+ * until after a specified wait time has elapsed since the last call.
+ *
+ * @param {Function} func - Function to debounce
+ * @param {number} wait - Milliseconds to wait before executing
+ * @returns {Function} Debounced function
+ */
+function debounce(func, wait) {
+    let timeoutId;
+    return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
+// ========================================
 // CHART.JS LAZY LOADING
 // ========================================
 
@@ -1703,7 +1723,7 @@ function buildCategoryChart() {
                     labels: {
                         color: colors.text,
                         padding: 20,
-                        font: { family: state.theme === 'tactical' ? 'JetBrains Mono' : 'Nunito', size: 12 }
+                        font: { family: state.theme === 'tactical' ? 'JetBrains Mono' : 'Space Grotesk', size: 12 }
                     }
                 }
             }
@@ -1772,7 +1792,7 @@ function buildProjectionChart() {
             maintainAspectRatio: false,
             interaction: { intersect: false, mode: 'index' },
             plugins: {
-                legend: { position: 'top', labels: { color: colors.text, padding: 20, font: { family: state.theme === 'tactical' ? 'JetBrains Mono' : 'Nunito', size: 11 } } },
+                legend: { position: 'top', labels: { color: colors.text, padding: 20, font: { family: state.theme === 'tactical' ? 'JetBrains Mono' : 'Space Grotesk', size: 11 } } },
                 tooltip: getTooltipConfig({
                     labelCallback: (ctx) => `${ctx.dataset.label}: $${Math.round(ctx.raw).toLocaleString()}`
                 })
@@ -1917,12 +1937,18 @@ function setProjectionYears(years) {
     buildProjectionChart();
 }
 
-function updateCustomRate() {
-    state.customRate = parseInt(document.getElementById('customRateSlider').value);
-    document.getElementById('customRateValue').textContent = state.customRate + '%';
-    
+// Debounced chart rebuild for smoother slider interaction
+const debouncedProjectionRebuild = debounce(() => {
     buildProjectionChart();
     buildProjectionTable();
+}, 150);
+
+function updateCustomRate() {
+    state.customRate = parseInt(document.getElementById('customRateSlider').value, 10);
+    // Update display immediately for responsive feel
+    document.getElementById('customRateValue').textContent = state.customRate + '%';
+    // Debounce expensive chart/table rebuilds
+    debouncedProjectionRebuild();
 }
 
 function setProjectionView(view) {
