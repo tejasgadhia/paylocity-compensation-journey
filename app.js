@@ -189,17 +189,6 @@ if (typeof window !== 'undefined') {
     window.employeeData = () => employeeData; // Function to get current value
 }
 
-/**
- * Helper function to set employee data and keep AppState in sync.
- * Use this instead of direct assignment to employeeData.
- *
- * @param {Object|null} data - Employee compensation data
- */
-function setEmployeeData(data) {
-    employeeData = data;
-    AppState.setEmployeeData(data);
-}
-
 // ========================================
 // BENCHMARK CALCULATION FUNCTIONS
 // ========================================
@@ -393,7 +382,8 @@ function validatePasteInput() {
     
     // Check for key structural indicators
     const hasSalary = /salary/i.test(input);
-    
+    const hasHistory = /history/i.test(input);
+
     // Validation checks
     if (dates.length === 0) {
         messageDiv.className = 'validation-message error visible';
@@ -1988,25 +1978,6 @@ function setProjectionView(view) {
         tableWrapper.classList.remove('hidden');
         intervalButtons.classList.add('hidden');
     }
-}
-
-function calculateTimeToTarget() {
-    const target = parseFloat(document.getElementById('targetSalary').value);
-    const growth = state.customRate / 100; // Use slider value
-    const current = getCurrentSalary(employeeData);
-    
-    if (target <= current) {
-        document.getElementById('timeToTarget').textContent = 'Already achieved!';
-        return;
-    }
-    
-    if (growth === 0) {
-        document.getElementById('timeToTarget').textContent = 'Never (0% growth)';
-        return;
-    }
-    
-    const years = Math.log(target / current) / Math.log(1 + growth);
-    document.getElementById('timeToTarget').textContent = `~${years.toFixed(1)} years`;
 }
 
 // ========================================
