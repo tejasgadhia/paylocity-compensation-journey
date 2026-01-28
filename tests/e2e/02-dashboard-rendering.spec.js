@@ -34,11 +34,11 @@ test.describe('Dashboard Rendering', () => {
     await checkA11y(page);
   });
 
-  test('displays all 6 KPI cards with values', async ({ page }) => {
+  test('displays all 4 metric cards with values', async ({ page }) => {
     // Switch to Home tab (should be default, but ensure)
     await switchTab(page, 'home');
 
-    // Verify all KPIs visible
+    // Verify all metrics visible
     await assertKPIsVisible(page);
 
     // A11y check
@@ -48,19 +48,18 @@ test.describe('Dashboard Rendering', () => {
   test('renders all 4 main charts', async ({ page }) => {
     // Verify main chart on Home tab
     await switchTab(page, 'home');
-    await assertChartRendered(page, 'main-chart');
+    await assertChartRendered(page, 'mainChart');
 
-    // Verify YoY chart on YoY tab
-    await switchTab(page, 'yoy');
-    await assertChartRendered(page, 'yoy-chart');
+    // Verify YoY chart on Analytics tab
+    await switchTab(page, 'analytics');
+    await assertChartRendered(page, 'yoyChart');
 
-    // Verify category chart on Breakdown tab
-    await switchTab(page, 'breakdown');
-    await assertChartRendered(page, 'category-chart');
+    // Verify category chart on Analytics tab
+    await assertChartRendered(page, 'categoryChart');
 
-    // Verify projection chart on Projection tab
-    await switchTab(page, 'projection');
-    await assertChartRendered(page, 'projection-chart');
+    // Verify projection chart on Projections tab
+    await switchTab(page, 'projections');
+    await assertChartRendered(page, 'projectionChart');
 
     // A11y check on final tab
     await checkA11y(page);
@@ -79,7 +78,7 @@ test.describe('Dashboard Rendering', () => {
 
   test('starts with Home tab active', async ({ page }) => {
     // Verify Home tab content is visible
-    const homeTab = page.locator('#home.tab-content.active');
+    const homeTab = page.locator('#tab-home.tab-content.active');
     await expect(homeTab).toBeVisible();
 
     // Verify URL hash is correct (or empty)

@@ -43,7 +43,8 @@ export async function switchTheme(page, theme) {
 
   // Only toggle if we need to switch
   if (currentTheme !== theme) {
-    await page.getByRole('button', { name: /tactical|artistic/i }).click();
+    // Click the specific theme button in the dashboard (not landing page)
+    await page.locator('.theme-switcher .theme-btn').filter({ hasText: new RegExp(theme, 'i') }).click();
 
     // Wait for theme to apply (CSS custom properties)
     await page.waitForTimeout(300);
@@ -57,14 +58,14 @@ export async function switchTheme(page, theme) {
  * Switch to a specific tab
  *
  * @param {import('@playwright/test').Page} page - Playwright page object
- * @param {string} tabName - Tab name: 'home', 'story', 'breakdown', etc.
+ * @param {string} tabName - Tab name: 'home', 'story', 'market', 'history', 'analytics', 'projections', 'help'
  */
 export async function switchTab(page, tabName) {
   // Find tab button by data-tab attribute
   await page.locator(`[data-tab="${tabName}"]`).click();
 
-  // Wait for tab content to render
-  await page.locator(`#${tabName}.tab-content.active`).waitFor({ state: 'visible' });
+  // Wait for tab content to render (IDs have 'tab-' prefix)
+  await page.locator(`#tab-${tabName}.tab-content.active`).waitFor({ state: 'visible' });
 
   // Wait for any charts in the tab to render
   await page.waitForTimeout(300);
@@ -76,11 +77,18 @@ export async function switchTab(page, tabName) {
  * @param {import('@playwright/test').Page} page - Playwright page object
  */
 export async function togglePrivacyMode(page) {
-  // Click the $ / 📊 toggle button
-  await page.locator('#privacy-toggle').click();
+  // Get current view mode
+  const currentView = await page.locator('.view-btn.active').getAttribute('data-view');
 
-  // Wait for UI to update
-  await page.waitForTimeout(300);
+  // Click the opposite button
+  const targetView = currentView === 'dollars' ? 'index' : 'dollars';
+  await page.locator(`.view-btn[data-view="${targetView}"]`).click();
+
+  // Wait for state to update and UI to re-render
+  await page.waitForTimeout(500);
+
+  // Wait for the button active class to switch
+  await page.locator(`.view-btn[data-view="${targetView}"].active`).waitFor({ state: 'visible', timeout: 2000 });
 }
 
 /**

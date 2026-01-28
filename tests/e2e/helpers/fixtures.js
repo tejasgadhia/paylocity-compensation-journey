@@ -158,21 +158,19 @@ export const THEME_COLORS = {
 export const TABS = [
   'home',
   'story',
-  'breakdown',
-  'yoy',
   'market',
-  'projection',
-  'about',
+  'history',
+  'analytics',
+  'projections',
+  'help',
 ];
 
 /**
  * KPI card labels for verification
  */
 export const KPI_LABELS = [
-  'Starting Salary',
-  'Current Salary',
+  'Current Compensation',
   'Total Growth',
-  'Growth Rate (CAGR)',
-  'Real Growth Rate',
-  'Inflation Impact',
+  'Years of Service',
+  'Total Adjustments',
 ];
