@@ -169,6 +169,11 @@ export function calculateYearsOfService(employeeData) {
  * console.log(cagr); // 0 (graceful fallback)
  */
 export function calculateCAGR(employeeData) {
+    // Return cached value if available (performance optimization - #47)
+    if (employeeData._cachedCAGR !== undefined) {
+        return employeeData._cachedCAGR;
+    }
+
     const start = getStartingSalary(employeeData);
     const end = getCurrentSalary(employeeData);
     const years = calculateYearsOfService(employeeData);
@@ -176,16 +181,22 @@ export function calculateCAGR(employeeData) {
     // Validation: Prevent division by zero and NaN propagation
     if (years <= 0 || start <= 0 || end <= 0) {
         console.warn('calculateCAGR: Invalid inputs, returning 0', { start, end, years });
+        employeeData._cachedCAGR = 0;
         return 0;
     }
 
     // For very short tenure (<~36 days), use simple percentage instead of CAGR
     // This avoids extreme CAGR values from compounding over very short periods
+    let result;
     if (years < CONSTANTS.CAGR_MIN_YEARS_THRESHOLD) {
-        return ((end - start) / start) * 100;
+        result = ((end - start) / start) * 100;
+    } else {
+        result = (Math.pow(end / start, 1 / years) - 1) * 100;
     }
 
-    return (Math.pow(end / start, 1 / years) - 1) * 100;
+    // Cache the result on the employeeData object
+    employeeData._cachedCAGR = result;
+    return result;
 }
 
 /**
@@ -206,6 +217,11 @@ export function calculateCAGR(employeeData) {
  */
 export function getBenchmarkComparisons(employeeData, benchmarks) {
     if (!employeeData) return null;
+
+    // Return cached value if available (performance optimization - #47)
+    if (employeeData._cachedBenchmarks) {
+        return employeeData._cachedBenchmarks;
+    }
 
     const raises = employeeData.records.filter(r => r.changePercent > 0);
     const avgRaise = raises.length > 0
@@ -244,7 +260,8 @@ export function getBenchmarkComparisons(employeeData, benchmarks) {
     // Industry comparison: what would salary be at industry CAGR?
     const industryProjectedSalary = startSalary * Math.pow(1 + benchmarks.industryCagr / 100, years);
 
-    return {
+    // Build result object
+    const result = {
         // User metrics
         avgRaise,
         userCagr,
@@ -275,4 +292,8 @@ export function getBenchmarkComparisons(employeeData, benchmarks) {
         performanceTier: avgRaise >= benchmarks.highPerformerRaise.min ? 'high' :
                          avgRaise >= benchmarks.typicalRaise.avg ? 'solid' : 'below'
     };
+
+    // Cache the result on the employeeData object
+    employeeData._cachedBenchmarks = result;
+    return result;
 }
