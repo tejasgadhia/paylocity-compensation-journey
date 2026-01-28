@@ -79,7 +79,7 @@ Fair. Here's how to verify this tool is truly private:
 The tool works entirely offline. Open your browser's DevTools (F12) → **Network tab** → you'll see zero outgoing requests after the initial page load.
 
 **Verify the code:**
-- **Inspect the source**: All ~5,000 lines of code are in one HTML file
+- **Inspect the source**: The code is split into modular JS files (`app.js`, `js/*.js`)
 - **Check network activity**: No API calls, no tracking, no external requests (except Chart.js CDN on initial load)
 - **Audit it yourself**: The code is unminified and readable—search for `fetch(`, `XMLHttpRequest`, or `navigator.sendBeacon` to confirm no data leaves your browser
 
@@ -89,10 +89,19 @@ The tool works entirely offline. Open your browser's DevTools (F12) → **Networ
 
 ```
 compensation-journey/
-├── index.html       # Entire app in one file (~5,000 lines)
-├── screenshots/     # UI screenshots (16 images, 2 themes)
+├── index.html           # HTML + CSS (~3,500 lines)
+├── app.js               # Main application logic
+├── js/
+│   ├── calculations.js  # Financial calculation helpers
+│   ├── constants.js     # Named constants
+│   └── parser.js        # Paylocity data parser
+├── assets/
+│   ├── js/              # Self-hosted Chart.js
+│   └── fonts/           # Self-hosted JetBrains Mono, Space Grotesk
+├── screenshots/         # UI screenshots (16 images, 2 themes)
+├── tests/               # Playwright E2E + Vitest unit tests
 ├── README.md
-├── CLAUDE.md        # Developer documentation
+├── CLAUDE.md            # Developer documentation
 ├── LICENSE
 └── .gitignore
 ```

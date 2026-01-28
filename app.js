@@ -25,6 +25,7 @@ import {
     parseRecord,
     parsePaylocityData
 } from './js/parser.js';
+import { validateTemplateData } from './js/security.js';
 
 // ========================================
 // MOBILE/TABLET DETECTION
@@ -263,34 +264,7 @@ function escapeHTML(str) {
  * @param {Object} data - Data object to validate
  * @throws {Error} If data contains unsafe types or suspicious patterns
  */
-function validateTemplateData(data) {
-    for (const [key, value] of Object.entries(data)) {
-        // Allow null (often used for optional fields like sixFigureDate)
-        if (value === null) continue;
-
-        // Check type is safe (string, number, boolean - no objects, functions, symbols)
-        const type = typeof value;
-        if (!['string', 'number', 'boolean'].includes(type)) {
-            throw new Error(`Unsafe data type for template: ${key} is ${type}`);
-        }
-
-        // For strings, check for suspicious patterns (script tags, event handlers)
-        if (type === 'string') {
-            const suspiciousPatterns = [
-                /<script/i,
-                /javascript:/i,
-                /on\w+\s*=/i,  // onclick=, onerror=, etc.
-                /<iframe/i
-            ];
-
-            for (const pattern of suspiciousPatterns) {
-                if (pattern.test(value)) {
-                    throw new Error(`Suspicious pattern in template data: ${key} contains ${pattern}`);
-                }
-            }
-        }
-    }
-}
+// validateTemplateData moved to js/security.js
 
 // ========================================
 // PARSER

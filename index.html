@@ -9,7 +9,11 @@
                    style-src 'self' 'unsafe-inline';
                    font-src 'self';
                    img-src 'self' data:;
-                   connect-src 'none';">
+                   connect-src 'none';
+                   frame-ancestors 'none';
+                   base-uri 'self';
+                   form-action 'self';
+                   object-src 'none';">
     <title>Compensation Journey</title>
     <!-- Chart.js self-hosted, lazy-loaded dynamically when needed for faster landing page -->
     <style>
