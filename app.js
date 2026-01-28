@@ -1678,10 +1678,14 @@ function initEventListeners() {
         btnSaveData.addEventListener('click', downloadData);
     }
 
-    // Start over button
+    // Start over button with confirmation (#20)
     const btnStartOver = document.querySelector('.btn-start-over');
     if (btnStartOver) {
-        btnStartOver.addEventListener('click', resetDashboard);
+        btnStartOver.addEventListener('click', () => {
+            if (confirm('Start over? This will clear your current data.\n\nYou can save your data first using the "Save Data" button.')) {
+                resetDashboard();
+            }
+        });
     }
 
     // JSON file input

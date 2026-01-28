@@ -769,10 +769,43 @@
             color: var(--accent-primary);
         }
 
+        /* Button variants for action clarity (#20) */
+        .btn-success {
+            background: transparent;
+            border: 1px solid var(--accent-secondary);
+            color: var(--accent-secondary);
+            padding: 0.5rem 0.75rem;
+        }
+
+        .btn-success:hover {
+            background: var(--accent-secondary);
+            color: var(--primary-bg);
+        }
+
+        .btn-danger {
+            background: transparent;
+            border: 1px solid var(--accent-warning);
+            color: var(--accent-warning);
+            padding: 0.5rem 0.75rem;
+            opacity: 0.8;
+        }
+
+        .btn-danger:hover {
+            background: var(--accent-warning);
+            color: var(--primary-bg);
+            opacity: 1;
+        }
+
         /* CSP Hardening: Replace inline styles (Closes #28) */
         .btn-compact {
             padding: 0.5rem 0.75rem;
             font-size: 0.65rem;
+        }
+
+        .help-note {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
         }
 
         .animate-delay-500 {
@@ -3240,8 +3273,8 @@ History
                         <button class="theme-btn" data-theme="tactical" aria-label="Dark tactical theme" aria-pressed="false">Tactical</button>
                         <button class="theme-btn active" data-theme="artistic" aria-label="Light artistic theme" aria-pressed="true">Artistic</button>
                     </div>
-                    <button class="btn btn-secondary btn-compact btn-save-data">Save Data</button>
-                    <button class="btn btn-secondary btn-compact btn-start-over">Start Over</button>
+                    <button class="btn btn-success btn-compact btn-save-data" title="Download your data as JSON">Save Data</button>
+                    <button class="btn btn-danger btn-compact btn-start-over" title="Clear data and return to input">Start Over</button>
                 </div>
             </div>
         </header>
@@ -3582,9 +3615,16 @@ History
                         </div>
                         <div class="help-card">
                             <h3>Keyboard Shortcuts</h3>
-                            <p><code>1-7</code> Switch tabs<br>
-                            <code>T</code> Toggle theme<br>
-                            <code>V</code> Toggle view ($/Index)</p>
+                            <p><strong>Navigation</strong><br>
+                            <code>1</code> Home &nbsp; <code>2</code> Story &nbsp; <code>3</code> Market &nbsp; <code>4</code> History<br>
+                            <code>5</code> Analytics &nbsp; <code>6</code> Projections &nbsp; <code>7</code> Help</p>
+                            <p><strong>Controls</strong><br>
+                            <code>T</code> Toggle theme (Tactical/Artistic)<br>
+                            <code>V</code> or <code>P</code> Toggle privacy mode ($/Index)</p>
+                            <p class="help-note">
+                                <strong>Accessibility:</strong> Shortcuts are disabled when typing in input fields.
+                                All features are accessible via mouse/touch and screen readers.
+                            </p>
                         </div>
                     </div>
                 </div>
