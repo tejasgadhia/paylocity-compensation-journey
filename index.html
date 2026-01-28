@@ -108,7 +108,7 @@
             --radius-full: 9999px;
         }
 
-        /* TACTICAL THEME (Anduril/Palantir) */
+        /* TACTICAL THEME (Dark - Anduril/Palantir) */
         [data-theme="tactical"] {
             /* ===== SEMANTIC COLORS (#101) ===== */
             /* Background hierarchy */
@@ -122,7 +122,7 @@
             /* Text hierarchy */
             --text-primary: #e8e8e8;
             --text-secondary: #a0a0a0;
-            --text-muted: #7a7a7a;  /* Improved contrast: 4.7:1 on #0a0a0b */
+            --text-muted: #7a7a7a;  /* WCAG AA compliant: 4.7:1 on #0a0a0b */
 
             /* Brand colors - gold is primary action/emphasis */
             --color-brand: #d4a845;
@@ -139,6 +139,16 @@
             --color-danger: #d45745;         /* Below benchmark, errors, destructive */
             --color-danger-muted: rgba(212, 87, 69, 0.15);
 
+            /* Badge colors - distinct for each compensation type */
+            --badge-merit-bg: rgba(69, 212, 138, 0.2);
+            --badge-merit-text: #45d48a;
+            --badge-promotion-bg: rgba(167, 139, 250, 0.2);
+            --badge-promotion-text: #A78BFA;
+            --badge-equity-bg: rgba(69, 152, 212, 0.2);
+            --badge-equity-text: #4598d4;
+            --badge-newhire-bg: rgba(212, 168, 69, 0.2);
+            --badge-newhire-text: #d4a845;
+
             /* Legacy aliases (for gradual migration) */
             --accent-primary: var(--color-brand);
             --accent-secondary: var(--color-success);
@@ -150,12 +160,12 @@
             --border-accent: #3a3a3d;
             --border-focus: var(--color-brand);
 
-            /* Charts */
+            /* Charts - green for growth, gold for highlights */
             --chart-grid: rgba(255, 255, 255, 0.06);
-            --chart-line-1: var(--color-brand);
-            --chart-line-2: var(--color-success);
-            --chart-fill-1: var(--color-brand-muted);
-            --chart-fill-2: var(--color-success-muted);
+            --chart-line-1: var(--color-success);
+            --chart-line-2: var(--color-brand);
+            --chart-fill-1: var(--color-success-muted);
+            --chart-fill-2: var(--color-brand-muted);
 
             /* Typography */
             --font-display: 'Space Grotesk', sans-serif;
@@ -207,36 +217,46 @@
             --btn-ghost-hover-bg: var(--bg-hover);
         }
 
-        /* ARTISTIC THEME (Zoho) */
+        /* ARTISTIC THEME (Light - Sage & Ember) */
         [data-theme="artistic"] {
             /* ===== SEMANTIC COLORS (#101) ===== */
             /* Background hierarchy */
-            --bg-primary: #faf8f5;
-            --bg-secondary: #ffffff;
-            --bg-tertiary: #f5f2ed;
-            --bg-card: #ffffff;
-            --bg-hover: #f0ebe3;
-            --bg-elevated: #ffffff;
+            --bg-primary: #FAF9F7;
+            --bg-secondary: #FFFFFF;
+            --bg-tertiary: #F5F3F0;
+            --bg-card: #FFFFFF;
+            --bg-hover: #F0EDE8;
+            --bg-elevated: #FFFFFF;
 
             /* Text hierarchy */
-            --text-primary: #2d2a26;
-            --text-secondary: #5c5650;
-            --text-muted: #706a61;  /* Improved contrast: 4.8:1 on #faf8f5 */
+            --text-primary: #1C1917;
+            --text-secondary: #57534E;
+            --text-muted: #78716C;  /* WCAG AA compliant: 4.8:1 */
 
-            /* Brand colors - orange is primary action/emphasis */
-            --color-brand: #e85d04;
-            --color-brand-hover: #d45303;
-            --color-brand-muted: rgba(232, 93, 4, 0.12);
+            /* Brand colors - ember is primary action/emphasis */
+            --color-brand: #D35400;
+            --color-brand-hover: #C2410C;
+            --color-brand-muted: rgba(211, 84, 0, 0.12);
 
             /* Semantic colors - each has distinct purpose */
-            --color-success: #0096c7;        /* Positive metrics, above benchmark (teal) */
-            --color-success-muted: rgba(0, 150, 199, 0.12);
-            --color-info: #7b2cbf;           /* Neutral info, tertiary actions (purple) */
-            --color-info-muted: rgba(123, 44, 191, 0.12);
-            --color-warning: #e85d04;        /* Caution, at benchmark (matches brand) */
-            --color-warning-muted: rgba(232, 93, 4, 0.12);
-            --color-danger: #d00000;         /* Below benchmark, errors, destructive */
-            --color-danger-muted: rgba(208, 0, 0, 0.12);
+            --color-success: #16A34A;        /* Positive metrics, above benchmark (green) */
+            --color-success-muted: rgba(22, 163, 74, 0.12);
+            --color-info: #2563EB;           /* Neutral info, tertiary actions (blue) */
+            --color-info-muted: rgba(37, 99, 235, 0.12);
+            --color-warning: #D97706;        /* Caution, at benchmark (amber) */
+            --color-warning-muted: rgba(217, 119, 6, 0.12);
+            --color-danger: #DC2626;         /* Below benchmark, errors, destructive (red) */
+            --color-danger-muted: rgba(220, 38, 38, 0.12);
+
+            /* Badge colors - distinct for each compensation type */
+            --badge-merit-bg: rgba(132, 204, 22, 0.15);
+            --badge-merit-text: #4D7C0F;
+            --badge-promotion-bg: rgba(139, 92, 246, 0.15);
+            --badge-promotion-text: #6D28D9;
+            --badge-equity-bg: rgba(6, 182, 212, 0.15);
+            --badge-equity-text: #0E7490;
+            --badge-newhire-bg: rgba(245, 158, 11, 0.15);
+            --badge-newhire-text: #B45309;
 
             /* Legacy aliases (for gradual migration) */
             --accent-primary: var(--color-brand);
@@ -245,16 +265,16 @@
             --accent-warning: var(--color-danger);
 
             /* Borders */
-            --border-color: #e8e2da;
-            --border-accent: #d4cdc3;
+            --border-color: #E7E5E4;
+            --border-accent: #D6D3D1;
             --border-focus: var(--color-brand);
 
-            /* Charts */
+            /* Charts - green for growth/timeline, brand for highlights */
             --chart-grid: rgba(0, 0, 0, 0.06);
-            --chart-line-1: var(--color-brand);
-            --chart-line-2: var(--color-success);
-            --chart-fill-1: var(--color-brand-muted);
-            --chart-fill-2: var(--color-success-muted);
+            --chart-line-1: var(--color-success);
+            --chart-line-2: var(--color-brand);
+            --chart-fill-1: var(--color-success-muted);
+            --chart-fill-2: var(--color-brand-muted);
 
             /* Typography */
             --font-display: 'Space Grotesk', sans-serif;
@@ -267,20 +287,20 @@
             --radius-lg: var(--radius-xl);
 
             /* Shadows & effects */
-            --shadow-card: 0 4px 20px rgba(45, 42, 38, 0.08);
-            --shadow-hover: 0 8px 30px rgba(45, 42, 38, 0.12);
+            --shadow-card: 0 4px 20px rgba(28, 25, 23, 0.08);
+            --shadow-hover: 0 8px 30px rgba(28, 25, 23, 0.12);
             --glow-primary: none;
             --glow-secondary: none;
 
             /* Tooltips */
-            --tooltip-bg: #ffffff;
-            --tooltip-border: #e8e2da;
+            --tooltip-bg: #FFFFFF;
+            --tooltip-border: #E7E5E4;
 
             /* ===== BUTTON TOKENS (#105) ===== */
             --btn-primary-bg: var(--color-brand);
-            --btn-primary-text: #ffffff;
+            --btn-primary-text: #FFFFFF;
             --btn-primary-hover-bg: var(--color-brand-hover);
-            --btn-primary-hover-shadow: 0 4px 12px rgba(232, 93, 4, 0.3);
+            --btn-primary-hover-shadow: 0 4px 12px rgba(211, 84, 0, 0.3);
 
             --btn-secondary-bg: transparent;
             --btn-secondary-text: var(--text-secondary);
@@ -292,13 +312,13 @@
             --btn-success-text: var(--color-success);
             --btn-success-border: var(--color-success);
             --btn-success-hover-bg: var(--color-success);
-            --btn-success-hover-text: #ffffff;
+            --btn-success-hover-text: #FFFFFF;
 
             --btn-danger-bg: transparent;
             --btn-danger-text: var(--color-danger);
             --btn-danger-border: var(--color-danger);
             --btn-danger-hover-bg: var(--color-danger);
-            --btn-danger-hover-text: #ffffff;
+            --btn-danger-hover-text: #FFFFFF;
 
             --btn-ghost-bg: transparent;
             --btn-ghost-text: var(--text-muted);
@@ -326,15 +346,28 @@
         }
 
         [data-theme="tactical"] body {
-            background-image: 
+            background-image:
                 linear-gradient(rgba(212, 168, 69, 0.02) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(212, 168, 69, 0.02) 1px, transparent 1px);
             background-size: 50px 50px;
         }
 
         [data-theme="artistic"] body {
-            background-image: radial-gradient(circle at 100% 0%, rgba(232, 93, 4, 0.03) 0%, transparent 50%),
-                              radial-gradient(circle at 0% 100%, rgba(0, 150, 199, 0.03) 0%, transparent 50%);
+            background-image: radial-gradient(circle at 100% 0%, rgba(211, 84, 0, 0.03) 0%, transparent 50%),
+                              radial-gradient(circle at 0% 100%, rgba(22, 163, 74, 0.03) 0%, transparent 50%);
+        }
+
+        /* Tabular numbers for proper alignment in financial data */
+        [style*="font-family: var(--font-mono)"],
+        .font-mono,
+        code,
+        pre,
+        .kpi-value,
+        .stat-value,
+        .salary-amount,
+        .percentage,
+        .currency {
+            font-variant-numeric: tabular-nums lining-nums;
         }
 
         /* ========================================
@@ -433,7 +466,7 @@
         }
 
         [data-theme="artistic"] .landing-logo-icon {
-            background: linear-gradient(135deg, var(--accent-primary), #ff7b00);
+            background: linear-gradient(135deg, var(--accent-primary), #EA580C);
             color: white;
         }
 
@@ -1221,9 +1254,10 @@
             background: transparent;
             border: 1px solid var(--border-color);
             color: var(--text-muted);
-            width: 32px;
-            height: 32px;
-            min-width: 32px;  /* Minimum touch target size */
+            width: 44px;
+            height: 44px;
+            min-width: 44px;  /* WCAG 2.2 AA minimum touch target */
+            min-height: 44px;
             border-radius: var(--radius-full);
             cursor: pointer;
             font-size: var(--font-size-sm);
@@ -1323,7 +1357,7 @@
         }
 
         [data-theme="artistic"] .logo-icon {
-            background: linear-gradient(135deg, var(--accent-primary), #ff7b00);
+            background: linear-gradient(135deg, var(--accent-primary), #EA580C);
             color: white;
         }
 
@@ -3106,6 +3140,62 @@
             .animate-in {
                 animation: none;
                 opacity: 1;
+            }
+        }
+
+        /* ========================================
+           PRINT STYLES
+           ======================================== */
+
+        @media print {
+            /* Hide non-essential UI elements */
+            .header-controls,
+            .keyboard-hint,
+            .demo-banner,
+            .tabs-nav,
+            .skip-link,
+            .chart-type-controls,
+            .interval-buttons,
+            .btn-primary,
+            .btn-secondary,
+            .btn-demo,
+            .demo-regenerate-btn,
+            .landing-theme-toggle {
+                display: none !important;
+            }
+
+            /* Show all tab content */
+            .tab-content {
+                display: block !important;
+                page-break-inside: avoid;
+            }
+
+            /* Reset backgrounds for print */
+            body {
+                background: white !important;
+                color: black !important;
+            }
+
+            .dashboard-container,
+            .main-container,
+            .metric-card,
+            .kpi-card,
+            .help-card,
+            .milestone-card {
+                background: white !important;
+                border-color: #ccc !important;
+                box-shadow: none !important;
+            }
+
+            /* Ensure text is readable */
+            * {
+                color: black !important;
+            }
+
+            /* Charts - ensure they're visible */
+            canvas {
+                max-width: 100% !important;
+                height: auto !important;
             }
         }
 
