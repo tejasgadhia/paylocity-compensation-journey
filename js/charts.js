@@ -354,12 +354,18 @@ export function buildMainChart() {
                 scales: {
                     x: {
                         grid: { color: colors.grid, drawBorder: false },
-                        ticks: { color: colors.text, maxRotation: 45, minRotation: 45 }
+                        ticks: {
+                            color: colors.text,
+                            maxRotation: 45,
+                            minRotation: 45,
+                            font: { size: 12 } // #71: Larger axis labels
+                        }
                     },
                     y: {
                         grid: { color: colors.grid, drawBorder: false },
                         ticks: {
                             color: colors.text,
+                            font: { size: 12 }, // #71: Larger axis labels
                             callback: (v) => _state.showDollars ? '$' + (v / 1000) + 'k' : v
                         }
                     }
@@ -451,8 +457,8 @@ export function buildYoyChart() {
                     })
                 },
                 scales: {
-                    x: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text } },
-                    y: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, callback: (v) => v + '%' } }
+                    x: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 12 } } },
+                    y: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 12 }, callback: (v) => v + '%' } }
                 }
             }
         });
@@ -599,8 +605,8 @@ export function buildProjectionChart() {
                     })
                 },
                 scales: {
-                    x: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text } },
-                    y: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, callback: (v) => '$' + (v/1000) + 'k' } }
+                    x: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 12 } } },
+                    y: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 12 }, callback: (v) => '$' + (v/1000) + 'k' } }
                 }
             }
         });
