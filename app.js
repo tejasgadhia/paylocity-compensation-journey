@@ -292,6 +292,13 @@ async function parseAndGenerate() {
         employeeData.isDemo = false;
         messageDiv.className = 'validation-message';
 
+        // Close import modal if open
+        const importModal = document.getElementById('importModal');
+        if (importModal) {
+            importModal.classList.remove('visible');
+            document.body.style.overflow = '';
+        }
+
         // Lazy-load Chart.js before showing dashboard (performance optimization)
         await loadChartJS();
 
@@ -593,7 +600,14 @@ function resetDashboard() {
     // Show landing page
     document.getElementById('dashboardPage').classList.add('hidden');
     document.getElementById('landingPage').classList.remove('hidden');
-    
+
+    // Close import modal if open
+    const importModal = document.getElementById('importModal');
+    if (importModal) {
+        importModal.classList.remove('visible');
+        document.body.style.overflow = '';
+    }
+
     // Clear paste area and validation
     document.getElementById('pasteInput').value = '';
     document.getElementById('validationMessage').className = 'validation-message';
@@ -1623,17 +1637,174 @@ function initEventListeners() {
         btn.addEventListener('click', () => setTheme(btn.dataset.theme));
     });
 
+    // ========================================
+    // LANDING PAGE - Feature Chips & Slider
+    // ========================================
+
+    // Tab data for feature chips - maps chip to screenshot and display name
+    const tabData = {
+        home: {
+            name: 'Salary Timeline',
+            img: 'screenshots/tab-home.png',
+            url: 'tejasgadhia.github.io/paylocity-compensation-journey/#home'
+        },
+        market: {
+            name: 'Market Benchmarks',
+            img: 'screenshots/tab-market.png',
+            url: 'tejasgadhia.github.io/paylocity-compensation-journey/#market'
+        },
+        history: {
+            name: 'Pay History',
+            img: 'screenshots/tab-history.png',
+            url: 'tejasgadhia.github.io/paylocity-compensation-journey/#history'
+        },
+        analytics: {
+            name: 'Growth Analytics',
+            img: 'screenshots/tab-analytics.png',
+            url: 'tejasgadhia.github.io/paylocity-compensation-journey/#analytics'
+        },
+        projections: {
+            name: 'Future Projections',
+            img: 'screenshots/tab-projections.png',
+            url: 'tejasgadhia.github.io/paylocity-compensation-journey/#projections'
+        }
+    };
+
+    // Feature chip click handlers - switch "after" image in slider
+    const featureChips = document.querySelectorAll('.feature-chip');
+    const afterImg = document.getElementById('afterImg');
+    const tabIndicator = document.getElementById('tabIndicator');
+    const browserUrl = document.getElementById('browserUrl');
+
+    featureChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            // Update active state
+            featureChips.forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+
+            // Get tab info
+            const tab = chip.dataset.tab;
+            const data = tabData[tab];
+
+            if (data && afterImg && tabIndicator && browserUrl) {
+                // Update indicator and URL
+                tabIndicator.textContent = data.name;
+                browserUrl.textContent = data.url;
+
+                // Swap image with fade effect
+                afterImg.style.opacity = '0.5';
+                setTimeout(() => {
+                    afterImg.src = data.img;
+                    afterImg.style.opacity = '1';
+                }, 150);
+            }
+        });
+    });
+
+    // Slider animation on page load - sweeping motion to catch attention
+    const comparisonSlider = document.getElementById('comparisonSlider');
+    if (comparisonSlider) {
+        // Wait for component to initialize, then animate
+        setTimeout(() => {
+            // Animate slider: 50 -> 15 -> 85 -> 50 (sweep left, then right, back to center)
+            const animateSlider = () => {
+                const duration = 600; // ms per segment
+                const easeInOut = (t) => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+                const animate = (from, to, onComplete) => {
+                    const startTime = performance.now();
+                    const step = (currentTime) => {
+                        const elapsed = currentTime - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        const easedProgress = easeInOut(progress);
+                        const currentValue = from + (to - from) * easedProgress;
+                        comparisonSlider.value = currentValue;
+
+                        if (progress < 1) {
+                            requestAnimationFrame(step);
+                        } else if (onComplete) {
+                            onComplete();
+                        }
+                    };
+                    requestAnimationFrame(step);
+                };
+
+                // Chain: 50 -> 15 -> 85 -> 50
+                animate(50, 15, () => {
+                    animate(15, 85, () => {
+                        animate(85, 50);
+                    });
+                });
+            };
+
+            animateSlider();
+        }, 800); // Wait for page to settle
+    }
+
+    // ========================================
+    // IMPORT MODAL
+    // ========================================
+
+    const importModal = document.getElementById('importModal');
+    const openImportBtn = document.getElementById('openImportBtn');
+    const closeImportBtn = document.getElementById('closeImportBtn');
+
+    function openImportModal() {
+        if (importModal) {
+            importModal.classList.add('visible');
+            document.body.style.overflow = 'hidden';
+            // Focus the textarea for immediate pasting
+            const pasteInput = document.getElementById('pasteInput');
+            if (pasteInput) {
+                setTimeout(() => pasteInput.focus(), 100);
+            }
+        }
+    }
+
+    function closeImportModal() {
+        if (importModal) {
+            importModal.classList.remove('visible');
+            document.body.style.overflow = '';
+        }
+    }
+
+    if (openImportBtn) {
+        openImportBtn.addEventListener('click', openImportModal);
+    }
+
+    if (closeImportBtn) {
+        closeImportBtn.addEventListener('click', closeImportModal);
+    }
+
+    // Close modal on backdrop click
+    if (importModal) {
+        importModal.addEventListener('click', (e) => {
+            if (e.target === importModal) {
+                closeImportModal();
+            }
+        });
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && importModal && importModal.classList.contains('visible')) {
+            closeImportModal();
+        }
+    });
+
     // Download offline button
     const btnDownloadOffline = document.querySelector('.btn-download-offline');
     if (btnDownloadOffline) {
         btnDownloadOffline.addEventListener('click', downloadHtmlFile);
     }
 
-    // Demo button
-    const btnDemo = document.querySelector('.btn-demo');
-    if (btnDemo) {
-        btnDemo.addEventListener('click', loadDemoData);
-    }
+    // Demo buttons (handle multiple on page)
+    document.querySelectorAll('.btn-demo').forEach(btn => {
+        btn.addEventListener('click', () => {
+            closeImportModal(); // Close modal if open
+            loadDemoData();
+        });
+    });
 
     // Generate button
     const btnGenerate = document.getElementById('generateBtn');

@@ -64,6 +64,8 @@
             src: url('assets/fonts/space-grotesk-700.ttf') format('truetype');
         }
     </style>
+    <!-- Image Comparison Slider (self-hosted) -->
+    <link rel="stylesheet" href="assets/css/img-comparison-slider.css">
     <style>
         /* ========================================
            CSS CUSTOM PROPERTIES - DESIGN TOKENS
@@ -372,425 +374,644 @@
 
         /* ========================================
            LANDING PAGE STYLES
+           New design with before/after slider
            ======================================== */
-        
+
         .landing-page {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-        }
-
-        .landing-container {
-            display: grid;
-            grid-template-columns: 40% 60%; /* #67: More balanced split */
-            gap: 0;
-            width: 80vw;
-            max-width: 1400px;
-            min-width: 320px;
-            height: auto;
-            min-height: min(75vh, 600px);
-            max-height: calc(100vh - 4rem);
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-card);
-            overflow: auto;
-        }
-
-        @media (max-width: 900px) {
-            .landing-container {
-                grid-template-columns: 1fr;
-                width: 90vw;
-                height: auto;
-                min-height: auto;
-                max-height: none;
-            }
-        }
-
-        @media (min-width: 1800px) {
-            .landing-container {
-                width: 75vw;
-            }
-        }
-
-        /* Handle smaller viewport heights */
-        @media (max-height: 800px) {
-            .landing-page {
-                padding: 1rem;
-                align-items: flex-start;
-            }
-            .landing-container {
-                max-height: none;
-                min-height: auto;
-            }
-        }
-
-        /* Left Panel */
-        .landing-left {
-            background: var(--bg-tertiary);
-            padding: 2rem;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            border-right: 1px solid var(--border-color);
-            overflow-y: auto;
+            overflow: hidden;
         }
 
-        @media (max-width: 900px) {
-            .landing-left {
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-            }
+        /* Landing Header */
+        .landing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-3) var(--space-8);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            background: var(--bg-card);
         }
 
         .landing-logo {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1.25rem;
+            gap: 0.65rem;
         }
 
         .landing-logo-icon {
-            width: 44px;
-            height: 44px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: var(--radius-md);
             font-weight: 700;
             font-family: var(--font-mono);
-            font-size: 0.94rem;
-            background: linear-gradient(135deg, var(--accent-primary), #b8942e);
+            font-size: 0.85rem;
+            transform: rotate(-3deg);
+        }
+
+        [data-theme="tactical"] .landing-logo-icon {
+            background: linear-gradient(135deg, var(--color-brand), #b8942e);
             color: #0a0a0b;
         }
 
         [data-theme="artistic"] .landing-logo-icon {
-            background: linear-gradient(135deg, var(--accent-primary), #EA580C);
+            background: var(--color-brand);
             color: white;
         }
 
-        .landing-logo-text h1 {
-            font-family: var(--font-display);
-            font-size: 1.25rem;
+        .landing-logo-text {
+            font-size: 1rem;
             font-weight: 600;
-            line-height: 1.2;
         }
 
-        [data-theme="tactical"] .landing-logo-text h1 {
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-size: 1.06rem;
-        }
-
-        .landing-logo-text span {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .landing-description {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-        }
-
-        /* Features List */
-        .features-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.6rem;
-            font-size: 0.94rem;
-            color: var(--text-secondary);
-            line-height: 1.4;
-        }
-
-        .feature-icon {
-            font-size: 1.125rem;
-            flex-shrink: 0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .feature-icon svg {
-            width: 1.125rem;
-            height: 1.125rem;
-            color: var(--accent-primary);
-        }
-
-        /* Privacy Badge - #63: More compact, less dominant */
-        .privacy-badge {
-            display: flex;
-            align-items: flex-start;
-            gap: var(--space-3);
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: var(--space-3);
-            margin-top: auto;
-        }
-
-        .privacy-icon {
-            font-size: 1rem;
-            flex-shrink: 0;
-            line-height: 1;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .privacy-icon svg {
-            width: 1rem;
-            height: 1rem;
-            color: var(--color-success);
-        }
-
-        .privacy-content h3 {
-            font-family: var(--font-mono);
-            font-size: var(--font-size-xs);
-            color: var(--color-success);
-            margin-bottom: var(--space-1);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .privacy-description {
-            font-size: var(--font-size-xs);
-            color: var(--text-muted);
-            line-height: 1.4;
-            margin-bottom: var(--space-2);
-        }
-
-        .privacy-features {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.25rem 0.875rem;
-        }
-
-        .privacy-feature {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-        }
-
-        .privacy-feature .check {
-            color: var(--accent-secondary);
-            font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .privacy-feature .check svg {
-            width: 0.875rem;
-            height: 0.875rem;
-        }
-
-        .privacy-session-warning {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            background: rgba(255, 193, 7, 0.1);
-            border: 1px solid rgba(255, 193, 7, 0.3);
-            border-radius: 4px;
-            padding: 0.5rem 0.75rem;
-            margin-top: 0.75rem;
-            line-height: 1.4;
-            display: flex;
-            align-items: flex-start;
-            gap: 0.5rem;
-        }
-
-        .privacy-session-warning svg {
-            width: 1rem;
-            height: 1rem;
-            color: rgba(255, 193, 7, 0.9);
-            flex-shrink: 0;
-            margin-top: 0.1rem;
-        }
-
-        .privacy-session-warning strong {
-            color: var(--text-primary);
-        }
-
-        /* Right Panel */
-        .landing-right {
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-
-        .landing-right-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.6rem;
-            flex-shrink: 0;
-        }
-
-        .landing-right-header h2 {
-            font-family: var(--font-display);
-            font-size: 1.125rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin: 0;
-        }
-
-        .landing-right-header h2 svg {
-            width: 1.125rem;
-            height: 1.125rem;
-            color: var(--accent-primary);
-        }
-
-        [data-theme="tactical"] .landing-right-header h2 {
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            font-size: 1rem;
-        }
-
-        /* Demo CTA - #64: Made secondary, less prominent */
-        .demo-cta {
+        .landing-header-right {
             display: flex;
             align-items: center;
             gap: var(--space-4);
-            margin-bottom: var(--space-5);
-            padding: var(--space-3) var(--space-4);
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            flex-shrink: 0;
         }
 
-        .btn-demo {
+        .privacy-note {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
             display: flex;
             align-items: center;
             gap: var(--space-2);
-            padding: var(--space-2) var(--space-4);
-            background: transparent;
+        }
+
+        .privacy-note svg {
+            width: 1rem;
+            height: 1rem;
+            color: var(--color-success);
+        }
+
+        /* Main Layout - 1/3 + 2/3 */
+        .landing-main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: minmax(320px, 1fr) 2fr;
+            min-height: 0;
+        }
+
+        @media (max-width: 1100px) {
+            .landing-main {
+                grid-template-columns: 1fr;
+                overflow-y: auto;
+            }
+        }
+
+        /* Left Column - Marketing/CTA */
+        .landing-left {
+            padding: var(--space-8) var(--space-10) var(--space-8) var(--space-6);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-end;
+            text-align: right;
+            background: var(--bg-card);
+        }
+
+        @media (max-width: 1100px) {
+            .landing-left {
+                padding: var(--space-6);
+                align-items: center;
+                text-align: center;
+            }
+        }
+
+        /* Editorial Headline */
+        .landing-headline {
+            font-size: var(--font-size-3xl);
+            font-weight: 700;
+            line-height: 1.05;
+            margin-bottom: var(--space-4);
+            letter-spacing: -0.02em;
+        }
+
+        .landing-headline em {
+            font-style: normal;
+            background: linear-gradient(135deg, var(--color-brand), var(--color-warning));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        [data-theme="tactical"] .landing-headline em {
+            background: linear-gradient(135deg, var(--color-brand), var(--color-success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .landing-subheadline {
+            font-size: var(--font-size-md);
             color: var(--text-secondary);
-            border: 1px solid var(--border-color);
+            margin-bottom: var(--space-6);
+            line-height: 1.5;
+        }
+
+        /* Feature Chips - Interactive preview buttons */
+        .features-label {
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--space-2);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-2);
+            margin-bottom: var(--space-6);
+            width: 100%;
+        }
+
+        .feature-chip {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-3);
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
             border-radius: var(--radius-md);
-            font-family: var(--font-mono);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            min-height: 44px;
+        }
+
+        .feature-chip:hover {
+            border-color: var(--color-brand);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .feature-chip.active {
+            background: var(--color-brand);
+            border-color: var(--color-brand);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .feature-chip.active .chip-title,
+        .feature-chip.active .chip-desc {
+            color: white;
+        }
+
+        .feature-chip.active .chip-icon {
+            color: white;
+        }
+
+        [data-theme="tactical"] .feature-chip.active .chip-title,
+        [data-theme="tactical"] .feature-chip.active .chip-desc,
+        [data-theme="tactical"] .feature-chip.active .chip-icon {
+            color: var(--bg-primary);
+        }
+
+        .feature-chip.active .chip-desc {
+            opacity: 0.85;
+        }
+
+        .chip-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-brand);
+        }
+
+        .chip-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .chip-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+
+        .chip-title {
             font-size: var(--font-size-sm);
             font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chip-desc {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        /* How it works - inline steps */
+        .how-it-works {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: var(--space-2);
+            margin-bottom: var(--space-6);
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 1100px) {
+            .how-it-works {
+                justify-content: center;
+            }
+        }
+
+        .how-step {
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+        }
+
+        .how-num {
+            width: 22px;
+            height: 22px;
+            background: var(--color-brand);
+            color: white;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-xs);
+            font-weight: 700;
+        }
+
+        [data-theme="tactical"] .how-num {
+            color: var(--bg-primary);
+        }
+
+        .how-arrow {
+            color: var(--text-muted);
+            font-size: var(--font-size-md);
+            margin: 0 var(--space-1);
+        }
+
+        /* CTA Row */
+        .cta-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: var(--space-3);
+        }
+
+        @media (max-width: 1100px) {
+            .cta-row {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
+
+        .btn-landing-primary {
+            padding: var(--space-3) var(--space-6);
+            background: var(--color-brand);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: var(--font-size-base);
+            font-weight: 600;
             cursor: pointer;
+            min-height: 48px;
+            box-shadow: 0 4px 0 var(--color-brand-hover);
+            transition: all 0.15s;
+        }
+
+        [data-theme="tactical"] .btn-landing-primary {
+            color: var(--bg-primary);
+        }
+
+        .btn-landing-primary:hover {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--color-brand-hover);
+        }
+
+        .btn-landing-secondary {
+            padding: var(--space-3) var(--space-5);
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: var(--font-size-base);
+            cursor: pointer;
+            min-height: 48px;
+            transition: all var(--transition-speed);
+        }
+
+        .btn-landing-secondary:hover {
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+
+        /* Right Column - Browser Mockup with Slider */
+        .landing-right {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-3);
+        }
+
+        [data-theme="artistic"] .landing-right {
+            background: linear-gradient(180deg, #FFF5EB 0%, #FFE4CC 100%);
+        }
+
+        [data-theme="tactical"] .landing-right {
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+        }
+
+        @media (max-width: 1100px) {
+            .landing-right {
+                padding: var(--space-4);
+                min-height: 60vh;
+            }
+        }
+
+        .slider-wrapper {
+            width: 98%;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slider-title {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .slider-tab-indicator {
+            padding: var(--space-1) var(--space-3);
+            background: var(--color-brand);
+            color: white;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            transition: all var(--transition-speed);
+        }
+
+        [data-theme="tactical"] .slider-tab-indicator {
+            color: var(--bg-primary);
+        }
+
+        /* Browser Window Frame */
+        .browser-window {
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow:
+                0 25px 50px -12px rgba(0, 0, 0, 0.25),
+                0 0 0 1px rgba(0, 0, 0, 0.05);
+        }
+
+        .browser-titlebar {
+            display: flex;
+            align-items: center;
+            padding: var(--space-3) var(--space-4);
+            background: linear-gradient(180deg, #E8E6E3 0%, #D4D2CF 100%);
+            border-bottom: 1px solid #C4C2BF;
+            gap: var(--space-3);
+        }
+
+        [data-theme="tactical"] .browser-titlebar {
+            background: linear-gradient(180deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .traffic-lights {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        .traffic-light {
+            width: 12px;
+            height: 12px;
+            border-radius: var(--radius-full);
+        }
+
+        .traffic-light.red { background: #FF5F57; border: 1px solid #E14942; }
+        .traffic-light.yellow { background: #FFBD2E; border: 1px solid #DFA123; }
+        .traffic-light.green { background: #28C840; border: 1px solid #1AAB2F; }
+
+        [data-theme="tactical"] .traffic-light.red { background: #d45745; border: 1px solid #b84535; }
+        [data-theme="tactical"] .traffic-light.yellow { background: #d4a845; border: 1px solid #b89035; }
+        [data-theme="tactical"] .traffic-light.green { background: #45d48a; border: 1px solid #35b870; }
+
+        .browser-url {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            padding: var(--space-2) var(--space-3);
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+
+        .browser-url-icon {
+            margin-right: var(--space-2);
+            color: var(--color-success);
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-2) 0;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            transition: all var(--transition-speed);
-            white-space: nowrap;
-            min-height: 40px;
         }
 
-        .btn-demo:hover {
-            border-color: var(--color-success);
-            color: var(--color-success);
-            background: var(--color-success-muted);
+        .slider-label.before {
+            color: var(--text-muted);
         }
 
-        .demo-icon {
-            font-size: var(--font-size-sm);
-            display: inline-flex;
+        .slider-label.after {
+            color: var(--color-brand);
+        }
+
+        .browser-content {
+            position: relative;
+            background: #e5e5e5;
+            aspect-ratio: 2692 / 1316;
+        }
+
+        [data-theme="tactical"] .browser-content {
+            background: var(--bg-tertiary);
+        }
+
+        /* Image Comparison Slider Styles */
+        img-comparison-slider {
+            width: 100%;
+            height: 100%;
+            --divider-width: 4px;
+            --divider-color: var(--color-brand);
+        }
+
+        img-comparison-slider img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #e5e5e5;
+            transition: opacity 0.15s ease;
+        }
+
+        [data-theme="tactical"] img-comparison-slider img {
+            background: var(--bg-tertiary);
+        }
+
+        /* Custom slider handle */
+        .custom-handle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: var(--color-brand);
+            border-radius: var(--radius-full);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            cursor: ew-resize;
+            border: 3px solid white;
+        }
+
+        .custom-handle svg {
+            width: 20px;
+            height: 20px;
+            color: white;
+        }
+
+        [data-theme="tactical"] .custom-handle svg {
+            color: var(--bg-primary);
+        }
+
+        /* ========================================
+           IMPORT MODAL
+           ======================================== */
+
+        .import-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-4);
+        }
+
+        .import-modal.visible {
+            display: flex;
+        }
+
+        .import-modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .import-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-4) var(--space-6);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .import-modal-header h2 {
+            font-family: var(--font-display);
+            font-size: var(--font-size-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            margin: 0;
+        }
+
+        .import-modal-header h2 svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: var(--color-brand);
+        }
+
+        .import-modal-close {
+            background: none;
+            border: none;
+            font-size: var(--font-size-lg);
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: var(--space-2);
+            line-height: 1;
+            min-width: 44px;
+            min-height: 44px;
+            display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .demo-icon svg {
-            width: 0.9rem;
-            height: 0.9rem;
+        .import-modal-close:hover {
+            color: var(--text-primary);
         }
 
-        .demo-hint {
-            font-size: var(--font-size-sm);
-            color: var(--text-muted);
-        }
-
-        .alt-actions {
+        .import-modal-body {
+            padding: var(--space-6);
             display: flex;
-            gap: 0.5rem;
-            align-items: center;
+            flex-direction: column;
+            gap: var(--space-4);
         }
 
-        .btn-text {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            padding: 0.5rem 0.7rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-            transition: color var(--transition-speed);
-        }
-
-        .btn-text:hover {
-            color: var(--accent-primary);
-        }
-
-        .btn-text-alt {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            padding: 0.5rem;
-            cursor: pointer;
-            transition: color var(--transition-speed);
-            text-decoration: underline;
-            text-underline-offset: 2px;
-        }
-
-        .btn-text-alt:hover {
-            color: var(--accent-primary);
-        }
-
-        .alt-divider {
-            color: var(--border-color);
-            font-size: 0.875rem;
-        }
-
-        /* Inline Instructions */
+        /* Instructions Box (reused from old design) */
         .instructions-box {
-            padding: 0.875rem 1.125rem;
+            padding: var(--space-4) var(--space-5);
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
-            margin-bottom: 0.875rem;
-            flex-shrink: 0;
         }
 
         .instructions-box .instructions-title {
             font-family: var(--font-mono);
-            font-size: 0.8rem;
+            font-size: var(--font-size-xs);
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--text-muted);
-            margin-bottom: 0.6rem;
+            margin-bottom: var(--space-3);
         }
 
         .instructions-list {
             margin: 0;
-            padding-left: 1.25rem;
-            font-size: 0.94rem;
+            padding-left: var(--space-5);
+            font-size: var(--font-size-sm);
             color: var(--text-secondary);
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .instructions-list li {
-            margin-bottom: 0.35rem;
-            padding-left: 0.25rem;
+            margin-bottom: var(--space-2);
+            padding-left: var(--space-1);
         }
 
         .instructions-list li:last-child {
@@ -799,55 +1020,57 @@
 
         .instructions-list code {
             background: var(--bg-primary);
-            padding: 0.125rem 0.35rem;
+            padding: 0.125rem var(--space-2);
             border-radius: var(--radius-sm);
             font-family: var(--font-mono);
-            font-size: 0.875rem;
-            color: var(--accent-primary);
+            font-size: var(--font-size-sm);
+            color: var(--color-brand);
         }
 
+        .instructions-list kbd {
+            background: var(--bg-tertiary);
+            padding: 0.15rem 0.4rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            font-family: var(--font-mono);
+            font-size: var(--font-size-xs);
+        }
+
+        /* Paste Area */
         .paste-area {
-            flex: 1;
             display: flex;
             flex-direction: column;
-            margin-bottom: 1rem;
-            min-height: 0;
         }
 
         .paste-area label {
             display: block;
             font-family: var(--font-mono);
-            font-size: 0.8rem;
+            font-size: var(--font-size-xs);
             text-transform: uppercase;
             letter-spacing: 0.1em;
             color: var(--text-muted);
-            margin-bottom: 0.5rem;
-            flex-shrink: 0;
+            margin-bottom: var(--space-2);
         }
 
         .paste-area textarea {
             width: 100%;
-            flex: 1;
-            min-height: 150px;
+            min-height: 200px;
             max-height: 400px;
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
-            padding: 0.875rem;
+            padding: var(--space-4);
             color: var(--text-primary);
             font-family: var(--font-mono);
-            font-size: 0.8rem;
+            font-size: var(--font-size-sm);
             line-height: 1.4;
-            resize: vertical;  /* Allow vertical resize */
+            resize: vertical;
             transition: border-color var(--transition-speed);
         }
 
         .paste-area textarea:focus {
-            border-color: var(--accent-primary);
-        }
-
-        .paste-area textarea:focus-visible {
-            outline: 2px solid var(--accent-primary);
+            border-color: var(--color-brand);
+            outline: 2px solid var(--color-brand);
             outline-offset: 0;
         }
 
@@ -855,6 +1078,7 @@
             color: var(--text-muted);
         }
 
+        /* Validation Message */
         .validation-message {
             margin-top: var(--space-3);
             padding: var(--space-2) var(--space-3);
@@ -862,7 +1086,6 @@
             font-size: var(--font-size-sm);
             font-family: var(--font-mono);
             display: none;
-            flex-shrink: 0;
         }
 
         .validation-message.visible {
@@ -887,27 +1110,58 @@
             color: var(--color-warning);
         }
 
-        /* #64 & #66: Landing footer - Generate is primary, JSON link grouped */
-        .landing-footer {
+        /* Import Modal Footer */
+        .import-modal-footer {
             display: flex;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: space-between;
+            padding: var(--space-4) var(--space-6);
+            border-top: 1px solid var(--border-color);
             gap: var(--space-4);
             flex-wrap: wrap;
-            flex-shrink: 0;
         }
 
-        .landing-footer .btn-primary {
-            flex: 0 0 auto;
-        }
-
-        .landing-footer .alt-data-action {
+        .import-modal-footer .alt-data-action {
             font-size: var(--font-size-sm);
             color: var(--text-muted);
         }
 
-        .landing-footer .alt-data-action .btn-text-alt {
+        .btn-text-alt {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
             font-size: var(--font-size-sm);
+            padding: var(--space-2);
+            cursor: pointer;
+            transition: color var(--transition-speed);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .btn-text-alt:hover {
+            color: var(--color-brand);
+        }
+
+        /* Privacy callout in modal */
+        .privacy-callout {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-3);
+            background: var(--color-success-muted);
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-sm);
+            color: var(--color-success);
+        }
+
+        .privacy-callout-icon svg {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .privacy-callout-text strong {
+            color: var(--text-primary);
         }
 
         /* ===== BUTTON SYSTEM (#105) ===== */
@@ -1043,9 +1297,6 @@
 
         /* Theme toggle on landing */
         .landing-theme-toggle {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
             display: flex;
             background: var(--bg-tertiary);
             border-radius: var(--radius-md);
@@ -1054,20 +1305,25 @@
         }
 
         .landing-theme-btn {
-            padding: 0.4rem 0.6rem;
+            padding: var(--space-2) var(--space-3);
             background: transparent;
             border: none;
             color: var(--text-secondary);
             font-family: var(--font-mono);
-            font-size: 0.7rem;
+            font-size: var(--font-size-xs);
             cursor: pointer;
             transition: all var(--transition-speed);
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            min-height: 36px;
         }
 
         .landing-theme-btn.active {
-            background: var(--accent-primary);
+            background: var(--color-brand);
+            color: white;
+        }
+
+        [data-theme="tactical"] .landing-theme-btn.active {
             color: var(--bg-primary);
         }
 
@@ -3489,81 +3745,134 @@
          LANDING PAGE
          ========================================== -->
     <div id="landingPage" class="landing-page">
-        <!-- Theme toggle -->
-        <div class="landing-theme-toggle">
-            <button class="landing-theme-btn" data-theme="tactical" aria-label="Dark tactical theme" aria-pressed="false">Tactical</button>
-            <button class="landing-theme-btn active" data-theme="artistic" aria-label="Light artistic theme" aria-pressed="true">Artistic</button>
-        </div>
+        <!-- Landing Header -->
+        <header class="landing-header">
+            <div class="landing-logo">
+                <div class="landing-logo-icon">CJ</div>
+                <span class="landing-logo-text">Compensation Journey</span>
+            </div>
+            <div class="landing-header-right">
+                <span class="privacy-note">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></g></svg>
+                    Data never leaves your device
+                </span>
+                <div class="landing-theme-toggle">
+                    <button class="landing-theme-btn" data-theme="tactical" aria-label="Dark tactical theme" aria-pressed="false">Tactical</button>
+                    <button class="landing-theme-btn active" data-theme="artistic" aria-label="Light artistic theme" aria-pressed="true">Artistic</button>
+                </div>
+            </div>
+        </header>
 
-        <div class="landing-container">
-            <!-- Left Panel: Logo, Instructions, Privacy -->
+        <!-- Main Content -->
+        <main class="landing-main">
+            <!-- Left Column: Marketing & CTAs -->
             <div class="landing-left">
-                <div class="landing-logo">
-                    <div class="landing-logo-icon">CJ</div>
-                    <div class="landing-logo-text">
-                        <h1>Compensation Journey</h1>
-                        <span>Paylocity → Insights</span>
-                    </div>
-                </div>
+                <h1 class="landing-headline">Your Paylocity data,<br><em>visualized.</em></h1>
+                <p class="landing-subheadline">Turn your pay history into beautiful charts, growth analytics, and future projections.</p>
 
-                <p class="landing-description">
-                    Transform your raw Paylocity pay history into a beautiful, interactive dashboard. Visualize your career growth, analyze raise patterns, and project future earnings.
-                </p>
-
-                <div class="features-list">
-                    <div class="feature-item">
-                        <span class="feature-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M16 7h6v6"/><path d="m22 7l-8.5 8.5l-5-5L2 17"/></g></svg></span>
-                        <span>Interactive salary timeline with multiple chart types</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 21v-6m7 6V9m7 12V3"/></svg></span>
-                        <span>Analytics: CAGR, averages, raise frequency & more</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg></span>
-                        <span>Future projections with customizable growth rates</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 7v14m-9-3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4a4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3a3 3 0 0 0-3-3z"/></svg></span>
-                        <span>Auto-generated narrative of your career story</span>
-                    </div>
-                </div>
-
-                <div class="privacy-badge">
-                    <div class="privacy-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></g></svg></div>
-                    <div class="privacy-content">
-                        <h3>100% Private & Local</h3>
-                        <p class="privacy-description">Your salary data never leaves your browser. No servers, no uploads, no tracking—works completely offline.</p>
-                        <div class="privacy-features">
-                            <span class="privacy-feature"><span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 6L9 17l-5-5"/></svg></span> Offline capable</span>
-                            <span class="privacy-feature"><span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 6L9 17l-5-5"/></svg></span> No AI processing</span>
-                            <span class="privacy-feature"><span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 6L9 17l-5-5"/></svg></span> No external requests</span>
-                            <span class="privacy-feature"><span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 6L9 17l-5-5"/></svg></span> No data storage</span>
+                <div class="features-label">Click to preview</div>
+                <div class="features-grid">
+                    <button class="feature-chip active" data-tab="home">
+                        <span class="chip-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M16 7h6v6"/><path d="m22 7l-8.5 8.5l-5-5L2 17"/></g></svg></span>
+                        <div class="chip-content">
+                            <span class="chip-title">Salary Timeline</span>
+                            <span class="chip-desc">Interactive compensation chart</span>
                         </div>
-                        <p class="privacy-session-warning"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01"/></svg> Data exists only in your current session. Refreshing or closing the tab will clear everything. Use <strong>Save Data</strong> to keep a local copy.</p>
-                        <div class="privacy-download">
-                            <button class="btn-download-offline" title="Save this webpage as an HTML file to run without internet access">
-                                <span><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M12 15V3m9 12v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10l5 5l5-5"/></g></svg></span> Save Page for Offline Use
-                            </button>
-                            <p class="download-hint">Download as HTML file · No internet needed</p>
+                    </button>
+                    <button class="feature-chip" data-tab="market">
+                        <span class="chip-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></g></svg></span>
+                        <div class="chip-content">
+                            <span class="chip-title">Market Benchmarks</span>
+                            <span class="chip-desc">Compare to industry standards</span>
+                        </div>
+                    </button>
+                    <button class="feature-chip" data-tab="analytics">
+                        <span class="chip-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3v16a2 2 0 0 0 2 2h16M7 11h8m-8 5h12M7 6h3"/></svg></span>
+                        <div class="chip-content">
+                            <span class="chip-title">Growth Analytics</span>
+                            <span class="chip-desc">CAGR and inflation-adjusted</span>
+                        </div>
+                    </button>
+                    <button class="feature-chip" data-tab="projections">
+                        <span class="chip-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m12 3l1.912 5.813a2 2 0 0 0 1.275 1.275L21 12l-5.813 1.912a2 2 0 0 0-1.275 1.275L12 21l-1.912-5.813a2 2 0 0 0-1.275-1.275L3 12l5.813-1.912a2 2 0 0 0 1.275-1.275zM5 3v4m14 14v-4M3 5h4m14 14h-4"/></svg></span>
+                        <div class="chip-content">
+                            <span class="chip-title">Future Projections</span>
+                            <span class="chip-desc">5-10 year forecasts</span>
+                        </div>
+                    </button>
+                </div>
+
+                <div class="how-it-works">
+                    <div class="how-step"><span class="how-num">1</span> Copy</div>
+                    <span class="how-arrow">→</span>
+                    <div class="how-step"><span class="how-num">2</span> Paste</div>
+                    <span class="how-arrow">→</span>
+                    <div class="how-step"><span class="how-num">3</span> Done!</div>
+                </div>
+
+                <div class="cta-row">
+                    <button class="btn-landing-primary" id="openImportBtn">Import Your Data →</button>
+                    <button class="btn-landing-secondary btn-demo">View Demo</button>
+                </div>
+            </div>
+
+            <!-- Right Column: Browser Mockup with Slider -->
+            <div class="landing-right">
+                <div class="slider-wrapper">
+                    <div class="slider-header">
+                        <span class="slider-title">Before & After</span>
+                        <span class="slider-tab-indicator" id="tabIndicator">Salary Timeline</span>
+                    </div>
+                    <div class="browser-window">
+                        <div class="browser-titlebar">
+                            <div class="traffic-lights">
+                                <span class="traffic-light red"></span>
+                                <span class="traffic-light yellow"></span>
+                                <span class="traffic-light green"></span>
+                            </div>
+                            <div class="browser-url">
+                                <span class="browser-url-icon">🔒</span>
+                                <span id="browserUrl">tejasgadhia.github.io/paylocity-compensation-journey</span>
+                            </div>
+                        </div>
+                        <div class="slider-labels">
+                            <span class="slider-label before">Before</span>
+                            <span class="slider-label after">After</span>
+                        </div>
+                        <div class="browser-content">
+                            <img-comparison-slider id="comparisonSlider">
+                                <!-- Before: Paylocity raw data -->
+                                <img slot="first" id="beforeImg" src="screenshots/paylocity-blurred.png" alt="Before: Paylocity interface">
+                                <!-- After: Dashboard view (changes based on selected chip) -->
+                                <img slot="second" id="afterImg" src="screenshots/tab-home.png" alt="After: Dashboard view">
+                                <div slot="handle" class="custom-handle">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M15 19l-7-7 7-7"/>
+                                        <path d="M9 19l7-7-7-7" transform="translate(6,0)"/>
+                                    </svg>
+                                </div>
+                            </img-comparison-slider>
                         </div>
                     </div>
                 </div>
             </div>
+        </main>
+    </div>
 
-            <!-- Right Panel: Paste Area & Actions -->
-            <div class="landing-right">
-                <div class="landing-right-header">
-                    <h2><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></g></svg> Import Your Data</h2>
-                </div>
+    <!-- ==========================================
+         IMPORT MODAL
+         ========================================== -->
+    <div id="importModal" class="import-modal" role="dialog" aria-modal="true" aria-labelledby="importModalTitle">
+        <div class="import-modal-content">
+            <div class="import-modal-header">
+                <h2 id="importModalTitle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></g></svg>
+                    Import Your Data
+                </h2>
+                <button class="import-modal-close" id="closeImportBtn" aria-label="Close import dialog">✕</button>
+            </div>
 
-                <div class="demo-cta">
-                    <button class="btn btn-demo">
-                        <span class="demo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span> View Demo Dashboard
-                    </button>
-                    <span class="demo-hint">See what you'll get before importing your data</span>
-                </div>
-
+            <div class="import-modal-body">
                 <div class="instructions-box">
                     <div class="instructions-title">How to get your data from Paylocity</div>
                     <ol class="instructions-list">
@@ -3571,14 +3880,14 @@
                         <li>On your dashboard, click the <code>Pay</code> card heading</li>
                         <li>Click the <code>Show Private Data</code> button</li>
                         <li>Navigate to the <code>Rates</code> tab</li>
-                        <li>Select all content starting from <code>Rates</code> at the top, through the History table, down to <code>items</code> at the bottom</li>
-                        <li>Copy (Ctrl+C / Cmd+C) and paste below</li>
+                        <li><strong>Select everything</strong> from the word <code>Rates</code> at the very top, all the way down to <code>items</code> at the bottom — include the Current section, History table, and pagination text</li>
+                        <li>Copy (<kbd>Ctrl+C</kbd> / <kbd>Cmd+C</kbd>) and paste below</li>
                     </ol>
                 </div>
 
                 <div class="privacy-callout">
                     <span class="privacy-callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></g></svg></span>
-                    <span class="privacy-callout-text"><strong>Your data stays on your device</strong> — nothing is sent anywhere. Disconnect from the internet to verify.</span>
+                    <span class="privacy-callout-text"><strong>Your data stays on your device</strong> — nothing is sent anywhere.</span>
                 </div>
 
                 <div class="paste-area">
@@ -3594,12 +3903,12 @@ History
 ..."></textarea>
                     <div id="validationMessage" class="validation-message"></div>
                 </div>
+            </div>
 
-                <div class="landing-footer">
-                    <button class="btn btn-primary btn-lg" id="generateBtn" disabled>Generate Dashboard</button>
-                    <span class="alt-data-action">or <button class="btn-text-alt" id="loadJsonBtn">load previously saved data</button></span>
-                    <input type="file" id="jsonFileInput" class="file-input" accept=".json">
-                </div>
+            <div class="import-modal-footer">
+                <button class="btn btn-primary btn-lg" id="generateBtn" disabled>Generate Dashboard</button>
+                <span class="alt-data-action">or <button class="btn-text-alt" id="loadJsonBtn">load previously saved data</button></span>
+                <input type="file" id="jsonFileInput" class="file-input" accept=".json">
             </div>
         </div>
     </div>
@@ -4004,6 +4313,8 @@ History
         </footer>
     </div>
 
+    <!-- Image Comparison Slider Web Component -->
+    <script type="module" src="assets/js/img-comparison-slider.js"></script>
     <script type="module" src="app.js"></script>
 </body>
 </html>
