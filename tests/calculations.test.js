@@ -15,7 +15,8 @@ import {
     calculateRealGrowth,
     calculateInflationAdjustedSalary,
     calculateCAGR,
-    getBenchmarkComparisons
+    getBenchmarkComparisons,
+    calculateAverageMonthsBetweenDates
 } from '../js/calculations.js';
 
 /**
@@ -371,6 +372,74 @@ describe('calculateInflationAdjustedSalary', () => {
     });
 });
 
+describe('calculateAverageMonthsBetweenDates (Raise Frequency Helper)', () => {
+
+    it('calculates average months between adjustment dates', () => {
+        // Three raises: Jan 2020, Jul 2020 (6 months later), Jan 2021 (6 months later)
+        const records = [
+            { date: '2020-01-15' },
+            { date: '2020-07-15' },
+            { date: '2021-01-15' }
+        ];
+        const result = calculateAverageMonthsBetweenDates(records);
+
+        // Average interval: (6 + 6) / 2 = 6 months (approximately)
+        expect(result).toBeGreaterThan(5.5);
+        expect(result).toBeLessThan(6.5);
+    });
+
+    it('returns default value for single record', () => {
+        const records = [{ date: '2020-01-15' }];
+        const result = calculateAverageMonthsBetweenDates(records);
+
+        expect(result).toBe(12); // Default is 12 months
+    });
+
+    it('returns custom default value when specified', () => {
+        const records = [{ date: '2020-01-15' }];
+        const result = calculateAverageMonthsBetweenDates(records, 0);
+
+        expect(result).toBe(0); // Custom default
+    });
+
+    it('returns default value for empty records', () => {
+        const result = calculateAverageMonthsBetweenDates([]);
+
+        expect(result).toBe(12); // Default is 12 months
+    });
+
+    it('handles records with irregular intervals', () => {
+        // Raises at varying intervals: 3 months, then 9 months
+        const records = [
+            { date: '2020-01-15' },
+            { date: '2020-04-15' }, // 3 months
+            { date: '2021-01-15' }  // 9 months
+        ];
+        const result = calculateAverageMonthsBetweenDates(records);
+
+        // Average: (3 + 9) / 2 = 6 months (approximately)
+        expect(result).toBeGreaterThan(5.5);
+        expect(result).toBeLessThan(6.5);
+    });
+
+    it('sorts dates correctly regardless of input order', () => {
+        // Same dates in different order should give same result
+        const recordsOrdered = [
+            { date: '2020-01-15' },
+            { date: '2020-07-15' }
+        ];
+        const recordsUnordered = [
+            { date: '2020-07-15' },
+            { date: '2020-01-15' }
+        ];
+
+        const result1 = calculateAverageMonthsBetweenDates(recordsOrdered);
+        const result2 = calculateAverageMonthsBetweenDates(recordsUnordered);
+
+        expect(result1).toBeCloseTo(result2, 1);
+    });
+});
+
 describe('CONSTANTS Validation', () => {
 
     it('has realistic salary validation ranges', () => {
@@ -386,6 +455,10 @@ describe('CONSTANTS Validation', () => {
 
     it('has default CPI rate for missing data', () => {
         expect(CONSTANTS.DEFAULT_CPI_RATE).toBe(2.5);
+    });
+
+    it('has em-dash placeholder for empty reasons', () => {
+        expect(CONSTANTS.EMPTY_REASON_PLACEHOLDER).toBe('—');
     });
 
     it('has chart configuration constants', () => {
