@@ -5,6 +5,37 @@ All notable changes to Paylocity Compensation Journey will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2026-01-28
+
+**Focus: Architecture, UX Polish & Documentation**
+
+This release completes the issue backlog (22/22 issues), modernizes the codebase architecture, and adds comprehensive API documentation.
+
+### Added
+- **API Documentation**: Comprehensive `docs/API.md` reference (579 lines) covering all public functions, data structures, and usage examples (#58)
+- **Cross-browser Visual Regression**: Added Firefox and WebKit baseline snapshots for visual testing
+- **Keyboard Shortcuts Help**: Improved accessibility with visible shortcut hints in Help tab (#57)
+
+### Changed
+- **Modular Architecture**: Extracted chart functions to `js/charts.js` (667 lines) - cleaner separation of concerns (#46)
+- **Removed AppState Pattern**: Simplified state management back to direct module imports (#44)
+- **Button Differentiation**: Primary/secondary/tertiary button hierarchy for clearer UI affordances (#20)
+- **Theme Toggle**: Converted to segmented control for better discoverability (#57)
+
+### Fixed
+- **UX Polish**: Improved button visual hierarchy and interactive states (#61)
+- **Quick Wins Batch**: Multiple small fixes including edge cases and UI tweaks (#60)
+
+### Documentation
+- **Closed #32**: app.js decomposition marked complete - architecture already well-modularized with 6 focused modules (3,220 total lines)
+
+### Technical
+- Final architecture: `app.js` (1,776 lines) + 5 extracted modules
+- All 22 GitHub issues resolved
+- 90% E2E test coverage maintained
+
+---
+
 ## [3.0.0] - 2026-01-26
 
 **Major Release: Polish & Production-Ready**
