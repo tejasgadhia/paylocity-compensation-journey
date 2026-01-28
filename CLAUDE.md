@@ -8,18 +8,23 @@ Paylocity Compensation Journey transforms raw Paylocity pay history data into a 
 
 ## Tech Stack
 
-- **Single HTML File**: 5,132 lines (HTML + CSS + JavaScript)
-- **Vanilla JavaScript**: No frameworks or build tools
-- **Chart.js**: Data visualization (CDN)
-- **Google Fonts**: JetBrains Mono, Space Grotesk, Nunito, Libre Baskerville
+- **Core**: `index.html` (HTML + CSS) + modular JavaScript
+- **JavaScript Modules**:
+  - `app.js` - Main application logic
+  - `js/calculations.js` - Financial calculation helpers
+  - `js/constants.js` - Named constants (magic numbers eliminated)
+  - `js/parser.js` - Paylocity data parser
+- **Chart.js**: Self-hosted with SRI (`assets/js/chart.umd.min.js`)
+- **Fonts**: Self-hosted JetBrains Mono, Space Grotesk
 - **LocalStorage**: Theme preference persistence
 - **Deployment**: GitHub Pages
 
 ## Architecture Principles
 
-### Single-File Application
-- All code in `index.html` (HTML + inline CSS + inline JavaScript)
-- No external JavaScript files (except Chart.js CDN)
+### Modular Application
+- `index.html` contains HTML structure and inline CSS
+- JavaScript split into focused modules (`app.js`, `js/*.js`)
+- Self-hosted dependencies (Chart.js, fonts) with SRI
 - No build process required
 - Works completely offline after initial load
 
@@ -303,9 +308,11 @@ python -m http.server 8000
 - Minimal re-renders (only on tab switch or data change)
 
 ### File Sizes
-- Total: ~200KB uncompressed (including inline fonts base64)
-- Chart.js CDN: ~200KB
-- Fast load time despite single-file approach
+- `index.html`: ~120KB (HTML + CSS)
+- `app.js`: ~25KB (main logic)
+- Chart.js: ~200KB (self-hosted)
+- Fonts: ~100KB (self-hosted TTF files)
+- Fast load time with proper caching
 
 ## Error Handling
 
@@ -322,45 +329,3 @@ python -m http.server 8000
 - Examine `updateMarket()` for benchmark comparisons
 
 Keep it self-contained, performant, and privacy-first!
-
----
-
-## Project Status (2026-01-27)
-
-**Phases 2-4 COMPLETE** ✅ Production-ready!
-
-**18 issues closed** across code organization, security hardening, and privacy enhancements:
-
-**Phase 2 - Code Organization:**
-- ✅ #30: Calculation helpers → calculations.js
-- ✅ #31: Magic numbers → named constants
-- ✅ #27: Tooltip factory pattern
-- ✅ #29: Chart theme metadata (robust switching)
-- ✅ #26: State management encapsulation (AppState)
-
-**Phase 3 - Security:**
-- ✅ #23: Subresource Integrity (SRI)
-- ✅ #24: XSS prevention (escapeHTML)
-- ✅ #28: CSP hardened (no unsafe-inline)
-
-**Phase 4 - Privacy & Quality:**
-- ✅ #25: parseRecord() complexity reduced (<10)
-- ✅ #33: Google Fonts self-hosted
-- ✅ #34: Download warning modal
-- ✅ #14-#19: Various improvements
-
-**Remaining (Optional):**
-- #20 🟢 LOW: Button differentiation (UX polish, deferred)
-- #32 🟢 LOW: app.js decomposition (future refactor)
-
-**Next Steps**:
-- **Option A**: Use as-is (production-ready)
-- **Option B**: Major refactor (see REFACTOR_PLAN.md - React + TypeScript)
-- **Option C**: Optional UX polish (#20)
-
-**Recent commits**:
-- dec7b1a (reduce parseRecord complexity - closes #25)
-- 532c062 (strengthen CSP - closes #28)
-- 602cda8 (self-host fonts - closes #33)
-- fa959f4 (download warning - closes #34)
-- 1578af5 (chart theme + state - closes #29, #26)

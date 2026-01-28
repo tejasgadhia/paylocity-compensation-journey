@@ -5,6 +5,10 @@ package-lock.json
 # Testing
 coverage/
 .vitest/
+test-results/
+playwright-report/
+Playwright Test Report.html
+test-structure.txt
 
 # macOS
 .DS_Store
@@ -20,8 +24,18 @@ LEARNINGS.md
 NEXT-STEPS.md
 PROJECT-STATUS.md
 NEXT-SESSION-PROMPT.md
+NEXT-SESSION-RESUME.md
+NEXT-SESSION-E2E-TESTS.md
 CODEBASE_ANALYSIS.md
 REFACTOR_PLAN.md
+PHASE-2-IMPLEMENTATION-SUMMARY.md
+E2E-TEST-STATUS.md
+E2E-TEST-FINAL-SUMMARY.md
+E2E-TEST-FIXES-SUMMARY.md
+FINAL-TEST-AND-CODE-QUALITY-SUMMARY.md
+TEST-FIXES-PROGRESS.md
+TEST-FIXES-SUMMARY.md
+TEST-FIXES-COMPLETE.md
 docs/sessions/
 docs/plans/
 docs/archive/
