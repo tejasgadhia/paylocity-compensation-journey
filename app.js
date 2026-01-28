@@ -1,8 +1,15 @@
+/**
+ * Global type declarations for external libraries
+ * Chart.js is loaded globally via script tag in index.html
+ * @global
+ */
+/* global Chart */
+
 // ========================================
 // IMPORTS
 // ========================================
 
-import { CONSTANTS, cpiData, benchmarks } from './js/constants.js';
+import { CONSTANTS, benchmarks } from './js/constants.js';
 import {
     calculateInflationOverPeriod,
     calculateRealGrowth,
@@ -1049,14 +1056,13 @@ function togglePrivacy() {
 
 function updateAllDisplays() {
     const current = getCurrentSalary(employeeData);
-    const start = getStartingSalary(employeeData);
-    
-    document.getElementById('currentSalary').textContent = state.showDollars 
-        ? formatCurrency(current) 
+
+    document.getElementById('currentSalary').textContent = state.showDollars
+        ? formatCurrency(current)
         : `Index: ${formatCurrency(current, false)}`;
-    
-    document.getElementById('currentSalaryIndexed').textContent = state.showDollars 
-        ? `Index: ${formatCurrency(current, false)}` 
+
+    document.getElementById('currentSalaryIndexed').textContent = state.showDollars
+        ? `Index: ${formatCurrency(current, false)}`
         : `Base 100 = Starting salary`;
 
     buildHistoryTable();
