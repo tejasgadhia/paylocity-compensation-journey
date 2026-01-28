@@ -44,10 +44,33 @@ export async function switchTheme(page, theme) {
   // Only toggle if we need to switch
   if (currentTheme !== theme) {
     // Click the specific theme button in the dashboard (not landing page)
-    await page.locator('.theme-switcher .theme-btn').filter({ hasText: new RegExp(theme, 'i') }).click();
+    const themeButton = page.locator('.theme-switcher .theme-btn[data-theme="' + theme + '"]');
+    await themeButton.click();
 
-    // Wait for theme to apply (CSS custom properties)
-    await page.waitForTimeout(300);
+    // Wait for theme attribute to update
+    await page.waitForFunction(
+      (expectedTheme) => {
+        return document.documentElement.getAttribute('data-theme') === expectedTheme;
+      },
+      theme,
+      { timeout: 2000 }
+    );
+
+    // Wait for localStorage to be set
+    await page.waitForFunction(
+      (expectedTheme) => {
+        try {
+          const stored = localStorage.getItem('theme');
+          console.log('localStorage theme:', stored, 'expected:', expectedTheme);
+          return stored === expectedTheme;
+        } catch (e) {
+          console.error('localStorage error:', e);
+          return false;
+        }
+      },
+      theme,
+      { timeout: 3000 }
+    );
 
     // Wait for charts to rebuild (setTimeout in applyTheme)
     await page.waitForTimeout(500);
@@ -84,11 +107,20 @@ export async function togglePrivacyMode(page) {
   const targetView = currentView === 'dollars' ? 'index' : 'dollars';
   await page.locator(`.view-btn[data-view="${targetView}"]`).click();
 
-  // Wait for state to update and UI to re-render
-  await page.waitForTimeout(500);
-
   // Wait for the button active class to switch
   await page.locator(`.view-btn[data-view="${targetView}"].active`).waitFor({ state: 'visible', timeout: 2000 });
+
+  // Wait for state to actually update in window.state
+  await page.waitForFunction(
+    (expectedMode) => {
+      return window.state && window.state.showDollars === (expectedMode === 'dollars');
+    },
+    targetView,
+    { timeout: 2000 }
+  );
+
+  // Wait for UI to re-render
+  await page.waitForTimeout(300);
 }
 
 /**
@@ -98,23 +130,31 @@ export async function togglePrivacyMode(page) {
  * @param {number} scenarioIndex - Scenario index: 0-3
  */
 export async function loadDemoScenario(page, scenarioIndex) {
-  // Navigate to home
-  await page.goto('/');
+  // Navigate to home (don't check if we're there - just go)
+  await page.goto('/', { waitUntil: 'networkidle' });
 
-  // Wait for landing page to be visible
+  // Wait for landing page
   await page.locator('#landingPage').waitFor({ state: 'visible' });
 
-  // Click "View Demo Dashboard" button to load first scenario
-  await page.getByRole('button', { name: 'View Demo Dashboard' }).click();
+  // Extra wait for initialization
+  await page.waitForTimeout(1000);
+
+  // Force click the demo button
+  await page.locator('button.btn-demo').click({ force: true });
 
   // Wait for dashboard to appear
-  await page.locator('#mainChart').waitFor({ state: 'visible', timeout: 15000 });
-  await page.waitForTimeout(500);
+  await page.locator('#dashboardPage').waitFor({ state: 'visible', timeout: 20000 });
+
+  // Wait for main chart to be visible
+  await page.locator('#mainChart').waitFor({ state: 'visible', timeout: 5000 });
+
+  // Wait for chart to fully render
+  await page.waitForTimeout(1500);
 
   // Click regenerate button (scenarioIndex) times to cycle to the desired scenario
   for (let i = 0; i < scenarioIndex; i++) {
     await page.locator('button.demo-regenerate-btn').click();
-    await page.waitForTimeout(800); // Wait for charts to update and data to regenerate
+    await page.waitForTimeout(1000);
   }
 }
 

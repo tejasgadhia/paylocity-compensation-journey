@@ -200,15 +200,6 @@ function setEmployeeData(data) {
     AppState.setEmployeeData(data);
 }
 
-/**
- * Helper function to clear all application state.
- */
-function clearAppState() {
-    setEmployeeData(null);
-    AppState.destroyAllCharts();
-}
-
-
 // ========================================
 // BENCHMARK CALCULATION FUNCTIONS
 // ========================================
@@ -401,10 +392,6 @@ function validatePasteInput() {
     const dollars = input.match(dollarPattern) || [];
     
     // Check for key structural indicators
-    const hasRates = /rates/i.test(input);
-    const hasCurrent = /current/i.test(input);
-    const hasHistory = /history/i.test(input);
-    const hasItems = /items/i.test(input);
     const hasSalary = /salary/i.test(input);
     
     // Validation checks
@@ -723,29 +710,6 @@ const storyContent = {
 // ========================================
 
 /**
- * Wraps chart build functions with error handling.
- * Prevents chart rendering failures from crashing the entire app.
- *
- * @param {Function} buildFn - The chart build function to wrap
- * @param {string} chartName - Name of the chart for error messages
- * @returns {Function} Wrapped function with error handling
- *
- * @example
- * const safeBuildChart = withChartErrorHandling(buildMainChart, 'Main Chart');
- * safeBuildChart(); // Catches and logs any errors
- */
-function withChartErrorHandling(buildFn, chartName) {
-    return function() {
-        try {
-            return buildFn.apply(this, arguments);
-        } catch (error) {
-            console.error(`${chartName} rendering failed:`, error);
-            showUserMessage(`${chartName} could not be rendered. Please refresh the page.`, 'warning');
-        }
-    };
-}
-
-/**
  * Displays a user-facing message banner at the top of the page.
  * Automatically removes after 5 seconds.
  *
@@ -1042,14 +1006,21 @@ function updateChartTheme(chart) {
 function setTheme(theme) {
     state.theme = theme;
     document.documentElement.setAttribute('data-theme', theme);
-    
+
+    // Persist theme preference to localStorage
+    try {
+        localStorage.setItem('theme', theme);
+    } catch (e) {
+        console.warn('Failed to save theme preference:', e);
+    }
+
     // Update all theme buttons
     document.querySelectorAll('.theme-btn, .landing-theme-btn').forEach(btn => {
         const isActive = btn.dataset.theme === theme;
         btn.classList.toggle('active', isActive);
         btn.setAttribute('aria-pressed', isActive);
     });
-    
+
     // Update URL
     updateUrlParams();
 
@@ -1325,8 +1296,7 @@ function buildMarketComparison() {
     }
 
     const start = getStartingSalary(employeeData);
-    const current = getCurrentSalary(employeeData);
-    
+
     const cards = [
         {
             label: 'Your CAGR',
@@ -1456,7 +1426,7 @@ if (typeof window !== 'undefined') {
     window.addEventListener('beforeunload', (e) => {
         if (employeeData && !employeeData.isDemo) {
             e.preventDefault();
-            e.returnValue = '';
+            return '';
         }
     });
 }
@@ -2131,6 +2101,20 @@ function initFromUrl() {
  * Replace all inline onclick handlers with addEventListener
  */
 function initEventListeners() {
+    // Load saved theme preference from localStorage
+    try {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme && (savedTheme === 'tactical' || savedTheme === 'artistic')) {
+            setTheme(savedTheme);
+        } else {
+            // Save initial theme to localStorage
+            const initialTheme = document.documentElement.getAttribute('data-theme') || 'artistic';
+            localStorage.setItem('theme', initialTheme);
+        }
+    } catch (e) {
+        console.warn('Failed to load/save theme preference:', e);
+    }
+
     // Landing page theme buttons
     document.querySelectorAll('.landing-theme-btn').forEach(btn => {
         btn.addEventListener('click', () => setTheme(btn.dataset.theme));

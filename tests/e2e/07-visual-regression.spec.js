@@ -66,8 +66,9 @@ test.describe('Visual Regression - Theme Switching', () => {
     await switchTheme(page, 'tactical');
     await page.waitForTimeout(500);
 
-    const themeButton = page.getByRole('button', { name: /tactical|artistic/i });
-    await expect(themeButton).toHaveScreenshot('theme-button-tactical.png', {
+    // Screenshot the entire theme switcher container (includes both buttons)
+    const themeSwitcher = page.locator('.theme-switcher');
+    await expect(themeSwitcher).toHaveScreenshot('theme-button-tactical.png', {
       maxDiffPixels: 10,
     });
 
@@ -75,7 +76,7 @@ test.describe('Visual Regression - Theme Switching', () => {
     await switchTheme(page, 'artistic');
     await page.waitForTimeout(500);
 
-    await expect(themeButton).toHaveScreenshot('theme-button-artistic.png', {
+    await expect(themeSwitcher).toHaveScreenshot('theme-button-artistic.png', {
       maxDiffPixels: 10,
     });
   });
