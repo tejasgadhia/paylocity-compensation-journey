@@ -83,6 +83,10 @@ function downloadHtmlFile() {
 /**
  * Centralized state manager for encapsulated state management.
  * Provides controlled access to application state through getters/setters.
+ *
+ * NOTE: Currently the codebase uses legacy globals (state, charts, employeeData)
+ * directly for backward compatibility. AppState getters/setters are available
+ * for future migration to fully encapsulated state management.
  */
 const AppState = {
     // Private state (accessed through getters/setters)
@@ -797,6 +801,32 @@ function getThemeColors() {
 }
 
 /**
+ * Gets canvas 2D context with validation and error handling.
+ * Consolidates repeated canvas/context checks across chart functions.
+ *
+ * @param {string} canvasId - DOM ID of the canvas element
+ * @param {string} chartName - Human-readable name for error messages
+ * @returns {CanvasRenderingContext2D|null} The 2D context, or null if unavailable
+ */
+function getChartContext(canvasId, chartName) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) {
+        console.error(`${chartName}: Canvas element not found`);
+        showUserMessage(`${chartName} rendering failed. Please refresh the page.`, 'error');
+        return null;
+    }
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error(`${chartName}: Canvas 2D context not available`);
+        showUserMessage(`${chartName} rendering failed. Your browser may not support this feature.`, 'error');
+        return null;
+    }
+
+    return ctx;
+}
+
+/**
  * Factory function for Chart.js tooltip configuration.
  * Eliminates DRY violation across multiple charts.
  *
@@ -860,7 +890,7 @@ function detectMilestones() {
     if (doubled) {
         const doubledDate = new Date(doubled.date);
         const hireDate = new Date(employeeData.hireDate);
-        const monthsToDouble = Math.round((doubledDate - hireDate) / (CONSTANTS.MILLISECONDS_PER_SECOND * CONSTANTS.SECONDS_PER_MINUTE * CONSTANTS.MINUTES_PER_HOUR * CONSTANTS.HOURS_PER_DAY * CONSTANTS.DAYS_PER_MONTH_AVG));
+        const monthsToDouble = Math.round((doubledDate - hireDate) / (CONSTANTS.MS_PER_DAY * CONSTANTS.DAYS_PER_MONTH_AVG));
         milestones.push({
             icon: '📈',
             title: 'Salary Doubled',
@@ -899,7 +929,7 @@ function detectMilestones() {
             icon: '🏆',
             title: 'Decade of Service',
             detail: '10+ years with the organization',
-            date: new Date(new Date(employeeData.hireDate).getTime() + CONSTANTS.YEARS_DECADE_SERVICE * CONSTANTS.DAYS_PER_YEAR * CONSTANTS.HOURS_PER_DAY * CONSTANTS.MINUTES_PER_HOUR * CONSTANTS.SECONDS_PER_MINUTE * CONSTANTS.MILLISECONDS_PER_SECOND).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+            date: new Date(new Date(employeeData.hireDate).getTime() + CONSTANTS.YEARS_DECADE_SERVICE * CONSTANTS.MS_PER_YEAR).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
         });
     }
 
@@ -1102,10 +1132,10 @@ function updateStory() {
     const dates = adjustments.map(r => new Date(r.date)).sort((a, b) => a - b);
     let totalDays = 0;
     for (let i = 1; i < dates.length; i++) {
-        totalDays += (dates[i] - dates[i-1]) / (CONSTANTS.MILLISECONDS_PER_SECOND * CONSTANTS.SECONDS_PER_MINUTE * CONSTANTS.MINUTES_PER_HOUR * CONSTANTS.HOURS_PER_DAY);
+        totalDays += (dates[i] - dates[i-1]) / CONSTANTS.MS_PER_DAY;
     }
     const avgMonths = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30.44 : 0;
-    
+
     // Find six figure date and calculate time to reach it
     const recordsChron = [...employeeData.records].reverse();
     const sixFigures = recordsChron.find(r => r.annual >= 100000);
@@ -1113,7 +1143,7 @@ function updateStory() {
     if (sixFigures) {
         const hireDate = new Date(employeeData.hireDate);
         const sixFigDate = new Date(sixFigures.date);
-        const diffYears = (sixFigDate - hireDate) / (CONSTANTS.MILLISECONDS_PER_SECOND * CONSTANTS.SECONDS_PER_MINUTE * CONSTANTS.MINUTES_PER_HOUR * CONSTANTS.HOURS_PER_DAY * CONSTANTS.DAYS_PER_YEAR);
+        const diffYears = (sixFigDate - hireDate) / CONSTANTS.MS_PER_YEAR;
         yearsToSixFigures = diffYears < 1 ? `${Math.round(diffYears * 12)} months` : `${diffYears.toFixed(1)} years`;
     }
     
@@ -1500,19 +1530,8 @@ function setYoyChartType(type) {
  */
 function buildMainChart() {
     try {
-        const canvas = document.getElementById('mainChart');
-        if (!canvas) {
-            console.error('buildMainChart: Canvas element not found');
-            showUserMessage('Chart rendering failed. Please refresh the page.', 'error');
-            return;
-        }
-
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-            console.error('buildMainChart: Canvas 2D context not available');
-            showUserMessage('Chart rendering failed. Your browser may not support this feature.', 'error');
-            return;
-        }
+        const ctx = getChartContext('mainChart', 'Main chart');
+        if (!ctx) return;
 
         const colors = getThemeColors();
 
@@ -1596,19 +1615,8 @@ function buildMainChart() {
 
 function buildYoyChart() {
     try {
-        const canvas = document.getElementById('yoyChart');
-        if (!canvas) {
-            console.error('buildYoyChart: Canvas element not found');
-            showUserMessage('YoY chart rendering failed. Please refresh the page.', 'error');
-            return;
-        }
-
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-            console.error('buildYoyChart: Canvas 2D context not available');
-            showUserMessage('YoY chart rendering failed. Your browser may not support this feature.', 'error');
-            return;
-        }
+        const ctx = getChartContext('yoyChart', 'YoY chart');
+        if (!ctx) return;
 
         const colors = getThemeColors();
 
@@ -1672,19 +1680,8 @@ function buildYoyChart() {
 
 function buildCategoryChart() {
     try {
-        const canvas = document.getElementById('categoryChart');
-        if (!canvas) {
-            console.error('buildCategoryChart: Canvas element not found');
-            showUserMessage('Category chart rendering failed. Please refresh the page.', 'error');
-            return;
-        }
-
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-            console.error('buildCategoryChart: Canvas 2D context not available');
-            showUserMessage('Category chart rendering failed. Your browser may not support this feature.', 'error');
-            return;
-        }
+        const ctx = getChartContext('categoryChart', 'Category chart');
+        if (!ctx) return;
 
         const colors = getThemeColors();
 
@@ -1759,19 +1756,8 @@ function initProjections() {
 
 function buildProjectionChart() {
     try {
-        const canvas = document.getElementById('projectionChart');
-        if (!canvas) {
-            console.error('buildProjectionChart: Canvas element not found');
-            showUserMessage('Projection chart rendering failed. Please refresh the page.', 'error');
-            return;
-        }
-
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-            console.error('buildProjectionChart: Canvas 2D context not available');
-            showUserMessage('Projection chart rendering failed. Your browser may not support this feature.', 'error');
-            return;
-        }
+        const ctx = getChartContext('projectionChart', 'Projection chart');
+        if (!ctx) return;
 
         const colors = getThemeColors();
 
@@ -1914,7 +1900,7 @@ function updateAnalytics() {
     const dates = adjustments.map(r => new Date(r.date)).sort((a, b) => a - b);
     let totalDays = 0;
     for (let i = 1; i < dates.length; i++) {
-        totalDays += (dates[i] - dates[i-1]) / (CONSTANTS.MILLISECONDS_PER_SECOND * CONSTANTS.SECONDS_PER_MINUTE * CONSTANTS.MINUTES_PER_HOUR * CONSTANTS.HOURS_PER_DAY);
+        totalDays += (dates[i] - dates[i-1]) / CONSTANTS.MS_PER_DAY;
     }
     const avgMonths = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30.44 : 12;
     

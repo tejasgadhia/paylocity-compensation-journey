@@ -20,6 +20,12 @@ export const CONSTANTS = {
     DAYS_PER_MONTH_AVG: 30,             // Approximate (used for rough calculations)
     DAYS_PER_YEAR: 365.25,              // Accounts for leap years
 
+    // Derived constants (computed once, reused everywhere)
+    // MS_PER_DAY = 1000 * 60 * 60 * 24 = 86,400,000
+    MS_PER_DAY: 86400000,
+    // MS_PER_YEAR = 86,400,000 * 365.25 = 31,557,600,000
+    MS_PER_YEAR: 31557600000,
+
     // Paycheck calculations
     PAY_PERIODS_PER_YEAR: 24,           // Used in Paylocity data conversions
 

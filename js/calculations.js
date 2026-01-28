@@ -140,7 +140,7 @@ export function getCurrentSalary(employeeData) {
 export function calculateYearsOfService(employeeData) {
     const hire = new Date(employeeData.hireDate);
     const current = new Date(employeeData.currentDate);
-    return (current - hire) / (CONSTANTS.MILLISECONDS_PER_SECOND * CONSTANTS.SECONDS_PER_MINUTE * CONSTANTS.MINUTES_PER_HOUR * CONSTANTS.HOURS_PER_DAY * CONSTANTS.DAYS_PER_YEAR);
+    return (current - hire) / CONSTANTS.MS_PER_YEAR;
 }
 
 /**
@@ -175,10 +175,8 @@ export function calculateCAGR(employeeData) {
 
     // Validation: Prevent division by zero and NaN propagation
     if (years <= 0 || start <= 0 || end <= 0) {
-        if (years <= 0 || start <= 0 || end <= 0) {
-            console.warn('calculateCAGR: Invalid inputs, returning 0', { start, end, years });
-        }
-        return 0; // Graceful fallback
+        console.warn('calculateCAGR: Invalid inputs, returning 0', { start, end, years });
+        return 0;
     }
 
     // For very short tenure (<~36 days), use simple percentage instead of CAGR
@@ -228,7 +226,7 @@ export function getBenchmarkComparisons(employeeData, benchmarks) {
     const dates = adjustments.map(r => new Date(r.date)).sort((a, b) => a - b);
     let totalDays = 0;
     for (let i = 1; i < dates.length; i++) {
-        totalDays += (dates[i] - dates[i-1]) / (CONSTANTS.MILLISECONDS_PER_SECOND * CONSTANTS.SECONDS_PER_MINUTE * CONSTANTS.MINUTES_PER_HOUR * CONSTANTS.HOURS_PER_DAY);
+        totalDays += (dates[i] - dates[i-1]) / CONSTANTS.MS_PER_DAY;
     }
     const avgMonthsBetween = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30.44 : 12;
 
