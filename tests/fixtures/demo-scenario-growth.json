@@ -1,0 +1,33 @@
+{
+  "version": "1.0",
+  "exportDate": "2024-01-15T10:30:00.000Z",
+  "data": [
+    {
+      "date": "2021-01-15",
+      "reason": "New Hire",
+      "perCheck": 2500.00,
+      "annual": 65000.00,
+      "hourlyRate": 31.25,
+      "change": 0,
+      "changePercent": 0
+    },
+    {
+      "date": "2021-07-01",
+      "reason": "Merit Increase",
+      "perCheck": 2692.30,
+      "annual": 70000.00,
+      "hourlyRate": 33.65,
+      "change": 5000.00,
+      "changePercent": 7.69
+    },
+    {
+      "date": "2022-01-01",
+      "reason": "Promotion",
+      "perCheck": 3076.92,
+      "annual": 80000.00,
+      "hourlyRate": 38.46,
+      "change": 10000.00,
+      "changePercent": 14.29
+    }
+  ]
+}

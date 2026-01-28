@@ -1,0 +1,2 @@
+01/15/2021   <script>alert('xss')</script>   $2,500.0065,000.0031.25
+07/01/2021   Merit<img src=x onerror=alert('xss')>   $2,692.3070,000.0033.65

@@ -309,9 +309,7 @@ async function loadChartJS() {
 
     return new Promise((resolve, reject) => {
         const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';
-        script.integrity = 'sha384-6qM4b9YlReaR+UStB0y5L7X4NPhTc2/4OfIUsSNn4jTrYE6EcjJNFqxAGBINx+9w';
-        script.crossOrigin = 'anonymous';
+        script.src = 'assets/js/chart.umd.min.js'; // Self-hosted for privacy & offline capability
         script.onload = () => {
             console.info('Chart.js loaded successfully');
             resolve();
@@ -342,7 +340,7 @@ async function parseAndGenerate() {
     
     try {
         employeeData = parsePaylocityData(input);
-        
+
         if (employeeData.records.length < 2) {
             throw new Error('Need at least 2 records to generate insights');
         }
@@ -1864,7 +1862,7 @@ function buildProjectionChart() {
 
 function buildHistoryTable() {
     const tbody = document.getElementById('historyTableBody');
-    const startingSalary = getStartingSalary();
+    const startingSalary = getStartingSalary(employeeData);
 
     tbody.innerHTML = employeeData.records.map(r => {
         const badgeClass = getBadgeClass(r.reason);
@@ -1896,8 +1894,8 @@ function getBadgeClass(reason) {
 
 function buildProjectionTable() {
     const tbody = document.getElementById('projectionTableBody');
-    const currentSalary = getCurrentSalary();
-    const cagr = calculateCAGR() / 100;
+    const currentSalary = getCurrentSalary(employeeData);
+    const cagr = calculateCAGR(employeeData) / 100;
     const customRate = state.customRate / 100;
     
     // Fixed intervals: 1-5 yearly, then 10, 15, 20
@@ -1920,7 +1918,7 @@ function buildProjectionTable() {
 
 function updateAnalytics() {
     const records = employeeData.records;
-    const startingSalary = getStartingSalary();
+    const startingSalary = getStartingSalary(employeeData);
     
     // Filter out "New Hire" - it's the starting point, not an adjustment
     const adjustments = records.filter(r => r.reason !== 'New Hire');
@@ -1947,10 +1945,10 @@ function updateAnalytics() {
     }
     const avgMonths = dates.length > 1 ? (totalDays / (dates.length - 1)) / 30.44 : 12;
     
-    document.getElementById('cagr').textContent = formatPercent(calculateCAGR());
+    document.getElementById('cagr').textContent = formatPercent(calculateCAGR(employeeData));
     document.getElementById('avgRaise').textContent = formatPercent(avgRaisePercent);
     
-    const avgRaiseDollar = (avgRaisePercent / 100) * getCurrentSalary();
+    const avgRaiseDollar = (avgRaisePercent / 100) * getCurrentSalary(employeeData);
     document.getElementById('avgRaiseDollar').textContent = state.showDollars 
         ? `~${formatCurrency(avgRaiseDollar)} per adjustment`
         : `~${((avgRaiseDollar / startingSalary) * 100).toFixed(1)} index points`;
@@ -2018,7 +2016,7 @@ function setProjectionView(view) {
 function calculateTimeToTarget() {
     const target = parseFloat(document.getElementById('targetSalary').value);
     const growth = state.customRate / 100; // Use slider value
-    const current = getCurrentSalary();
+    const current = getCurrentSalary(employeeData);
     
     if (target <= current) {
         document.getElementById('timeToTarget').textContent = 'Already achieved!';
@@ -2039,11 +2037,11 @@ function calculateTimeToTarget() {
 // ========================================
 
 function initDashboard() {
-    const current = getCurrentSalary();
-    const start = getStartingSalary();
+    const current = getCurrentSalary(employeeData);
+    const start = getStartingSalary(employeeData);
     const growth = ((current - start) / start) * 100;
-    const years = calculateYearsOfService();
-    
+    const years = calculateYearsOfService(employeeData);
+
     // Exclude "New Hire" from adjustment counts - it's the starting point, not an adjustment
     const adjustments = employeeData.records.filter(r => r.reason !== 'New Hire');
     const adjustmentCount = adjustments.length;

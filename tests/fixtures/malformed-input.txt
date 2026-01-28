@@ -1,0 +1,3 @@
+Invalid line without date
+Merit Increase $2,500.00
+07/01/2021   Merit Increase   Invalid amount
