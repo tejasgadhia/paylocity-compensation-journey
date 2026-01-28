@@ -320,6 +320,21 @@ async function loadChartJS() {
 // PARSE AND GENERATE
 // ========================================
 
+/**
+ * Main data pipeline: parses Paylocity input and initializes the dashboard.
+ *
+ * Validates input, parses compensation records, updates URL with encoded data,
+ * hides the landing page, and initializes all dashboard components.
+ * Shows user-friendly error messages for invalid or incomplete data.
+ *
+ * @async
+ * @global {Object} employeeData - Sets parsed compensation data
+ * @returns {Promise<void>}
+ *
+ * @example
+ * // Triggered by "Generate" button click
+ * document.getElementById('generateBtn').addEventListener('click', parseAndGenerate);
+ */
 async function parseAndGenerate() {
     const input = document.getElementById('pasteInput').value.trim();
     const messageDiv = document.getElementById('validationMessage');
@@ -1024,6 +1039,19 @@ function updateChartTheme(chart) {
     chart.update('none');
 }
 
+/**
+ * Sets the application theme and updates all visual components.
+ *
+ * Changes the data-theme attribute, persists preference to localStorage,
+ * updates theme toggle buttons, and refreshes chart colors without rebuilding.
+ *
+ * @param {string} theme - Theme name ('tactical' for dark, 'artistic' for light)
+ * @returns {void}
+ *
+ * @example
+ * setTheme('tactical'); // Switch to dark theme
+ * setTheme('artistic'); // Switch to light theme
+ */
 function setTheme(theme) {
     state.theme = theme;
     document.documentElement.setAttribute('data-theme', theme);
@@ -1103,6 +1131,21 @@ function updateAllDisplays() {
 // STORY UPDATE
 // ========================================
 
+/**
+ * Updates the Story tab with narrative insights about compensation history.
+ *
+ * Generates personalized story cards with CAGR analysis, milestone detection,
+ * industry comparisons, and contextual insights. Adapts language and metrics
+ * based on theme (tactical/artistic) and tenure length.
+ *
+ * @global {Object} employeeData - Employee compensation records
+ * @global {Object} state - UI state (theme, showDollars)
+ * @returns {void}
+ *
+ * @example
+ * // Refresh story after data or theme change
+ * updateStory();
+ */
 function updateStory() {
     const content = storyContent[state.theme];
     document.getElementById('storyTitle').textContent = content.title;
@@ -1390,6 +1433,21 @@ function buildMarketComparison() {
 // TAB FUNCTIONS
 // ========================================
 
+/**
+ * Switches to the specified dashboard tab and lazy-loads its content.
+ *
+ * Updates URL parameters, toggles active states on tab buttons, shows/hides
+ * tab content panels, and initializes tab-specific charts on first view
+ * (market benchmarks, analytics charts, projections).
+ *
+ * @param {string} tabId - Tab identifier (home, story, market, history, analytics, projections, help)
+ * @param {boolean} [updateUrl=true] - Whether to update browser URL with tab parameter
+ * @returns {void}
+ *
+ * @example
+ * setTab('market');           // Switch to Market tab, update URL
+ * setTab('history', false);   // Switch to History tab, don't update URL
+ */
 function setTab(tabId, updateUrl = true) {
     state.currentTab = tabId;
     
@@ -1682,6 +1740,22 @@ function buildMainChart() {
     }
 }
 
+/**
+ * Builds the year-over-year salary growth chart.
+ *
+ * Calculates annual growth percentages by comparing end-of-year salaries.
+ * Supports bar and line chart types via state.yoyChartType.
+ * Destroys existing chart before creation to prevent memory leaks.
+ *
+ * @global {Object} employeeData - Compensation records with dates and annual values
+ * @global {Object} state - UI state (yoyChartType, theme)
+ * @global {Object} charts - Chart.js instance storage
+ * @returns {void}
+ *
+ * @example
+ * // Build chart on Analytics tab first view
+ * buildYoyChart();
+ */
 function buildYoyChart() {
     try {
         const ctx = getChartContext('yoyChart', 'YoY chart');
@@ -1747,6 +1821,22 @@ function buildYoyChart() {
     }
 }
 
+/**
+ * Builds the category breakdown doughnut chart.
+ *
+ * Groups salary adjustments by reason (Merit, Promotion, Cost of Living, etc.)
+ * and displays as a doughnut chart with percentage breakdown.
+ * Excludes "New Hire" records as they represent starting point, not adjustments.
+ *
+ * @global {Object} employeeData - Compensation records with reasons
+ * @global {Object} state - UI state (theme)
+ * @global {Object} charts - Chart.js instance storage
+ * @returns {void}
+ *
+ * @example
+ * // Build chart on Analytics tab
+ * buildCategoryChart();
+ */
 function buildCategoryChart() {
     try {
         const ctx = getChartContext('categoryChart', 'Category chart');
@@ -1823,6 +1913,24 @@ function initProjections() {
     document.getElementById('historicalRateDisplay').textContent = historicalCAGR + '%';
 }
 
+/**
+ * Builds the salary projection chart with multiple scenarios.
+ *
+ * Displays 4 projection lines: historical CAGR, conservative (5%),
+ * custom (user-adjustable via slider), and optimistic (12%).
+ * Shows projected salary values over configurable year range.
+ *
+ * @global {Object} employeeData - Current salary data for projections
+ * @global {Object} state - UI state (projectionYears, customRate, theme)
+ * @global {Object} charts - Chart.js instance storage
+ * @returns {void}
+ *
+ * @example
+ * // Build projection on Projections tab first view
+ * state.projectionYears = 5;
+ * state.customRate = 8;
+ * buildProjectionChart();
+ */
 function buildProjectionChart() {
     try {
         const ctx = getChartContext('projectionChart', 'Projection chart');
@@ -2105,6 +2213,20 @@ function setProjectionView(view) {
 // DASHBOARD INITIALIZATION
 // ========================================
 
+/**
+ * Initializes the main dashboard with KPI cards and summary statistics.
+ *
+ * Calculates and displays current salary, total growth percentage, tenure,
+ * adjustment count, CAGR, and real (inflation-adjusted) growth. Populates
+ * the Home tab KPI cards. Called after parsing data or loading demo.
+ *
+ * @global {Object} employeeData - Parsed compensation records
+ * @returns {void}
+ *
+ * @example
+ * // Initialize after parseAndGenerate() or loadDemoData()
+ * initDashboard();
+ */
 function initDashboard() {
     const current = getCurrentSalary(employeeData);
     const start = getStartingSalary(employeeData);
