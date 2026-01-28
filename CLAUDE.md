@@ -10,10 +10,12 @@ Paylocity Compensation Journey transforms raw Paylocity pay history data into a 
 
 - **Core**: `index.html` (HTML + CSS) + modular JavaScript
 - **JavaScript Modules**:
-  - `app.js` - Main application logic
+  - `app.js` - Main application logic, UI orchestration
+  - `js/charts.js` - Chart building and theme updates (Chart.js)
   - `js/calculations.js` - Financial calculation helpers
   - `js/constants.js` - Named constants (magic numbers eliminated)
   - `js/parser.js` - Paylocity data parser
+  - `js/security.js` - Template validation
 - **Chart.js**: Self-hosted with SRI (`assets/js/chart.umd.min.js`)
 - **Fonts**: Self-hosted JetBrains Mono, Space Grotesk
 - **LocalStorage**: Theme preference persistence
@@ -29,17 +31,35 @@ Paylocity Compensation Journey transforms raw Paylocity pay history data into a 
 - Works completely offline after initial load
 
 ### State Management
+
+Simple globals appropriate for this app's complexity:
+
 ```javascript
-const state = {
-  theme: 'tactical|artistic',
-  showDollars: true,  // vs. indexed values
+// UI state
+let state = {
+  theme: 'artistic',        // 'tactical' (dark) or 'artistic' (light)
+  showDollars: true,        // vs. indexed values (privacy mode)
   currentTab: 'home',
-  chartTypes: {...},  // Chart type per visualization
+  mainChartType: 'line',    // line/bar/area/step
+  yoyChartType: 'bar',      // bar/line
   projectionYears: 5,
-  customRate: 6,
-  currentScenarioIndex: 0
+  customRate: 8,
+  currentScenarioIndex: 0   // Demo scenario cycling
 };
+
+// Chart.js instances
+let charts = {
+  main: null,
+  yoy: null,
+  category: null,
+  projection: null
+};
+
+// Parsed compensation data
+let employeeData = null;
 ```
+
+Chart functions in `js/charts.js` receive state via dependency injection through `initCharts()`.
 
 ## Code Conventions
 
@@ -174,9 +194,9 @@ charts.main = new Chart(ctx, config);
 - **Projection**: Line chart with forecast scenarios
 
 ### Theme Integration
-- Charts inherit colors from CSS variables
-- Rebuild charts on theme change (setTimeout 100ms)
-- Tooltips styled to match theme
+- Charts inherit colors from CSS variables via `getThemeColors()`
+- Theme updates use efficient in-place `updateChartTheme()` (no rebuild)
+- Tooltips styled via `getTooltipConfig()` factory
 
 ## Demo System
 
@@ -255,17 +275,22 @@ function setTab(tabId) {
 ### Adding a New Chart
 
 1. Create canvas in HTML
-2. Add build function:
+2. Add build function in `js/charts.js`:
 ```javascript
-function buildNewChart() {
-  if (charts.newChart) charts.newChart.destroy();
+export function buildNewChart() {
+  const employeeData = _getEmployeeData();
+  if (!employeeData) return;
 
-  const ctx = document.getElementById('new-chart').getContext('2d');
-  charts.newChart = new Chart(ctx, config);
+  const ctx = getChartContext('newChart', 'New chart');
+  if (!ctx) return;
+
+  if (_charts.newChart) _charts.newChart.destroy();
+  _charts.newChart = new Chart(ctx, config);
 }
 ```
 
-3. Call in appropriate tab's update function
+3. Export from `js/charts.js` and import in `app.js`
+4. Call in appropriate tab's update function
 
 ### Updating Benchmarks
 
@@ -309,7 +334,9 @@ python -m http.server 8000
 
 ### File Sizes
 - `index.html`: ~120KB (HTML + CSS)
-- `app.js`: ~25KB (main logic)
+- `app.js`: ~60KB (main logic, ~1850 lines)
+- `js/charts.js`: ~22KB (chart functions, ~670 lines)
+- `js/calculations.js`: ~10KB (calculation helpers)
 - Chart.js: ~200KB (self-hosted)
 - Fonts: ~100KB (self-hosted TTF files)
 - Fast load time with proper caching
@@ -323,9 +350,9 @@ python -m http.server 8000
 
 ## Questions?
 
-- Review `parsePaylocityData()` for parsing logic
-- Check `buildMainChart()` for Chart.js usage
-- See `calculateCAGR()` for calculation examples
-- Examine `updateMarket()` for benchmark comparisons
+- Review `js/parser.js` for parsing logic
+- Check `js/charts.js` for Chart.js usage (build, update, theme functions)
+- See `js/calculations.js` for CAGR, inflation, benchmark calculations
+- Examine `updateMarket()` in `app.js` for benchmark comparisons
 
 Keep it self-contained, performant, and privacy-first!

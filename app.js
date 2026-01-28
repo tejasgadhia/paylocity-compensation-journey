@@ -27,6 +27,17 @@ import {
     parsePaylocityData
 } from './js/parser.js';
 import { validateTemplateData } from './js/security.js';
+import {
+    initCharts,
+    updateChartTheme,
+    updateMainChartType,
+    updateYoyChartType,
+    buildMainChart,
+    buildYoyChart,
+    buildCategoryChart,
+    buildProjectionChart,
+    updateProjectionChartData
+} from './js/charts.js';
 
 // ========================================
 // MOBILE/TABLET DETECTION
@@ -79,121 +90,32 @@ function downloadHtmlFile() {
 }
 
 // ========================================
-// STATE MANAGEMENT (Closes #26)
+// STATE MANAGEMENT
 // ========================================
 
 /**
- * Centralized state manager for encapsulated state management.
- * Provides controlled access to application state through getters/setters.
- *
- * NOTE: Currently the codebase uses legacy globals (state, charts, employeeData)
- * directly for backward compatibility. AppState getters/setters are available
- * for future migration to fully encapsulated state management.
+ * Application state - simple globals appropriate for this app's complexity.
+ * Chart functions are in js/charts.js and receive these via initCharts().
  */
-const AppState = {
-    // Private state (accessed through getters/setters)
-    _employeeData: null,
-    _ui: {
-        theme: 'artistic',
-        showDollars: true,
-        currentTab: 'home',
-        mainChartType: 'line',
-        yoyChartType: 'bar',
-        projectionYears: 5,
-        customRate: 8,
-        currentScenarioIndex: 0
-    },
-    _charts: {
-        main: null,
-        yoy: null,
-        category: null,
-        projection: null
-    },
+let employeeData = null;
 
-    // Employee Data Getters/Setters
-    getEmployeeData() {
-        return this._employeeData;
-    },
-    setEmployeeData(data) {
-        this._employeeData = data;
-    },
-    hasEmployeeData() {
-        return this._employeeData !== null;
-    },
-
-    // Chart Getters/Setters
-    getChart(chartName) {
-        return this._charts[chartName];
-    },
-    setChart(chartName, chartInstance) {
-        this._charts[chartName] = chartInstance;
-    },
-    destroyChart(chartName) {
-        if (this._charts[chartName]) {
-            this._charts[chartName].destroy();
-            this._charts[chartName] = null;
-        }
-    },
-    destroyAllCharts() {
-        Object.keys(this._charts).forEach(name => this.destroyChart(name));
-    },
-
-    // UI State Getters/Setters
-    getTheme() {
-        return this._ui.theme;
-    },
-    setTheme(theme) {
-        this._ui.theme = theme;
-    },
-    getShowDollars() {
-        return this._ui.showDollars;
-    },
-    setShowDollars(value) {
-        this._ui.showDollars = value;
-    },
-    getCurrentTab() {
-        return this._ui.currentTab;
-    },
-    setCurrentTab(tab) {
-        this._ui.currentTab = tab;
-    },
-    getMainChartType() {
-        return this._ui.mainChartType;
-    },
-    setMainChartType(type) {
-        this._ui.mainChartType = type;
-    },
-    getYoyChartType() {
-        return this._ui.yoyChartType;
-    },
-    setYoyChartType(type) {
-        this._ui.yoyChartType = type;
-    },
-    getProjectionYears() {
-        return this._ui.projectionYears;
-    },
-    setProjectionYears(years) {
-        this._ui.projectionYears = years;
-    },
-    getCustomRate() {
-        return this._ui.customRate;
-    },
-    setCustomRate(rate) {
-        this._ui.customRate = rate;
-    },
-    getCurrentScenarioIndex() {
-        return this._ui.currentScenarioIndex;
-    },
-    setCurrentScenarioIndex(index) {
-        this._ui.currentScenarioIndex = index;
-    }
+let state = {
+    theme: 'artistic',
+    showDollars: true,
+    currentTab: 'home',
+    mainChartType: 'line',
+    yoyChartType: 'bar',
+    projectionYears: 5,
+    customRate: 8,
+    currentScenarioIndex: 0
 };
 
-// Legacy global state (will be migrated to AppState during refactor)
-// For now, keep these for backward compatibility with existing code
-let employeeData = null;
-let state = AppState._ui;  // Direct reference to maintain reactivity
-let charts = AppState._charts;  // Direct reference to maintain reactivity
+let charts = {
+    main: null,
+    yoy: null,
+    category: null,
+    projection: null
+};
 
 // Expose for E2E tests (allows Playwright to access state/charts/data)
 if (typeof window !== 'undefined') {
@@ -201,6 +123,14 @@ if (typeof window !== 'undefined') {
     window.charts = charts;
     window.employeeData = () => employeeData; // Function to get current value
 }
+
+// Initialize charts module with dependencies
+initCharts({
+    state,
+    charts,
+    getEmployeeData: () => employeeData,
+    showUserMessage
+});
 
 // ========================================
 // BENCHMARK CALCULATION FUNCTIONS
@@ -796,84 +726,7 @@ function formatPercent(value) {
 }
 
 // Helper functions moved to js/calculations.js (imported above)
-
-function getThemeColors() {
-    const style = getComputedStyle(document.documentElement);
-    return {
-        line1: style.getPropertyValue('--chart-line-1').trim(),
-        line2: style.getPropertyValue('--chart-line-2').trim(),
-        fill1: style.getPropertyValue('--chart-fill-1').trim(),
-        fill2: style.getPropertyValue('--chart-fill-2').trim(),
-        grid: style.getPropertyValue('--chart-grid').trim(),
-        text: style.getPropertyValue('--text-secondary').trim(),
-        accent: style.getPropertyValue('--accent-primary').trim()
-    };
-}
-
-/**
- * Gets canvas 2D context with validation and error handling.
- * Consolidates repeated canvas/context checks across chart functions.
- *
- * @param {string} canvasId - DOM ID of the canvas element
- * @param {string} chartName - Human-readable name for error messages
- * @returns {CanvasRenderingContext2D|null} The 2D context, or null if unavailable
- */
-function getChartContext(canvasId, chartName) {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) {
-        console.error(`${chartName}: Canvas element not found`);
-        showUserMessage(`${chartName} rendering failed. Please refresh the page.`, 'error');
-        return null;
-    }
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-        console.error(`${chartName}: Canvas 2D context not available`);
-        showUserMessage(`${chartName} rendering failed. Your browser may not support this feature.`, 'error');
-        return null;
-    }
-
-    return ctx;
-}
-
-/**
- * Factory function for Chart.js tooltip configuration.
- * Eliminates DRY violation across multiple charts.
- *
- * @param {Object} options - Optional configuration overrides
- * @param {Function} options.labelCallback - Custom label formatter (receives Chart.js context)
- * @param {number} options.padding - Tooltip padding (default: 12)
- * @param {boolean} options.displayColors - Show dataset colors (default: false)
- * @returns {Object} Chart.js tooltip configuration object
- *
- * @example
- * // Basic usage (default label)
- * tooltip: getTooltipConfig()
- *
- * @example
- * // Custom label formatter
- * tooltip: getTooltipConfig({
- *   labelCallback: (ctx) => `Growth: ${ctx.raw.toFixed(1)}%`
- * })
- */
-function getTooltipConfig(options = {}) {
-    const {
-        labelCallback = (ctx) => `${ctx.raw}`,
-        padding = 12,
-        displayColors = false
-    } = options;
-
-    return {
-        backgroundColor: state.theme === 'tactical' ? '#1a1a1d' : '#ffffff',
-        titleColor: state.theme === 'tactical' ? '#e8e8e8' : '#2d2a26',
-        bodyColor: state.theme === 'tactical' ? '#a0a0a0' : '#5c5650',
-        borderColor: state.theme === 'tactical' ? '#2a2a2d' : '#e8e2da',
-        borderWidth: 1,
-        padding,
-        displayColors,
-        callbacks: { label: labelCallback }
-    };
-}
+// Chart functions moved to js/charts.js (imported above)
 
 // ========================================
 // MILESTONES DETECTION
@@ -949,96 +802,6 @@ function detectMilestones() {
 // ========================================
 // THEME FUNCTIONS
 // ========================================
-
-function updateChartTheme(chart) {
-    if (!chart) return;
-
-    const colors = getThemeColors();
-
-    // Update dataset colors using metadata (closes #29)
-    chart.data.datasets.forEach((dataset) => {
-        // Update border colors based on dataset type (metadata-driven, not label-matching)
-        if (dataset.borderColor && dataset.datasetType) {
-            switch (dataset.datasetType) {
-                case 'mainSalary':
-                    dataset.borderColor = colors.line1;
-                    dataset.pointBackgroundColor = colors.line1;
-                    dataset.pointBorderColor = colors.line1;
-                    break;
-                case 'yoyGrowth':
-                    dataset.borderColor = colors.line2;
-                    break;
-                case 'historicalCAGR':
-                    dataset.borderColor = colors.line1;
-                    break;
-                case 'custom':
-                    dataset.borderColor = colors.line2;
-                    break;
-                case 'conservative':
-                    dataset.borderColor = state.theme === 'tactical' ? '#666' : '#8a837a';
-                    break;
-                case 'optimistic':
-                    dataset.borderColor = state.theme === 'tactical' ? '#4598d4' : '#7b2cbf';
-                    break;
-            }
-        }
-
-        // Update background colors for bar/area charts
-        if (dataset.backgroundColor && dataset.backgroundColor !== 'transparent') {
-            // Use dataset type for precise color matching
-            switch (dataset.datasetType) {
-                case 'mainSalary':
-                    if (state.mainChartType === 'area') {
-                        dataset.backgroundColor = colors.fill1;
-                    } else if (state.mainChartType === 'bar') {
-                        dataset.backgroundColor = colors.line1;
-                    }
-                    break;
-                case 'yoyGrowth':
-                    if (state.yoyChartType === 'bar') {
-                        dataset.backgroundColor = colors.line2;
-                    }
-                    break;
-            }
-        }
-    });
-
-    // Update grid and axis colors
-    if (chart.options.scales) {
-        Object.keys(chart.options.scales).forEach(scaleKey => {
-            const scale = chart.options.scales[scaleKey];
-            if (scale.grid) {
-                scale.grid.color = colors.grid;
-            }
-            if (scale.ticks) {
-                scale.ticks.color = colors.text;
-            }
-        });
-    }
-
-    // Update tooltip colors
-    if (chart.options.plugins?.tooltip) {
-        chart.options.plugins.tooltip.backgroundColor = state.theme === 'tactical' ? '#1a1a1d' : '#ffffff';
-        chart.options.plugins.tooltip.titleColor = state.theme === 'tactical' ? '#e8e8e8' : '#2d2a26';
-        chart.options.plugins.tooltip.bodyColor = state.theme === 'tactical' ? '#a0a0a0' : '#5c5650';
-        chart.options.plugins.tooltip.borderColor = state.theme === 'tactical' ? '#2a2a2d' : '#e8e2da';
-    }
-
-    // Update legend colors
-    if (chart.options.plugins?.legend?.labels) {
-        chart.options.plugins.legend.labels.color = colors.text;
-    }
-
-    // Update category chart border color
-    if (chart.config.type === 'doughnut') {
-        chart.data.datasets.forEach(dataset => {
-            dataset.borderColor = state.theme === 'tactical' ? '#141416' : '#ffffff';
-        });
-    }
-
-    // Fast update without animation
-    chart.update('none');
-}
 
 /**
  * Sets the application theme and updates all visual components.
@@ -1551,45 +1314,6 @@ function setChartType(type) {
     updateMainChartType();
 }
 
-/**
- * Efficiently updates main chart type without full rebuild.
- * Uses Chart.js in-place updates for type and dataset properties.
- * Falls back to full rebuild if chart doesn't exist.
- *
- * Performance: ~5-10ms vs 20-40ms for full rebuild
- */
-function updateMainChartType() {
-    // Fall back to full build if chart doesn't exist
-    if (!charts.main) {
-        buildMainChart();
-        return;
-    }
-
-    try {
-        const colors = getThemeColors();
-        const type = state.mainChartType;
-
-        // Update chart type (Chart.js 3+ supports this)
-        charts.main.config.type = type === 'bar' ? 'bar' : 'line';
-
-        // Update dataset properties based on chart type
-        const dataset = charts.main.data.datasets[0];
-        dataset.backgroundColor = type === 'area' ? colors.fill1 :
-                                  type === 'bar' ? colors.line1 : 'transparent';
-        dataset.fill = type === 'area';
-        dataset.tension = type === 'step' ? 0 : 0.3;
-        dataset.stepped = type === 'step' ? 'before' : false;
-        dataset.pointRadius = type === 'bar' ? 0 : 4;
-
-        // Fast update without animation
-        charts.main.update('none');
-    } catch (error) {
-        console.error('Failed to update main chart type:', error);
-        // Fall back to full rebuild on error
-        buildMainChart();
-    }
-}
-
 function setYoyChartType(type) {
     state.yoyChartType = type;
     document.querySelectorAll('[data-chart^="yoy-"]').forEach(btn => {
@@ -1599,302 +1323,7 @@ function setYoyChartType(type) {
     updateYoyChartType();
 }
 
-/**
- * Efficiently updates YoY chart type without full rebuild.
- * Uses Chart.js in-place updates for type and dataset properties.
- * Falls back to full rebuild if chart doesn't exist.
- *
- * Performance: ~5-10ms vs 20-40ms for full rebuild
- */
-function updateYoyChartType() {
-    // Fall back to full build if chart doesn't exist
-    if (!charts.yoy) {
-        buildYoyChart();
-        return;
-    }
-
-    try {
-        const colors = getThemeColors();
-        const type = state.yoyChartType;
-
-        // Update chart type
-        charts.yoy.config.type = type;
-
-        // Update dataset properties based on chart type
-        const dataset = charts.yoy.data.datasets[0];
-        dataset.backgroundColor = type === 'bar' ? colors.line2 : 'transparent';
-
-        // Fast update without animation
-        charts.yoy.update('none');
-    } catch (error) {
-        console.error('Failed to update YoY chart type:', error);
-        // Fall back to full rebuild on error
-        buildYoyChart();
-    }
-}
-
-/**
- * Builds the main compensation timeline chart with theme-aware styling.
- *
- * Supports 4 chart types (line, bar, area, step) and 2 view modes (dollars vs indexed).
- * Destroys previous chart instance before creating new one to prevent memory leaks.
- * Automatically adjusts colors, tooltips, and formatting based on current theme.
- *
- * @global {Object} employeeData - Compensation records (from parsePaylocityData)
- * @global {Object} state - UI state (theme, showDollars, mainChartType)
- * @global {Object} charts - Chart.js instances storage
- * @returns {void}
- *
- * @example
- * // After parsing data and setting state
- * state.mainChartType = 'area';
- * state.showDollars = true;
- * buildMainChart(); // Creates new area chart with dollar values
- */
-function buildMainChart() {
-    try {
-        const ctx = getChartContext('mainChart', 'Main chart');
-        if (!ctx) return;
-
-        const colors = getThemeColors();
-
-        const data = [...employeeData.records].reverse();
-
-        const labels = data.map(r => {
-            const date = new Date(r.date);
-            return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-        });
-
-        const values = data.map(r => state.showDollars ? r.annual : (r.annual / getStartingSalary(employeeData)) * 100);
-
-        if (charts.main) {
-            charts.main.destroy();
-        }
-
-        charts.main = new Chart(ctx, {
-        type: state.mainChartType === 'bar' ? 'bar' : 'line',
-        data: {
-            labels,
-            datasets: [{
-                label: state.showDollars ? 'Annual Salary' : 'Index Value',
-                data: values,
-                datasetType: 'mainSalary', // Metadata for theme updates (closes #29)
-                borderColor: colors.line1,
-                backgroundColor: state.mainChartType === 'area' ? colors.fill1 :
-                                state.mainChartType === 'bar' ? colors.line1 : 'transparent',
-                fill: state.mainChartType === 'area',
-                tension: state.mainChartType === 'step' ? 0 : 0.3,
-                stepped: state.mainChartType === 'step' ? 'before' : false,
-                borderWidth: 2,
-                pointBackgroundColor: colors.line1,
-                pointBorderColor: colors.line1,
-                pointRadius: state.mainChartType === 'bar' ? 0 : 4,
-                pointHoverRadius: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: { intersect: false, mode: 'index' },
-            plugins: {
-                legend: { display: false },
-                tooltip: getTooltipConfig({
-                    labelCallback: (ctx) => state.showDollars ? `$${ctx.raw.toLocaleString()}` : `Index: ${ctx.raw.toFixed(0)}`
-                })
-            },
-            scales: {
-                x: {
-                    grid: { color: colors.grid, drawBorder: false },
-                    ticks: { color: colors.text, maxRotation: 45, minRotation: 45 }
-                },
-                y: {
-                    grid: { color: colors.grid, drawBorder: false },
-                    ticks: {
-                        color: colors.text,
-                        callback: (v) => state.showDollars ? '$' + (v / 1000) + 'k' : v
-                    }
-                }
-            }
-        }
-    });
-
-        // Hide loading state
-        const loading = document.getElementById('mainChartLoading');
-        if (loading) loading.classList.add('hidden');
-    } catch (error) {
-        console.error('buildMainChart: Chart creation failed', error);
-        showUserMessage('Chart rendering failed. Please try refreshing the page.', 'error');
-
-        // Attempt to show a fallback message in the chart container
-        const canvas = document.getElementById('mainChart');
-        if (canvas && canvas.parentElement) {
-            const fallback = document.createElement('div');
-            fallback.style.cssText = 'padding: 2rem; text-align: center; color: var(--text-muted);';
-            fallback.textContent = 'Chart could not be rendered. Please refresh the page or try a different browser.';
-            canvas.parentElement.appendChild(fallback);
-        }
-    }
-}
-
-/**
- * Builds the year-over-year salary growth chart.
- *
- * Calculates annual growth percentages by comparing end-of-year salaries.
- * Supports bar and line chart types via state.yoyChartType.
- * Destroys existing chart before creation to prevent memory leaks.
- *
- * @global {Object} employeeData - Compensation records with dates and annual values
- * @global {Object} state - UI state (yoyChartType, theme)
- * @global {Object} charts - Chart.js instance storage
- * @returns {void}
- *
- * @example
- * // Build chart on Analytics tab first view
- * buildYoyChart();
- */
-function buildYoyChart() {
-    try {
-        const ctx = getChartContext('yoyChart', 'YoY chart');
-        if (!ctx) return;
-
-        const colors = getThemeColors();
-
-        const yoyData = {};
-        employeeData.records.forEach(r => {
-            const year = new Date(r.date).getFullYear();
-            if (!yoyData[year]) {
-                yoyData[year] = { start: r.annual, end: r.annual };
-            } else {
-                yoyData[year].start = r.annual;
-            }
-        });
-
-        const years = Object.keys(yoyData).sort();
-        const growthRates = [];
-
-        for (let i = 1; i < years.length; i++) {
-            const prevYear = years[i - 1];
-            const currYear = years[i];
-            const growth = ((yoyData[currYear].end - yoyData[prevYear].end) / yoyData[prevYear].end) * 100;
-            growthRates.push({ year: currYear, growth });
-        }
-
-        if (charts.yoy) charts.yoy.destroy();
-
-        charts.yoy = new Chart(ctx, {
-        type: state.yoyChartType,
-        data: {
-            labels: growthRates.map(d => d.year),
-            datasets: [{
-                label: 'YoY Growth %',
-                data: growthRates.map(d => d.growth),
-                datasetType: 'yoyGrowth', // Metadata for theme updates (closes #29)
-                borderColor: colors.line2,
-                backgroundColor: state.yoyChartType === 'bar' ? colors.line2 : 'transparent',
-                borderWidth: 2,
-                tension: 0.3,
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: getTooltipConfig({
-                    labelCallback: (ctx) => `${ctx.raw.toFixed(1)}% growth`
-                })
-            },
-            scales: {
-                x: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text } },
-                y: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, callback: (v) => v + '%' } }
-            }
-        }
-    });
-    } catch (error) {
-        console.error('Failed to build YoY chart:', error);
-        showUserMessage('YoY chart rendering failed. Try refreshing the page.', 'error');
-    }
-}
-
-/**
- * Builds the category breakdown doughnut chart.
- *
- * Groups salary adjustments by reason (Merit, Promotion, Cost of Living, etc.)
- * and displays as a doughnut chart with percentage breakdown.
- * Excludes "New Hire" records as they represent starting point, not adjustments.
- *
- * @global {Object} employeeData - Compensation records with reasons
- * @global {Object} state - UI state (theme)
- * @global {Object} charts - Chart.js instance storage
- * @returns {void}
- *
- * @example
- * // Build chart on Analytics tab
- * buildCategoryChart();
- */
-function buildCategoryChart() {
-    try {
-        const ctx = getChartContext('categoryChart', 'Category chart');
-        if (!ctx) return;
-
-        const colors = getThemeColors();
-
-        // Filter out "New Hire" - it's the starting point, not an adjustment
-        const adjustments = employeeData.records.filter(r => r.reason !== 'New Hire');
-
-        // Guard against no adjustments
-        if (adjustments.length === 0) return;
-
-        const categories = {};
-        adjustments.forEach(r => {
-            const reason = r.reason || 'Other';
-            if (reason !== CONSTANTS.EMPTY_REASON_PLACEHOLDER) {
-                categories[reason] = (categories[reason] || 0) + 1;
-            }
-        });
-
-        const labels = Object.keys(categories);
-        const data = Object.values(categories);
-
-        const categoryColors = [colors.line1, colors.line2,
-            state.theme === 'tactical' ? '#4598d4' : '#7b2cbf',
-            state.theme === 'tactical' ? '#d45745' : '#d00000'];
-
-        if (charts.category) charts.category.destroy();
-
-        charts.category = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels,
-            datasets: [{
-                data,
-                backgroundColor: categoryColors,
-                borderColor: state.theme === 'tactical' ? '#141416' : '#ffffff',
-                borderWidth: 3
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '60%',
-            plugins: {
-                legend: {
-                    position: 'right',
-                    labels: {
-                        color: colors.text,
-                        padding: 20,
-                        font: { family: state.theme === 'tactical' ? 'JetBrains Mono' : 'Space Grotesk', size: 12 }
-                    }
-                }
-            }
-        }
-    });
-    } catch (error) {
-        console.error('Failed to build category chart:', error);
-        showUserMessage('Category chart rendering failed. Try refreshing the page.', 'error');
-    }
-}
+// Chart build functions moved to js/charts.js (imported above)
 
 function initProjections() {
     // Set slider to historical CAGR
@@ -1907,138 +1336,6 @@ function initProjections() {
     slider.value = historicalCAGR;
     document.getElementById('customRateValue').textContent = historicalCAGR + '%';
     document.getElementById('historicalRateDisplay').textContent = historicalCAGR + '%';
-}
-
-/**
- * Builds the salary projection chart with multiple scenarios.
- *
- * Displays 4 projection lines: historical CAGR, conservative (5%),
- * custom (user-adjustable via slider), and optimistic (12%).
- * Shows projected salary values over configurable year range.
- *
- * @global {Object} employeeData - Current salary data for projections
- * @global {Object} state - UI state (projectionYears, customRate, theme)
- * @global {Object} charts - Chart.js instance storage
- * @returns {void}
- *
- * @example
- * // Build projection on Projections tab first view
- * state.projectionYears = 5;
- * state.customRate = 8;
- * buildProjectionChart();
- */
-function buildProjectionChart() {
-    try {
-        const ctx = getChartContext('projectionChart', 'Projection chart');
-        if (!ctx) return;
-
-        const colors = getThemeColors();
-
-        const currentSalary = getCurrentSalary(employeeData);
-        const cagr = calculateCAGR(employeeData) / 100;
-        const years = state.projectionYears;
-        const customRate = state.customRate / 100;
-
-        const labels = ['Now'];
-        const historical = [currentSalary];
-        const conservative = [currentSalary];
-        const custom = [currentSalary];
-        const optimistic = [currentSalary];
-
-        for (let i = 1; i <= years; i++) {
-            labels.push(`+${i}yr`);
-            historical.push(currentSalary * Math.pow(1 + cagr, i));
-            conservative.push(currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_CONSERVATIVE, i));
-            custom.push(currentSalary * Math.pow(1 + customRate, i));
-            optimistic.push(currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_OPTIMISTIC, i));
-        }
-
-        if (charts.projection) charts.projection.destroy();
-
-        charts.projection = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [
-                { label: `Historical CAGR (${(cagr * 100).toFixed(1)}%)`, data: historical, datasetType: 'historicalCAGR', borderColor: colors.line1, backgroundColor: 'transparent', borderWidth: 3, tension: 0.3, pointRadius: 4 },
-                { label: 'Conservative (5%)', data: conservative, datasetType: 'conservative', borderColor: state.theme === 'tactical' ? '#666' : '#8a837a', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5,5], tension: 0.3, pointRadius: 3 },
-                { label: `Custom (${state.customRate}%)`, data: custom, datasetType: 'custom', borderColor: colors.line2, backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 4 },
-                { label: 'Optimistic (12%)', data: optimistic, datasetType: 'optimistic', borderColor: state.theme === 'tactical' ? '#4598d4' : '#7b2cbf', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5,5], tension: 0.3, pointRadius: 3 }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: { intersect: false, mode: 'index' },
-            plugins: {
-                legend: { position: 'top', labels: { color: colors.text, padding: 20, font: { family: state.theme === 'tactical' ? 'JetBrains Mono' : 'Space Grotesk', size: 11 } } },
-                tooltip: getTooltipConfig({
-                    labelCallback: (ctx) => `${ctx.dataset.label}: $${Math.round(ctx.raw).toLocaleString()}`
-                })
-            },
-            scales: {
-                x: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text } },
-                y: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, callback: (v) => '$' + (v/1000) + 'k' } }
-            }
-        }
-    });
-    } catch (error) {
-        console.error('Failed to build projection chart:', error);
-        showUserMessage('Projection chart rendering failed. Try refreshing the page.', 'error');
-    }
-}
-
-/**
- * Efficiently updates projection chart data without full rebuild.
- * Uses Chart.js update() method instead of destroy/create pattern.
- * Falls back to full rebuild if chart doesn't exist.
- *
- * Performance: ~5-10ms vs 20-40ms for full rebuild
- *
- * @returns {void}
- */
-function updateProjectionChartData() {
-    // Fall back to full build if chart doesn't exist
-    if (!charts.projection) {
-        buildProjectionChart();
-        return;
-    }
-
-    try {
-        const currentSalary = getCurrentSalary(employeeData);
-        const cagr = calculateCAGR(employeeData) / 100;
-        const years = state.projectionYears;
-        const customRate = state.customRate / 100;
-
-        const labels = ['Now'];
-        const historical = [currentSalary];
-        const conservative = [currentSalary];
-        const custom = [currentSalary];
-        const optimistic = [currentSalary];
-
-        for (let i = 1; i <= years; i++) {
-            labels.push(`+${i}yr`);
-            historical.push(currentSalary * Math.pow(1 + cagr, i));
-            conservative.push(currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_CONSERVATIVE, i));
-            custom.push(currentSalary * Math.pow(1 + customRate, i));
-            optimistic.push(currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_OPTIMISTIC, i));
-        }
-
-        // Update data in place
-        charts.projection.data.labels = labels;
-        charts.projection.data.datasets[0].data = historical;
-        charts.projection.data.datasets[1].data = conservative;
-        charts.projection.data.datasets[2].data = custom;
-        charts.projection.data.datasets[2].label = `Custom (${state.customRate}%)`;
-        charts.projection.data.datasets[3].data = optimistic;
-
-        // Fast update without animation
-        charts.projection.update('none');
-    } catch (error) {
-        console.error('Failed to update projection chart:', error);
-        // Fall back to full rebuild on error
-        buildProjectionChart();
-    }
 }
 
 // ========================================
