@@ -34,7 +34,6 @@ import {
     updateYoyChartType,
     buildMainChart,
     buildYoyChart,
-    buildCategoryChart,
     buildProjectionChart,
     updateProjectionChartData
 } from './js/charts.js';
@@ -113,7 +112,6 @@ let state = {
 let charts = {
     main: null,
     yoy: null,
-    category: null,
     projection: null
 };
 
@@ -502,7 +500,7 @@ async function cycleNextScenario() {
     Object.values(charts).forEach(chart => {
         if (chart) chart.destroy();
     });
-    charts = { main: null, yoy: null, category: null, projection: null };
+    charts = { main: null, yoy: null, projection: null };
 
     // Load the new scenario
     await loadDemoData(state.currentScenarioIndex);
@@ -586,8 +584,8 @@ function resetDashboard() {
     Object.values(charts).forEach(chart => {
         if (chart) chart.destroy();
     });
-    charts = { main: null, yoy: null, category: null, projection: null };
-    
+    charts = { main: null, yoy: null, projection: null };
+
     // Reset state
     state.currentTab = 'home';
     employeeData = null;
@@ -857,7 +855,6 @@ function setTheme(theme) {
         // Instantly update chart colors without rebuilding (performance optimization)
         updateChartTheme(charts.main);
         updateChartTheme(charts.yoy);
-        updateChartTheme(charts.category);
         updateChartTheme(charts.projection);
     }
 }
@@ -1250,7 +1247,6 @@ function setTab(tabId, pushHistory = true) {
     if (tabId === 'analytics' && !charts.yoy) {
         setTimeout(() => {
             buildYoyChart();
-            buildCategoryChart();
         }, 100);
     }
     if (tabId === 'projections' && !charts.projection) {

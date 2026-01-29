@@ -196,13 +196,6 @@ export function updateChartTheme(chart) {
         chart.options.plugins.legend.labels.color = colors.text;
     }
 
-    // Update category chart border color
-    if (chart.config.type === 'doughnut') {
-        chart.data.datasets.forEach(dataset => {
-            dataset.borderColor = _state.theme === 'tactical' ? '#141416' : '#ffffff';
-        });
-    }
-
     // Fast update without animation
     chart.update('none');
 }
@@ -465,81 +458,6 @@ export function buildYoyChart() {
     } catch (error) {
         console.error('Failed to build YoY chart:', error);
         _showUserMessage('YoY chart rendering failed. Try refreshing the page.', 'error');
-    }
-}
-
-/**
- * Builds the category breakdown doughnut chart.
- *
- * Groups salary adjustments by reason (Merit, Promotion, Cost of Living, etc.)
- * and displays as a doughnut chart with percentage breakdown.
- * Excludes "New Hire" records as they represent starting point, not adjustments.
- *
- * @returns {void}
- */
-export function buildCategoryChart() {
-    const employeeData = _getEmployeeData();
-    if (!employeeData) return;
-
-    try {
-        const ctx = getChartContext('categoryChart', 'Category chart');
-        if (!ctx) return;
-
-        const colors = getThemeColors();
-
-        // Filter out "New Hire" - it's the starting point, not an adjustment
-        const adjustments = employeeData.records.filter(r => r.reason !== 'New Hire');
-
-        // Guard against no adjustments
-        if (adjustments.length === 0) return;
-
-        const categories = {};
-        adjustments.forEach(r => {
-            const reason = r.reason || 'Other';
-            if (reason !== CONSTANTS.EMPTY_REASON_PLACEHOLDER) {
-                categories[reason] = (categories[reason] || 0) + 1;
-            }
-        });
-
-        const labels = Object.keys(categories);
-        const data = Object.values(categories);
-
-        const categoryColors = [colors.line1, colors.line2,
-            _state.theme === 'tactical' ? '#4598d4' : '#7b2cbf',
-            _state.theme === 'tactical' ? '#d45745' : '#d00000'];
-
-        if (_charts.category) _charts.category.destroy();
-
-        _charts.category = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels,
-                datasets: [{
-                    data,
-                    backgroundColor: categoryColors,
-                    borderColor: _state.theme === 'tactical' ? '#141416' : '#ffffff',
-                    borderWidth: 3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '60%',
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            color: colors.text,
-                            padding: 20,
-                            font: { family: _state.theme === 'tactical' ? 'JetBrains Mono' : 'Space Grotesk', size: 12 }
-                        }
-                    }
-                }
-            }
-        });
-    } catch (error) {
-        console.error('Failed to build category chart:', error);
-        _showUserMessage('Category chart rendering failed. Try refreshing the page.', 'error');
     }
 }
 
