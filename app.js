@@ -19,7 +19,10 @@ import {
     calculateYearsOfService,
     calculateCAGR,
     getBenchmarkComparisons,
-    calculateAverageMonthsBetweenDates
+    calculateAverageMonthsBetweenDates,
+    formatDateSummary,
+    formatDateDetail,
+    formatDateProse
 } from './js/calculations.js';
 import {
     validateSalaryRange,
@@ -755,7 +758,7 @@ function detectMilestones() {
     const milestones = [];
     const records = [...employeeData.records].reverse();
     const startingSalary = getStartingSalary(employeeData);
-    
+
     // Six figures
     const sixFigures = records.find(r => r.annual >= CONSTANTS.SALARY_SIX_FIGURES);
     if (sixFigures) {
@@ -763,7 +766,7 @@ function detectMilestones() {
             icon: '💯',
             title: 'Six Figures',
             detail: 'Crossed $100,000 annual salary',
-            date: new Date(sixFigures.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+            date: formatDateSummary(sixFigures.date)
         });
     }
 
@@ -777,7 +780,7 @@ function detectMilestones() {
             icon: '📈',
             title: 'Salary Doubled',
             detail: `Reached 2× starting salary in ${monthsToDouble} months`,
-            date: doubledDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+            date: formatDateSummary(doubledDate)
         });
     }
 
@@ -788,7 +791,7 @@ function detectMilestones() {
             icon: '🎯',
             title: '$200K Milestone',
             detail: 'Crossed $200,000 annual salary',
-            date: new Date(twoHundredK.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+            date: formatDateSummary(twoHundredK.date)
         });
     }
 
@@ -800,7 +803,7 @@ function detectMilestones() {
             icon: '⭐',
             title: 'Largest Raise',
             detail: `${biggestRaise.changePercent.toFixed(1)}% increase`,
-            date: new Date(biggestRaise.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+            date: formatDateSummary(biggestRaise.date)
         });
     }
 
@@ -811,7 +814,7 @@ function detectMilestones() {
             icon: '🏆',
             title: 'Decade of Service',
             detail: '10+ years with the organization',
-            date: new Date(new Date(employeeData.hireDate).getTime() + CONSTANTS.YEARS_DECADE_SERVICE * CONSTANTS.MS_PER_YEAR).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+            date: formatDateSummary(new Date(new Date(employeeData.hireDate).getTime() + CONSTANTS.YEARS_DECADE_SERVICE * CONSTANTS.MS_PER_YEAR))
         });
     }
 
@@ -971,7 +974,7 @@ function updateStory() {
     const dollarIncrease = current - start;
     
     const data = {
-        hireDateFormatted: new Date(employeeData.hireDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+        hireDateFormatted: formatDateProse(employeeData.hireDate),
         startSalary: state.showDollars ? formatCurrency(start) : 'Index 100',
         currentSalary: state.showDollars ? formatCurrency(current) : `Index ${formatCurrency(current, false)}`,
         dollarIncrease: state.showDollars ? formatCurrency(dollarIncrease) : `Index ${(dollarIncrease / start * 100).toFixed(0)}`,
@@ -981,13 +984,13 @@ function updateStory() {
         cagr: cagr.toFixed(1),
         avgInterval: avgMonths.toFixed(1),
         meritPercent,
-        largestRaiseDate: largestRaise ? new Date(largestRaise.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'N/A',
+        largestRaiseDate: largestRaise ? formatDateSummary(largestRaise.date) : 'N/A',
         largestRaise: largestRaise ? largestRaise.changePercent.toFixed(1) : '0',
-        sixFigureDate: sixFigures ? new Date(sixFigures.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : null,
+        sixFigureDate: sixFigures ? formatDateSummary(sixFigures.date) : null,
         yearsToSixFigures,
         cumulativeInflation: cumulativeInflation.toFixed(1),
         realGrowth: realGrowth.toFixed(1),
-        dateRange: new Date(employeeData.hireDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) + ' – Present'
+        dateRange: formatDateSummary(employeeData.hireDate) + ' – Present'
     };
 
     // Security: Validate data types before template interpolation (defense-in-depth)
@@ -1137,13 +1140,33 @@ function buildMarketComparison() {
 
     const start = getStartingSalary(employeeData);
 
+    // #79: Primary metrics get larger cards, secondary metrics get smaller cards
     const cards = [
         {
             label: 'Your CAGR',
             value: `${bench.userCagr.toFixed(1)}%`,
             comparison: `Industry avg: <strong>${benchmarks.industryCagr}%</strong>`,
             diff: bench.cagrVsIndustry,
-            badge: bench.cagrVsIndustry > 0.5 ? 'above' : bench.cagrVsIndustry < -0.5 ? 'below' : 'at'
+            badge: bench.cagrVsIndustry > 0.5 ? 'above' : bench.cagrVsIndustry < -0.5 ? 'below' : 'at',
+            primary: true
+        },
+        {
+            label: 'Real Growth',
+            value: `${bench.realGrowth.toFixed(1)}%`,
+            comparison: `After <strong>${bench.totalInflation.toFixed(1)}%</strong> cumulative inflation`,
+            diff: bench.realGrowth,
+            badge: bench.realGrowth > 10 ? 'above' : bench.realGrowth > 0 ? 'at' : 'below',
+            primary: true
+        },
+        {
+            label: 'vs Industry Path',
+            value: state.showDollars
+                ? (bench.vsIndustrySalary >= 0 ? '+' : '') + formatCurrency(bench.vsIndustrySalary)
+                : (bench.vsIndustrySalary >= 0 ? '+' : '') + (bench.vsIndustrySalary / start * 100).toFixed(0) + ' pts',
+            comparison: `At ${benchmarks.industryCagr}% CAGR: <strong>${state.showDollars ? formatCurrency(bench.industryProjectedSalary) : Math.round(bench.industryProjectedSalary / start * 100)}</strong>`,
+            diff: bench.vsIndustrySalary,
+            badge: bench.vsIndustryPercent > 5 ? 'above' : bench.vsIndustryPercent < -5 ? 'below' : 'at',
+            primary: true
         },
         {
             label: 'Avg Raise',
@@ -1160,29 +1183,13 @@ function buildMarketComparison() {
             badge: bench.avgMonthsBetween < benchmarks.avgMonthsBetweenRaises - 1 ? 'above' : bench.avgMonthsBetween > benchmarks.avgMonthsBetweenRaises + 1 ? 'below' : 'at'
         },
         {
-            label: 'Real Growth',
-            value: `${bench.realGrowth.toFixed(1)}%`,
-            comparison: `After <strong>${bench.totalInflation.toFixed(1)}%</strong> cumulative inflation`,
-            diff: bench.realGrowth,
-            badge: bench.realGrowth > 10 ? 'above' : bench.realGrowth > 0 ? 'at' : 'below'
-        },
-        {
             label: 'Purchasing Power',
-            value: state.showDollars 
+            value: state.showDollars
                 ? (bench.purchasingPowerGain >= 0 ? '+' : '') + formatCurrency(bench.purchasingPowerGain)
                 : (bench.purchasingPowerGain >= 0 ? '+' : '') + (bench.purchasingPowerGain / start * 100).toFixed(0) + ' pts',
             comparison: `${state.showDollars ? formatCurrency(bench.inflationAdjustedStart) : Math.round(bench.inflationAdjustedStart / start * 100)} would equal start salary today`,
             diff: bench.purchasingPowerGain,
             badge: bench.purchasingPowerGain > 0 ? 'above' : bench.purchasingPowerGain < 0 ? 'below' : 'at'
-        },
-        {
-            label: 'vs Industry Path',
-            value: state.showDollars 
-                ? (bench.vsIndustrySalary >= 0 ? '+' : '') + formatCurrency(bench.vsIndustrySalary)
-                : (bench.vsIndustrySalary >= 0 ? '+' : '') + (bench.vsIndustrySalary / start * 100).toFixed(0) + ' pts',
-            comparison: `At ${benchmarks.industryCagr}% CAGR: <strong>${state.showDollars ? formatCurrency(bench.industryProjectedSalary) : Math.round(bench.industryProjectedSalary / start * 100)}</strong>`,
-            diff: bench.vsIndustrySalary,
-            badge: bench.vsIndustryPercent > 5 ? 'above' : bench.vsIndustryPercent < -5 ? 'below' : 'at'
         }
     ];
 
@@ -1192,7 +1199,7 @@ function buildMarketComparison() {
     // - Badge strings (conditional on 'above'/'below'/'at' - all hardcoded safe values)
     // No user-controlled data interpolated without validation.
     grid.innerHTML = cards.map(card => `
-        <div class="market-card ${card.diff > 0 ? 'positive' : card.diff < 0 ? 'negative' : 'neutral'}">
+        <div class="market-card ${card.diff > 0 ? 'positive' : card.diff < 0 ? 'negative' : 'neutral'}${card.primary ? ' market-card-primary' : ''}">
             <div class="market-card-header">
                 <span class="market-card-label">${card.label}</span>
                 <span class="market-card-badge ${card.badge}">${card.badge === 'above' ? '↑ Above' : card.badge === 'below' ? '↓ Below' : '● At'}</span>
@@ -1386,7 +1393,7 @@ function buildHistoryTable() {
 
         return `
             <tr>
-                <td>${new Date(r.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                <td>${formatDateDetail(r.date)}</td>
                 <td><span class="badge ${badgeClass}">${escapeHTML(r.reason)}</span></td>
                 <td>${state.showDollars ? formatCurrency(r.annual) : `Index: ${index}`}</td>
                 <td>${index}</td>
@@ -1463,7 +1470,7 @@ function updateAnalytics() {
     
     document.getElementById('medianRaise').textContent = formatPercent(medianRaise);
     document.getElementById('largestRaise').textContent = formatPercent(largestRaise);
-    document.getElementById('largestRaiseDate').textContent = new Date(largestRaiseRecord.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    document.getElementById('largestRaiseDate').textContent = formatDateSummary(largestRaiseRecord.date);
     document.getElementById('avgTimeBetween').textContent = `${avgMonths.toFixed(1)} mo`;
     const benchmarkMonths = CONSTANTS.TYPICAL_RAISE_INTERVAL_MONTHS;
     const timeDiff = avgMonths - benchmarkMonths;
@@ -1560,7 +1567,7 @@ function initDashboard() {
     document.getElementById('currentSalaryIndexed').textContent = `Index: ${formatCurrency(current, false)}`;
     document.getElementById('totalGrowth').textContent = `+${growth.toFixed(0)}%`;
     document.getElementById('yearsService').textContent = years.toFixed(1);
-    document.getElementById('hireDateText').textContent = `Since ${new Date(employeeData.hireDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`;
+    document.getElementById('hireDateText').textContent = `Since ${formatDateSummary(employeeData.hireDate)}`;
     document.getElementById('totalRaises').textContent = adjustmentCount;
     document.getElementById('avgRaisesPerYear').textContent = `Avg: ${(adjustmentCount / years).toFixed(1)} per year`;
     

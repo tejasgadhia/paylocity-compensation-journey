@@ -318,3 +318,54 @@ export function calculateAverageMonthsBetweenDates(records, defaultValue = 12) {
     }
     return (totalDays / (dates.length - 1)) / 30.44;
 }
+
+// ========================================
+// DATE FORMATTING UTILITIES (#86)
+// ========================================
+
+/**
+ * Formats a date for summary display (month + year only).
+ * Use for KPIs, milestones, charts, and high-level summaries.
+ *
+ * @param {string|Date} date - Date string or Date object
+ * @returns {string} Formatted date like "Jan 2023"
+ *
+ * @example
+ * formatDateSummary('2023-01-15'); // "Jan 2023"
+ * formatDateSummary(new Date(2023, 0, 15)); // "Jan 2023"
+ */
+export function formatDateSummary(date) {
+    const d = typeof date === 'string' ? new Date(date) : date;
+    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+}
+
+/**
+ * Formats a date for detailed display (month + day + year).
+ * Use for history tables and detailed records.
+ *
+ * @param {string|Date} date - Date string or Date object
+ * @returns {string} Formatted date like "Jan 15, 2023"
+ *
+ * @example
+ * formatDateDetail('2023-01-15'); // "Jan 15, 2023"
+ * formatDateDetail(new Date(2023, 0, 15)); // "Jan 15, 2023"
+ */
+export function formatDateDetail(date) {
+    const d = typeof date === 'string' ? new Date(date) : date;
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+/**
+ * Formats a date for prose/narrative display (full month + day + year).
+ * Use for story text and long-form content.
+ *
+ * @param {string|Date} date - Date string or Date object
+ * @returns {string} Formatted date like "January 15, 2023"
+ *
+ * @example
+ * formatDateProse('2023-01-15'); // "January 15, 2023"
+ */
+export function formatDateProse(date) {
+    const d = typeof date === 'string' ? new Date(date) : date;
+    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
