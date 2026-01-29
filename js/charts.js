@@ -5,7 +5,7 @@
 /* global Chart */
 
 import { CONSTANTS } from './constants.js';
-import { calculateCAGR, getCurrentSalary, getStartingSalary } from './calculations.js';
+import { calculateCAGR, getCurrentSalary, getStartingSalary, formatDateSummary } from './calculations.js';
 
 // ========================================
 // MODULE STATE (injected via initCharts)
@@ -302,10 +302,7 @@ export function buildMainChart() {
 
         const data = [...employeeData.records].reverse();
 
-        const labels = data.map(r => {
-            const date = new Date(r.date);
-            return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-        });
+        const labels = data.map(r => formatDateSummary(r.date));
 
         const values = data.map(r => _state.showDollars ? r.annual : (r.annual / getStartingSalary(employeeData)) * 100);
 

@@ -2025,6 +2025,14 @@
             height: 360px;
         }
 
+        /* #72: Inline chart controls positioned inside chart area */
+        .chart-controls-inline {
+            position: absolute;
+            top: var(--space-2);
+            right: var(--space-2);
+            z-index: 10;
+        }
+
         .chart-loading {
             position: absolute;
             top: 0;
@@ -2277,16 +2285,12 @@
             font-style: normal;
         }
 
-        /* #74: Milestones section - better anchored to content */
+        /* #74: Milestones section - anchored below story content */
         .milestones-section {
-            width: 280px;
-            flex-shrink: 0;
-            padding: var(--space-5);
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-card);
-            align-self: flex-start;
+            padding: var(--space-6) var(--space-8);
+            padding-top: var(--space-5);
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
         }
 
         .milestones-title {
@@ -2295,7 +2299,6 @@
             margin-bottom: var(--space-4);
             display: flex;
             align-items: center;
-            flex-shrink: 0;
             color: var(--text-secondary);
         }
 
@@ -2306,18 +2309,19 @@
         }
 
         .milestone-grid {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-3);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-4);
         }
 
         .milestone-card {
-            background: var(--bg-tertiary);
+            background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-card);  /* 8px per #106 */
-            padding: var(--space-3) var(--space-4);
+            padding: var(--space-4);
             position: relative;
             overflow: hidden;
+            box-shadow: var(--shadow-card);
         }
 
         .milestone-card::before {
@@ -2325,14 +2329,14 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 3px;
-            height: 100%;
+            right: 0;
+            height: 3px;
             background: var(--color-success);
         }
 
         .milestone-icon {
-            font-size: var(--font-size-md);
-            margin-bottom: var(--space-1);
+            font-size: var(--font-size-lg);
+            margin-bottom: var(--space-2);
         }
 
         .milestone-title {
@@ -2590,13 +2594,27 @@
             }
         }
 
-        /* #79: Market cards - visual differentiation through subtle backgrounds */
+        /* #79: Market cards - visual differentiation through hierarchy */
         .market-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-card);  /* 8px per #106 */
             padding: var(--space-4);
             position: relative;
+        }
+
+        /* #79: Primary cards have larger typography and stronger visual weight */
+        .market-card-primary {
+            padding: var(--space-5);
+            box-shadow: var(--shadow-card);
+        }
+
+        .market-card-primary .market-card-value {
+            font-size: var(--font-size-2xl);
+        }
+
+        .market-card-primary .market-card-label {
+            font-size: var(--font-size-sm);
         }
 
         .market-card.positive {
@@ -2820,12 +2838,42 @@
             }
         }
 
+        /* #87: Analytics cards aligned with Home metric-card layout */
         .analytics-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-card);  /* 8px per #106 */
-            padding: var(--space-5);
+            padding: var(--space-5) var(--space-6);
             box-shadow: var(--shadow-card);
+            position: relative;
+            transition: all var(--transition-speed);
+        }
+
+        .analytics-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent-primary);
+        }
+
+        [data-theme="tactical"] .analytics-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-primary), transparent);
+        }
+
+        [data-theme="artistic"] .analytics-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-primary);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
         }
 
         .analytics-card-title {
@@ -2836,14 +2884,15 @@
             text-transform: uppercase;
             letter-spacing: 0.1em;
             font-family: var(--font-mono);
-            margin-bottom: var(--space-3);
+            margin-bottom: var(--space-2);
         }
 
         .analytics-card-value {
-            font-size: var(--font-size-xl);
+            font-size: var(--font-size-2xl);
             font-weight: 700;
             color: var(--text-primary);
             font-family: var(--font-mono);
+            line-height: 1.2;
         }
 
         [data-theme="artistic"] .analytics-card-value {
@@ -4075,14 +4124,14 @@ History
                         Compensation Timeline
                         <span class="info-tooltip"><span class="tip-text">Visual representation of your salary progression over time. Each point represents a compensation adjustment. Hover over points for details.</span></span>
                     </h2>
-                    <div class="chart-controls">
+                </div>
+                <div class="chart-wrapper">
+                    <div class="chart-controls chart-controls-inline">
                         <button class="chart-type-btn active" data-chart="line">Line</button>
                         <button class="chart-type-btn" data-chart="area">Area</button>
                         <button class="chart-type-btn" data-chart="bar">Bar</button>
                         <button class="chart-type-btn" data-chart="step">Step</button>
                     </div>
-                </div>
-                <div class="chart-wrapper">
                     <div class="chart-loading" id="mainChartLoading">Loading chart...</div>
                     <canvas id="mainChart"></canvas>
                 </div>
@@ -4100,14 +4149,13 @@ History
                         </div>
                         <div class="story-content">
                             <div class="story-text" id="storyText"></div>
-                            
-                            <div class="milestones-section">
-                                <h3 class="milestones-title">
-                                    Key Milestones Achieved
-                                    <span class="info-tooltip"><span class="tip-text">Automatically detected career achievements based on your compensation history.</span></span>
-                                </h3>
-                                <div class="milestone-grid" id="milestonesGrid"></div>
-                            </div>
+                        </div>
+                        <div class="milestones-section">
+                            <h3 class="milestones-title">
+                                Key Milestones Achieved
+                                <span class="info-tooltip"><span class="tip-text">Automatically detected career achievements based on your compensation history.</span></span>
+                            </h3>
+                            <div class="milestone-grid" id="milestonesGrid"></div>
                         </div>
                     </div>
                 </div>
@@ -4246,12 +4294,12 @@ History
                     <div class="chart-section">
                         <div class="chart-header">
                             <h2 class="chart-title">Annual Salary Change Rate</h2>
-                            <div class="chart-controls">
+                        </div>
+                        <div class="chart-wrapper">
+                            <div class="chart-controls chart-controls-inline">
                                 <button class="chart-type-btn active" data-chart="yoy-bar">Bar</button>
                                 <button class="chart-type-btn" data-chart="yoy-line">Line</button>
                             </div>
-                        </div>
-                        <div class="chart-wrapper">
                             <canvas id="yoyChart"></canvas>
                         </div>
                     </div>
