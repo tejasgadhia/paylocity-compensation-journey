@@ -1215,19 +1215,21 @@ function buildMarketComparison() {
  * (market benchmarks, analytics charts, projections).
  *
  * @param {string} tabId - Tab identifier (home, story, market, history, analytics, projections, help)
- * @param {boolean} [updateUrl=true] - Whether to update browser URL with tab parameter
+ * @param {boolean} [pushHistory=true] - Whether to push a new browser history entry (enables back/forward)
  * @returns {void}
  *
  * @example
- * setTab('market');           // Switch to Market tab, update URL
- * setTab('history', false);   // Switch to History tab, don't update URL
+ * setTab('market');           // Switch to Market tab, push history entry
+ * setTab('history', false);   // Switch to History tab, don't push history (e.g., from popstate)
  */
-function setTab(tabId, updateUrl = true) {
+function setTab(tabId, pushHistory = true) {
     state.currentTab = tabId;
-    
-    // Update URL params for stateful URLs
-    if (updateUrl) {
-        updateUrlParams();
+
+    // Update URL params - push history for user-initiated navigation
+    if (pushHistory) {
+        updateUrlParams(true);  // true = pushState for back/forward support
+    } else {
+        updateUrlParams(false); // false = replaceState (from popstate handler)
     }
     
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1269,7 +1271,7 @@ function handleTabFromUrl() {
     const tab = params.get('tab');
     const validTabs = ['home', 'story', 'market', 'history', 'analytics', 'projections', 'help'];
     if (tab && validTabs.includes(tab) && employeeData) {
-        setTab(tab, false); // false = don't update URL again
+        setTab(tab, false); // false = don't push history (initial load)
     }
 }
 
@@ -1279,6 +1281,18 @@ if (typeof window !== 'undefined') {
         if (employeeData && !employeeData.isDemo) {
             e.preventDefault();
             return '';
+        }
+    });
+
+    // Handle browser back/forward navigation
+    window.addEventListener('popstate', (event) => {
+        if (!employeeData) return; // Only handle if dashboard is active
+
+        const tab = event.state?.tab || new URLSearchParams(window.location.search).get('tab') || 'home';
+        const validTabs = ['home', 'story', 'market', 'history', 'analytics', 'projections', 'help'];
+
+        if (validTabs.includes(tab)) {
+            setTab(tab, false); // false = don't push another history entry
         }
     });
 }
@@ -1558,29 +1572,40 @@ function initDashboard() {
 // URL PARAMETER HANDLING
 // ========================================
 
-function updateUrlParams() {
+/**
+ * Update URL parameters to reflect current state.
+ *
+ * @param {boolean} [pushHistory=false] - If true, create new history entry (for back/forward nav).
+ *                                        If false, replace current entry (for non-navigation updates).
+ */
+function updateUrlParams(pushHistory = false) {
     const params = new URLSearchParams();
-    
+
     // Always include theme
     params.set('theme', state.theme);
-    
+
     // Include view mode (only if not default 'dollars')
     if (!state.showDollars) {
         params.set('view', 'index');
     }
-    
+
     // Include demo flag if in demo mode
     if (employeeData && employeeData.isDemo) {
         params.set('demo', 'true');
     }
-    
+
     // Include tab if on dashboard and not home
     if (!document.getElementById('dashboardPage').classList.contains('hidden') && state.currentTab !== 'home') {
         params.set('tab', state.currentTab);
     }
-    
+
     const newUrl = `${window.location.pathname}?${params.toString()}`;
-    history.replaceState(null, '', newUrl);
+
+    if (pushHistory) {
+        history.pushState({ tab: state.currentTab }, '', newUrl);
+    } else {
+        history.replaceState({ tab: state.currentTab }, '', newUrl);
+    }
 }
 
 function getUrlParams() {
