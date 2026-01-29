@@ -108,7 +108,8 @@ let state = {
     yoyChartType: 'bar',
     projectionYears: 5,
     customRate: 8,
-    currentScenarioIndex: 0
+    currentScenarioIndex: 0,
+    showOptimistic: false  // #92: Hide Optimistic line by default
 };
 
 let charts = {
@@ -1640,21 +1641,26 @@ function getUrlParams() {
 
 function initFromUrl() {
     const params = getUrlParams();
-    
+
     // Apply theme from URL if specified
     if (params.theme && (params.theme === 'tactical' || params.theme === 'artistic')) {
         setTheme(params.theme);
     }
-    
+
     // Apply view mode from URL if specified
     if (params.view === 'index') {
         setViewMode('index');
     }
-    
+
+    // Set tab from URL BEFORE loading demo (so showDashboard can use it)
+    const validTabs = ['home', 'story', 'market', 'history', 'analytics', 'projections', 'help'];
+    if (params.tab && validTabs.includes(params.tab)) {
+        state.currentTab = params.tab;
+    }
+
     // Auto-load demo if specified
     if (params.demo) {
         loadDemoData();
-        // Tab will be handled by checkInitialHash called from showDashboard
     }
 }
 
@@ -1952,6 +1958,15 @@ function initEventListeners() {
     document.querySelectorAll('.chart-type-btn[data-view]').forEach(btn => {
         btn.addEventListener('click', () => setProjectionView(btn.dataset.view));
     });
+
+    // #92: Optimistic toggle checkbox
+    const optimisticToggle = document.getElementById('showOptimisticToggle');
+    if (optimisticToggle) {
+        optimisticToggle.addEventListener('change', () => {
+            state.showOptimistic = optimisticToggle.checked;
+            buildProjectionChart();
+        });
+    }
 
     // Paste input textarea
     const pasteInput = document.getElementById('pasteInput');
