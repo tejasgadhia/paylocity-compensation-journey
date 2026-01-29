@@ -1697,6 +1697,9 @@ function initEventListeners() {
     const tabIndicator = document.getElementById('tabIndicator');
     const browserUrl = document.getElementById('browserUrl');
 
+    // Get slider reference for reset on chip click (#108, #111)
+    const comparisonSliderRef = document.getElementById('comparisonSlider');
+
     featureChips.forEach(chip => {
         chip.addEventListener('click', () => {
             // Update active state
@@ -1718,6 +1721,11 @@ function initEventListeners() {
                     afterImg.src = data.img;
                     afterImg.style.opacity = '1';
                 }, 150);
+
+                // Reset slider to show full "after" view (#108, #111)
+                if (comparisonSliderRef) {
+                    comparisonSliderRef.value = 0;
+                }
             }
         });
     });
