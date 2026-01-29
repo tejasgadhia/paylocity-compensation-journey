@@ -51,7 +51,6 @@ let state = {
 let charts = {
   main: null,
   yoy: null,
-  category: null,
   projection: null
 };
 
@@ -190,7 +189,6 @@ charts.main = new Chart(ctx, config);
 ### Chart Types
 - **Main Timeline**: Line/Bar/Area/Step (user-selectable)
 - **YoY Comparison**: Bar chart with color coding
-- **Category Breakdown**: Doughnut chart
 - **Projection**: Line chart with forecast scenarios
 
 ### Theme Integration

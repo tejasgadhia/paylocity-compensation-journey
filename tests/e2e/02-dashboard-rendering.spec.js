@@ -4,7 +4,7 @@
  * Tests for:
  * - All 7 tabs present and clickable
  * - 6 KPI cards visible with values
- * - 4 main charts rendered (main, YoY, category, projection)
+ * - 3 main charts rendered (main, YoY, projection)
  * - History table populated with correct row count
  * - Initial state correct (Home tab active)
  */
@@ -45,7 +45,7 @@ test.describe('Dashboard Rendering', () => {
     await checkA11y(page);
   });
 
-  test('renders all 4 main charts', async ({ page }) => {
+  test('renders all 3 main charts', async ({ page }) => {
     // Verify main chart on Home tab
     await switchTab(page, 'home');
     await assertChartRendered(page, 'mainChart');
@@ -53,9 +53,6 @@ test.describe('Dashboard Rendering', () => {
     // Verify YoY chart on Analytics tab
     await switchTab(page, 'analytics');
     await assertChartRendered(page, 'yoyChart');
-
-    // Verify category chart on Analytics tab
-    await assertChartRendered(page, 'categoryChart');
 
     // Verify projection chart on Projections tab
     await switchTab(page, 'projections');

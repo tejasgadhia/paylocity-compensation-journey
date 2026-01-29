@@ -130,7 +130,7 @@ helpers/
 
 - ✅ All 7 tabs present and clickable
 - ✅ 6 KPI cards visible with values
-- ✅ 4 charts rendered (main, YoY, category, projection)
+- ✅ 3 charts rendered (main, YoY, projection)
 - ✅ History table populated with records
 - ✅ Initial state correct (Home tab active)
 
