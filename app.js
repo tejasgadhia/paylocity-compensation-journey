@@ -1729,8 +1729,11 @@ function initEventListeners() {
                 }, 150);
 
                 // Reset slider to show full "after" view (#108, #111)
+                // Use setTimeout to let the image swap start first
                 if (comparisonSliderRef) {
-                    comparisonSliderRef.value = 0;
+                    setTimeout(() => {
+                        comparisonSliderRef.value = 0;
+                    }, 50);
                 }
             }
         });
