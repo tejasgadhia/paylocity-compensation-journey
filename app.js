@@ -21,8 +21,7 @@ import {
     getBenchmarkComparisons,
     calculateAverageMonthsBetweenDates,
     formatDateSummary,
-    formatDateDetail,
-    formatDateProse
+    formatDateDetail
 } from './js/calculations.js';
 import {
     validateSalaryRange,
@@ -472,6 +471,14 @@ async function loadDemoData(scenarioIndex = null) {
         state.currentScenarioIndex = scenarioIndex;
     }
 
+    // #79 fix: Preserve tab from URL before it gets overwritten
+    const params = new URLSearchParams(window.location.search);
+    const initialTab = params.get('tab');
+    const validTabs = ['home', 'story', 'market', 'history', 'analytics', 'projections', 'help'];
+    if (initialTab && validTabs.includes(initialTab)) {
+        state.currentTab = initialTab;
+    }
+
     const scenario = DEMO_SCENARIOS[scenarioIndex];
 
     employeeData = {
@@ -486,12 +493,12 @@ async function loadDemoData(scenarioIndex = null) {
     await loadChartJS();
 
     showDashboard();
-    
+
     // Update demo banner
     document.getElementById('demoBanner').classList.remove('hidden');
     updateScenarioLabel();
-    
-    // Update URL
+
+    // Update URL (now preserves the tab since state.currentTab was set above)
     updateUrlParams();
 }
 
@@ -576,7 +583,11 @@ function showDashboard() {
     document.getElementById('dashboardPage').classList.remove('hidden');
     window.scrollTo(0, 0);
     initDashboard();
-    checkInitialHash(); // Check URL hash for tab navigation
+
+    // If a non-home tab was specified (e.g., from URL), switch to it immediately
+    if (state.currentTab && state.currentTab !== 'home') {
+        setTab(state.currentTab, false);
+    }
 
     // Focus management for accessibility - move focus to dashboard heading
     setTimeout(() => {
@@ -974,7 +985,7 @@ function updateStory() {
     const dollarIncrease = current - start;
     
     const data = {
-        hireDateFormatted: formatDateProse(employeeData.hireDate),
+        hireDateFormatted: formatDateDetail(employeeData.hireDate),
         startSalary: state.showDollars ? formatCurrency(start) : 'Index 100',
         currentSalary: state.showDollars ? formatCurrency(current) : `Index ${formatCurrency(current, false)}`,
         dollarIncrease: state.showDollars ? formatCurrency(dollarIncrease) : `Index ${(dollarIncrease / start * 100).toFixed(0)}`,
