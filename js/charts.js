@@ -504,9 +504,9 @@ export function buildProjectionChart() {
                 labels,
                 datasets: [
                     { label: `Historical CAGR (${(cagr * 100).toFixed(1)}%)`, data: historical, datasetType: 'historicalCAGR', borderColor: colors.line1, backgroundColor: 'transparent', borderWidth: 3, tension: 0.3, pointRadius: 4 },
-                    { label: 'Conservative (5%)', data: conservative, datasetType: 'conservative', borderColor: _state.theme === 'tactical' ? '#666' : '#8a837a', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5,5], tension: 0.3, pointRadius: 3 },
+                    { label: 'Conservative (5%)', data: conservative, datasetType: 'conservative', borderColor: _state.theme === 'tactical' ? '#666' : '#8a837a', backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 3 },
                     { label: `Custom (${_state.customRate}%)`, data: custom, datasetType: 'custom', borderColor: colors.line2, backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 4 },
-                    { label: 'Optimistic (12%)', data: optimistic, datasetType: 'optimistic', borderColor: _state.theme === 'tactical' ? '#4598d4' : '#7b2cbf', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5,5], tension: 0.3, pointRadius: 3 }
+                    { label: 'Optimistic (12%)', data: optimistic, datasetType: 'optimistic', borderColor: _state.theme === 'tactical' ? '#4598d4' : '#7b2cbf', backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 3, hidden: !_state.showOptimistic }
                 ]
             },
             options: {
@@ -577,6 +577,7 @@ export function updateProjectionChartData() {
         _charts.projection.data.datasets[2].data = custom;
         _charts.projection.data.datasets[2].label = `Custom (${_state.customRate}%)`;
         _charts.projection.data.datasets[3].data = optimistic;
+        _charts.projection.data.datasets[3].hidden = !_state.showOptimistic;  // #92: Respect toggle state
 
         // Fast update without animation
         _charts.projection.update('none');

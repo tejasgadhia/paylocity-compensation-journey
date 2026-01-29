@@ -108,7 +108,8 @@ let state = {
     yoyChartType: 'bar',
     projectionYears: 5,
     customRate: 8,
-    currentScenarioIndex: 0
+    currentScenarioIndex: 0,
+    showOptimistic: false  // #92: Hide Optimistic line by default
 };
 
 let charts = {
@@ -1952,6 +1953,15 @@ function initEventListeners() {
     document.querySelectorAll('.chart-type-btn[data-view]').forEach(btn => {
         btn.addEventListener('click', () => setProjectionView(btn.dataset.view));
     });
+
+    // #92: Optimistic toggle checkbox
+    const optimisticToggle = document.getElementById('showOptimisticToggle');
+    if (optimisticToggle) {
+        optimisticToggle.addEventListener('change', () => {
+            state.showOptimistic = optimisticToggle.checked;
+            buildProjectionChart();
+        });
+    }
 
     // Paste input textarea
     const pasteInput = document.getElementById('pasteInput');

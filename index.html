@@ -3267,54 +3267,140 @@
             font-size: var(--font-size-sm);
         }
 
-        .projection-slider-inline {
+        /* #94: Dedicated controls box above chart */
+        .projections-controls-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            margin-bottom: var(--space-5);
+            box-shadow: var(--shadow-card);
+        }
+
+        .projections-controls-row {
             display: flex;
-            align-items: center;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            gap: var(--space-6);
+        }
+
+        .projections-control-group {
+            display: flex;
+            flex-direction: column;
             gap: var(--space-2);
         }
 
-        .projection-slider-inline .slider-label {
+        .control-group-label {
+            font-size: var(--font-size-xs);
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .projection-slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            flex: 1;
+            min-width: 200px;
+            max-width: 320px;
+        }
+
+        .projection-slider-group .slider-label {
             font-size: var(--font-size-sm);
             color: var(--text-secondary);
         }
 
-        .projection-slider-inline input[type="range"] {
-            width: 100px;
+        .slider-with-value {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
         }
 
-        .projection-slider-inline .slider-value {
+        .slider-with-value input[type="range"] {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .slider-with-value .slider-value {
             font-weight: 700;
             color: var(--accent-primary);
             font-family: var(--font-mono);
-            font-size: var(--font-size-sm);
-            min-width: 35px;
+            font-size: var(--font-size-base);
+            min-width: 40px;
         }
 
-        .projection-slider-inline .scenario-label {
+        .projection-slider-group .slider-context {
             font-size: var(--font-size-xs);
-            padding: var(--space-1) var(--space-2);
-            border-radius: var(--radius-badge);  /* 4px per #106 */
+            color: var(--text-tertiary);
+        }
+
+        .projection-slider-group .slider-context span {
             font-weight: 600;
-        }
-
-        .projection-slider-inline .scenario-label.conservative {
-            background: rgba(0, 150, 199, 0.15);
-            color: var(--accent-secondary);
-        }
-
-        .projection-slider-inline .scenario-label.historical {
-            background: var(--bg-tertiary);
             color: var(--text-secondary);
         }
 
-        .projection-slider-inline .scenario-label.aggressive {
-            background: rgba(232, 93, 4, 0.15);
-            color: var(--accent-primary);
+        /* #92: Optimistic toggle checkbox */
+        .checkbox-control {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            cursor: pointer;
+            padding: var(--space-2) var(--space-3);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            transition: all var(--transition-speed);
+            min-height: 36px;
         }
 
-        .projection-slider-inline .slider-context {
-            font-size: var(--font-size-xs);
-            color: var(--text-tertiary);
+        .checkbox-control:hover {
+            background: var(--bg-hover);
+            border-color: var(--text-muted);
+        }
+
+        .checkbox-control input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent-primary);
+            cursor: pointer;
+        }
+
+        .checkbox-control .checkbox-label {
+            font-size: var(--font-size-sm);
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+        }
+
+        .checkbox-control:has(input:checked) {
+            background: var(--bg-hover);
+            border-color: var(--accent-primary);
+        }
+
+        .checkbox-control:has(input:checked) .checkbox-label {
+            color: var(--text-primary);
+        }
+
+        /* #95, #96: Unified control styling in projections box */
+        .projections-controls-box .interval-buttons,
+        .projections-controls-box .chart-controls {
+            min-height: 36px;
+        }
+
+        .projections-controls-box .interval-btn,
+        .projections-controls-box .chart-type-btn {
+            min-height: 36px;
+            padding: var(--space-2) var(--space-4);
+        }
+
+        /* Chart section without header */
+        .projections-chart-section {
+            margin-top: 0;
+        }
+
+        .projections-chart-section .chart-wrapper {
+            border-radius: var(--radius-lg);
         }
 
         .projections-table {
@@ -4312,16 +4398,22 @@ History
                         <p>Explore potential salary growth scenarios. Adjust the raise percentage to see how different growth rates would impact your compensation over time.</p>
                     </div>
 
-                    <div class="chart-section">
-                        <div class="chart-header">
-                            <h2 class="chart-title">Future Trajectory</h2>
-                            <div class="chart-header-controls">
-                                <div class="projection-slider-inline">
-                                    <label for="customRateSlider" class="slider-label">What if raises average</label>
+                    <!-- #94: Dedicated controls box above chart -->
+                    <div class="projections-controls-box">
+                        <div class="projections-controls-row">
+                            <!-- Slider control -->
+                            <div class="projection-slider-group">
+                                <label for="customRateSlider" class="slider-label">What if raises average</label>
+                                <div class="slider-with-value">
                                     <input type="range" min="0" max="25" value="8" id="customRateSlider" aria-label="Average raise percentage">
                                     <span class="slider-value" id="customRateValue">8%</span>
-                                    <span class="slider-context">(Your historical: <span id="historicalRateDisplay">--</span>)</span>
                                 </div>
+                                <span class="slider-context">(Your historical: <span id="historicalRateDisplay">--</span>)</span>
+                            </div>
+
+                            <!-- Time period buttons (#95: segmented control) -->
+                            <div class="projections-control-group">
+                                <span class="control-group-label">Time Period</span>
                                 <div class="interval-buttons">
                                     <button class="interval-btn" data-years="1">1 yr</button>
                                     <button class="interval-btn" data-years="3">3 yr</button>
@@ -4329,12 +4421,29 @@ History
                                     <button class="interval-btn" data-years="10">10 yr</button>
                                     <button class="interval-btn" data-years="20">20 yr</button>
                                 </div>
+                            </div>
+
+                            <!-- Chart/Table toggle (#96: larger, aligned) -->
+                            <div class="projections-control-group">
+                                <span class="control-group-label">View</span>
                                 <div class="chart-controls">
                                     <button class="chart-type-btn active" data-view="chart">Chart</button>
                                     <button class="chart-type-btn" data-view="table">Table</button>
                                 </div>
                             </div>
+
+                            <!-- #92: Optimistic toggle -->
+                            <div class="projections-control-group">
+                                <span class="control-group-label">Scenarios</span>
+                                <label class="checkbox-control">
+                                    <input type="checkbox" id="showOptimisticToggle">
+                                    <span class="checkbox-label">Show Optimistic (12%)</span>
+                                </label>
+                            </div>
                         </div>
+                    </div>
+
+                    <div class="chart-section projections-chart-section">
                         <div class="chart-wrapper" id="projectionChartWrapper">
                             <canvas id="projectionChart"></canvas>
                         </div>
