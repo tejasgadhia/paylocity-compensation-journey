@@ -2991,22 +2991,23 @@
 
         input[type="range"] {
             width: 100%;
-            height: 8px;
-            border-radius: var(--radius-sm);
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(to right, var(--accent-primary) 0%, var(--accent-primary) var(--range-progress, 50%), var(--bg-tertiary) var(--range-progress, 50%), var(--bg-tertiary) 100%);
+            border: none;
             outline: none;
             -webkit-appearance: none;
+            cursor: pointer;
         }
 
         input[type="range"]:focus-visible {
-            outline: 2px solid var(--color-brand);
+            outline: 2px solid var(--accent-primary);
             outline-offset: 4px;
         }
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 20px;
+            width: 22px;
             height: 20px;
             border-radius: 50%;
             background: var(--color-brand);
@@ -3272,7 +3273,7 @@
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            padding: var(--space-5);
+            padding: var(--space-6);
             margin-bottom: var(--space-5);
             box-shadow: var(--shadow-card);
         }
@@ -3280,97 +3281,129 @@
         .projections-controls-row {
             display: flex;
             flex-wrap: wrap;
-            align-items: flex-start;
-            gap: var(--space-6);
+            align-items: flex-end;  /* Align to bottom for better visual balance */
+            gap: var(--space-8);
         }
 
         .projections-control-group {
             display: flex;
             flex-direction: column;
-            gap: var(--space-2);
+            gap: var(--space-3);
         }
 
         .control-group-label {
             font-size: var(--font-size-xs);
             font-family: var(--font-mono);
-            color: var(--text-muted);
+            font-weight: 600;
+            color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
         }
 
         .projection-slider-group {
             display: flex;
             flex-direction: column;
-            gap: var(--space-2);
+            gap: var(--space-3);
             flex: 1;
-            min-width: 200px;
-            max-width: 320px;
+            min-width: 220px;
+            max-width: 340px;
         }
 
         .projection-slider-group .slider-label {
             font-size: var(--font-size-sm);
-            color: var(--text-secondary);
+            font-weight: 500;
+            color: var(--text-primary);
         }
 
         .slider-with-value {
             display: flex;
             align-items: center;
-            gap: var(--space-3);
+            gap: var(--space-4);
         }
 
         .slider-with-value input[type="range"] {
             flex: 1;
-            min-width: 120px;
+            min-width: 140px;
         }
 
         .slider-with-value .slider-value {
             font-weight: 700;
             color: var(--accent-primary);
             font-family: var(--font-mono);
-            font-size: var(--font-size-base);
-            min-width: 40px;
+            font-size: var(--font-size-lg);
+            min-width: 50px;
         }
 
         .projection-slider-group .slider-context {
-            font-size: var(--font-size-xs);
-            color: var(--text-tertiary);
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            background: var(--bg-tertiary);
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-sm);
+            display: inline-block;
         }
 
         .projection-slider-group .slider-context span {
-            font-weight: 600;
-            color: var(--text-secondary);
+            font-weight: 700;
+            color: var(--accent-secondary);
+            font-family: var(--font-mono);
         }
 
-        /* #92: Optimistic toggle checkbox */
+        /* #92: Optimistic toggle - custom switch style */
         .checkbox-control {
             display: flex;
             align-items: center;
-            gap: var(--space-2);
+            gap: var(--space-3);
             cursor: pointer;
-            padding: var(--space-2) var(--space-3);
+            padding: var(--space-2) var(--space-4);
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
-            transition: all var(--transition-speed);
-            min-height: 36px;
+            transition: all 0.2s ease;
+            min-height: 40px;
         }
 
         .checkbox-control:hover {
             background: var(--bg-hover);
-            border-color: var(--text-muted);
+            border-color: var(--accent-primary);
         }
 
+        /* Custom checkbox appearance */
         .checkbox-control input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            accent-color: var(--accent-primary);
+            position: relative;
+            width: 18px;
+            height: 18px;
+            appearance: none;
+            -webkit-appearance: none;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
             cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-control input[type="checkbox"]:checked {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .checkbox-control input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 2px;
+            width: 5px;
+            height: 9px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
         }
 
         .checkbox-control .checkbox-label {
             font-size: var(--font-size-sm);
             font-family: var(--font-mono);
             color: var(--text-secondary);
+            transition: color 0.2s ease;
         }
 
         .checkbox-control:has(input:checked) {
@@ -3382,16 +3415,29 @@
             color: var(--text-primary);
         }
 
-        /* #95, #96: Unified control styling in projections box */
+        /* #95, #96: Unified control styling with sliding animation */
         .projections-controls-box .interval-buttons,
         .projections-controls-box .chart-controls {
-            min-height: 36px;
+            min-height: 40px;
+            position: relative;
         }
 
         .projections-controls-box .interval-btn,
         .projections-controls-box .chart-type-btn {
-            min-height: 36px;
+            min-height: 40px;
             padding: var(--space-2) var(--space-4);
+            position: relative;
+            z-index: 1;
+            transition: color 0.2s ease, background 0.2s ease;
+        }
+
+        /* Active state with stronger visual */
+        .projections-controls-box .interval-btn.active,
+        .projections-controls-box .chart-type-btn.active {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1), inset 0 0 0 1px var(--border-color);
         }
 
         /* Chart section without header */

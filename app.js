@@ -1380,12 +1380,16 @@ function initProjections() {
     const historicalCAGR = Math.round(calculateCAGR(employeeData));
     state.cagr = historicalCAGR;
     state.customRate = historicalCAGR;
-    
+
     // Update slider and display
     const slider = document.getElementById('customRateSlider');
     slider.value = historicalCAGR;
     document.getElementById('customRateValue').textContent = historicalCAGR + '%';
     document.getElementById('historicalRateDisplay').textContent = historicalCAGR + '%';
+
+    // Initialize slider track fill
+    const progress = (historicalCAGR / 25) * 100;
+    slider.style.setProperty('--range-progress', `${progress}%`);
 }
 
 // ========================================
@@ -1519,9 +1523,13 @@ const debouncedProjectionUpdate = debounce(() => {
 }, 150);
 
 function updateCustomRate() {
-    state.customRate = parseInt(document.getElementById('customRateSlider').value, 10);
+    const slider = document.getElementById('customRateSlider');
+    state.customRate = parseInt(slider.value, 10);
     // Update display immediately for responsive feel
     document.getElementById('customRateValue').textContent = state.customRate + '%';
+    // Update slider track fill (CSS variable for gradient)
+    const progress = (state.customRate / 25) * 100;
+    slider.style.setProperty('--range-progress', `${progress}%`);
     // Debounce chart data updates (uses efficient update() instead of rebuild)
     debouncedProjectionUpdate();
 }
@@ -1529,22 +1537,20 @@ function updateCustomRate() {
 function setProjectionView(view) {
     const chartWrapper = document.getElementById('projectionChartWrapper');
     const tableWrapper = document.getElementById('projectionTableWrapper');
-    const intervalButtons = document.querySelector('#tab-projections .interval-buttons');
     const buttons = document.querySelectorAll('#tab-projections .chart-type-btn');
-    
+
     buttons.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.view === view);
     });
-    
+
     if (view === 'chart') {
         chartWrapper.classList.remove('hidden');
         tableWrapper.classList.add('hidden');
-        intervalButtons.classList.remove('hidden');
     } else {
         chartWrapper.classList.add('hidden');
         tableWrapper.classList.remove('hidden');
-        intervalButtons.classList.add('hidden');
     }
+    // Note: Time period buttons always stay visible (affects both chart and table)
 }
 
 // ========================================
