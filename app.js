@@ -521,7 +521,7 @@ function updateScenarioLabel() {
 function loadJsonFile(event) {
     const file = event.target.files[0];
     if (!file) return;
-    
+
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
@@ -535,6 +535,12 @@ function loadJsonFile(event) {
             document.getElementById('demoBanner').classList.add('hidden');
             // Update URL (removes demo flag)
             updateUrlParams();
+            // Auto-close import modal after successful load (#66)
+            const modal = document.getElementById('importModal');
+            if (modal) {
+                modal.classList.remove('visible');
+                document.body.style.overflow = '';
+            }
         } catch (err) {
             showUserMessage('Error loading file: ' + err.message, 'error');
         }
