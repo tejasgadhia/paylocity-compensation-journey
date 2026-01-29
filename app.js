@@ -1733,7 +1733,7 @@ function initEventListeners() {
                 if (comparisonSliderRef) {
                     setTimeout(() => {
                         comparisonSliderRef.value = 0;
-                    }, 50);
+                    }, 250);
                 }
             }
         });
