@@ -16,6 +16,21 @@
                    object-src 'none';">
     <title>Paylocity Compensation Journey</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+    <!-- Open Graph meta tags for social sharing (#125) -->
+    <meta property="og:title" content="Compensation Journey - Visualize Your Paylocity Data">
+    <meta property="og:description" content="Transform your Paylocity pay history into beautiful charts, growth analytics, and future projections. 100% private - data never leaves your device.">
+    <meta property="og:image" content="https://tejasgadhia.github.io/paylocity-compensation-journey/assets/og-image.png">
+    <meta property="og:url" content="https://tejasgadhia.github.io/paylocity-compensation-journey/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Compensation Journey">
+
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Compensation Journey - Visualize Your Paylocity Data">
+    <meta name="twitter:description" content="Transform your Paylocity pay history into charts, analytics, and projections. 100% private.">
+    <meta name="twitter:image" content="https://tejasgadhia.github.io/paylocity-compensation-journey/assets/og-image.png">
+
     <!-- Chart.js self-hosted, lazy-loaded dynamically when needed for faster landing page -->
     <style>
         /* ========================================
@@ -1500,7 +1515,7 @@
         }
 
         /* ========================================
-           DEMO BANNER - #104: Less aggressive, subtle styling
+           DEMO BANNER - #104: Subtle but distinct, #114: Stronger visual distinction
            ======================================== */
 
         .demo-banner {
@@ -1508,11 +1523,12 @@
             align-items: center;
             justify-content: center;
             gap: var(--space-3);
-            padding: var(--space-1) var(--space-4);
-            background: var(--color-warning-muted);
-            border-bottom: 1px solid color-mix(in srgb, var(--color-warning) 30%, transparent);
+            padding: var(--space-2) var(--space-4);
+            background: color-mix(in srgb, var(--color-warning) 15%, var(--bg-primary));
+            border-bottom: 1px solid color-mix(in srgb, var(--color-warning) 40%, transparent);
+            border-left: 4px solid var(--color-warning);
             color: var(--text-primary);
-            font-size: var(--font-size-xs);
+            font-size: var(--font-size-sm);
             position: sticky;
             top: 0;
             z-index: 200;
@@ -1530,8 +1546,8 @@
         }
 
         .demo-banner-icon svg {
-            width: 0.875rem;
-            height: 0.875rem;
+            width: 1rem;
+            height: 1rem;
             color: var(--color-warning);
         }
 
@@ -1540,13 +1556,15 @@
         }
 
         .demo-banner-text strong {
-            font-weight: 600;
-            color: var(--text-primary);
+            font-weight: 700;
+            color: var(--color-warning);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .demo-banner-close {
             background: transparent;
-            border: 1px solid var(--border-color);
+            border: 1px solid color-mix(in srgb, var(--color-warning) 40%, transparent);
             color: var(--text-muted);
             width: 44px;
             height: 44px;
@@ -1565,12 +1583,13 @@
         .demo-banner-close:hover {
             border-color: var(--color-danger);
             color: var(--color-danger);
+            background: color-mix(in srgb, var(--color-danger) 10%, transparent);
         }
 
         .demo-regenerate-btn {
-            background: transparent;
-            border: 1.5px solid var(--color-brand);
-            color: var(--color-brand);
+            background: var(--color-brand);
+            border: none;
+            color: var(--text-on-brand);
             padding: var(--space-1) var(--space-3);
             border-radius: var(--radius-sm);
             font-family: var(--font-mono);
@@ -1583,6 +1602,7 @@
             transition: all var(--transition-speed);
             white-space: nowrap;
             min-height: 32px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         .demo-regenerate-btn svg {
@@ -1591,8 +1611,10 @@
         }
 
         .demo-regenerate-btn:hover {
-            background: var(--color-brand);
-            color: #fff;
+            background: var(--color-brand-hover);
+            color: var(--text-on-brand);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
         }
 
         /* ========================================
