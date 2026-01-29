@@ -1641,21 +1641,26 @@ function getUrlParams() {
 
 function initFromUrl() {
     const params = getUrlParams();
-    
+
     // Apply theme from URL if specified
     if (params.theme && (params.theme === 'tactical' || params.theme === 'artistic')) {
         setTheme(params.theme);
     }
-    
+
     // Apply view mode from URL if specified
     if (params.view === 'index') {
         setViewMode('index');
     }
-    
+
+    // Set tab from URL BEFORE loading demo (so showDashboard can use it)
+    const validTabs = ['home', 'story', 'market', 'history', 'analytics', 'projections', 'help'];
+    if (params.tab && validTabs.includes(params.tab)) {
+        state.currentTab = params.tab;
+    }
+
     // Auto-load demo if specified
     if (params.demo) {
         loadDemoData();
-        // Tab will be handled by checkInitialHash called from showDashboard
     }
 }
 
