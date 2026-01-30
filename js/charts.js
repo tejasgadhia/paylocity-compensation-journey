@@ -440,6 +440,7 @@ export function buildYoyChart() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: { padding: { top: 20 } },  // #88: Room for data labels
                 plugins: {
                     legend: { display: false },
                     tooltip: getTooltipConfig({
@@ -448,7 +449,7 @@ export function buildYoyChart() {
                 },
                 scales: {
                     x: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 12 } } },
-                    y: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 12 }, callback: (v) => v + '%' } }
+                    y: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 12 }, callback: (v) => v + '%' }, grace: '10%' }
                 }
             },
             // #88: Inline plugin to draw data labels above bars
