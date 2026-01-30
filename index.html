@@ -3415,42 +3415,69 @@
            HELP SECTION - #97-100: Help tab polish
            ======================================== */
 
-        .help-grid {
+        /* #97: Help section headers - group cards into logical sections */
+        .help-section {
+            margin-bottom: var(--space-8);
+        }
+
+        .help-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .help-section-header {
+            font-family: var(--font-display);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--space-4);
+            padding-bottom: var(--space-2);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        [data-theme="tactical"] .help-section-header {
+            color: var(--color-brand);
+        }
+
+        .help-section-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: var(--space-6);
         }
 
         @media (max-width: 768px) {
-            .help-grid {
+            .help-section-grid {
                 grid-template-columns: 1fr;
             }
         }
 
-        /* #97: Help cards - visual hierarchy through first card emphasis */
+        /* Help cards */
         .help-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: var(--radius-card);  /* 8px per #106 */
+            border-radius: var(--radius-card);
             padding: var(--space-6);
             box-shadow: var(--shadow-card);
         }
 
-        .help-card:first-child {
+        /* Featured card spans full width */
+        .help-card--featured {
             grid-column: span 2;
             background: linear-gradient(135deg, var(--color-brand-muted), transparent);
         }
 
         @media (max-width: 768px) {
-            .help-card:first-child {
+            .help-card--featured {
                 grid-column: span 1;
             }
         }
 
-        /* #100: Help card headers - better stand out */
+        /* #100: Help card headers - 18px semibold with orange accent */
         .help-card h3 {
             font-family: var(--font-display);
-            font-size: var(--font-size-md);
+            font-size: 1.125rem; /* 18px */
+            font-weight: 600;
             margin-bottom: var(--space-4);
             color: var(--text-primary);
             display: flex;
@@ -3464,6 +3491,7 @@
             height: 1em;
             background: var(--color-brand);
             border-radius: var(--radius-xs);
+            flex-shrink: 0;
         }
 
         [data-theme="tactical"] .help-card h3 {
@@ -3478,7 +3506,11 @@
             line-height: 1.7;
         }
 
-        /* #98 & #99: Code and formula styling */
+        .help-card p + p {
+            margin-top: var(--space-3);
+        }
+
+        /* #98: Formula display - proper math formatting */
         .help-card code {
             background: var(--bg-tertiary);
             padding: var(--space-1) var(--space-2);
@@ -3489,8 +3521,68 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Keyboard shortcut styling */
-        .help-card kbd {
+        .formula-block {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: var(--space-4);
+            margin: var(--space-4) 0;
+            text-align: center;
+        }
+
+        .formula-block code {
+            font-size: var(--font-size-md);
+            background: none;
+            border: none;
+            padding: 0;
+            display: block;
+            margin-bottom: var(--space-3);
+        }
+
+        .formula-legend {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: var(--space-3);
+            padding-top: var(--space-3);
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .formula-legend span {
+            display: inline-block;
+            margin: 0 var(--space-2);
+        }
+
+        /* #99: Keyboard shortcut table */
+        .shortcut-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--space-3) 0;
+        }
+
+        .shortcut-table th {
+            text-align: left;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: var(--space-2) var(--space-3);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .shortcut-table td {
+            padding: var(--space-2) var(--space-3);
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .shortcut-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .shortcut-table kbd {
             display: inline-block;
             padding: var(--space-1) var(--space-2);
             font-family: var(--font-mono);
@@ -3499,6 +3591,17 @@
             border: 1px solid var(--border-color);
             border-radius: var(--radius-xs);
             box-shadow: 0 1px 0 var(--border-color);
+            min-width: 1.5rem;
+            text-align: center;
+        }
+
+        /* Help note styling */
+        .help-note {
+            font-size: var(--font-size-xs) !important;
+            color: var(--text-muted) !important;
+            margin-top: var(--space-4) !important;
+            padding-top: var(--space-3);
+            border-top: 1px dashed var(--border-color);
         }
 
         /* ========================================
@@ -4466,42 +4569,84 @@ History
 
                 <!-- HELP TAB -->
                 <div class="tab-content" id="tab-help" role="tabpanel" aria-labelledby="tab-btn-help">
-                    <div class="help-grid">
-                        <div class="help-card">
-                            <h3>Understanding Indexed Values</h3>
-                            <p>When privacy mode is enabled, salary values are shown as an index where your starting salary equals <code>100</code>. An index of <code>704</code> means your current compensation is 7.04× your starting salary.</p>
+                    <!-- #97: Core Concepts Section -->
+                    <div class="help-section">
+                        <h2 class="help-section-header">Core Concepts</h2>
+                        <div class="help-section-grid">
+                            <div class="help-card">
+                                <h3>CAGR (Compound Annual Growth Rate)</h3>
+                                <p>CAGR represents the mean annual growth rate over a specified time period, smoothing out volatility to show consistent growth.</p>
+                                <!-- #98: Proper formula display -->
+                                <div class="formula-block">
+                                    <code>CAGR = (Final ÷ Initial)<sup>1/years</sup> − 1</code>
+                                    <div class="formula-legend">
+                                        <span><strong>Final</strong> = ending salary</span>
+                                        <span><strong>Initial</strong> = starting salary</span>
+                                        <span><strong>years</strong> = time period</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="help-card">
+                                <h3>Adjustment Categories</h3>
+                                <p><strong>Merit Increase:</strong> Performance-based raise reflecting your contributions.</p>
+                                <p><strong>Equity:</strong> Internal fairness alignment with peers in similar roles.</p>
+                                <p><strong>Market Adjustment:</strong> Response to external market compensation data.</p>
+                                <p><strong>New Hire:</strong> Your starting compensation when joining.</p>
+                            </div>
                         </div>
-                        <div class="help-card">
-                            <h3>CAGR (Compound Annual Growth Rate)</h3>
-                            <p>CAGR represents the mean annual growth rate over a specified time period. Formula: <code>((Final/Initial)^(1/years)) - 1</code></p>
+                    </div>
+
+                    <!-- #97: Your Data Section -->
+                    <div class="help-section">
+                        <h2 class="help-section-header">Your Data</h2>
+                        <div class="help-section-grid">
+                            <div class="help-card">
+                                <h3>Understanding Indexed Values</h3>
+                                <p>When privacy mode is enabled, salary values are shown as an index where your starting salary equals <code>100</code>.</p>
+                                <p>An index of <code>704</code> means your current compensation is 7.04× your starting salary—useful for sharing without revealing actual numbers.</p>
+                            </div>
+                            <div class="help-card">
+                                <h3>Saving Your Data</h3>
+                                <p>Click <code>Save Data</code> to download a JSON file containing your parsed compensation history.</p>
+                                <p>Load it later with <code>Load Saved Data</code> on the landing page—no need to re-paste from Paylocity.</p>
+                            </div>
                         </div>
-                        <div class="help-card">
-                            <h3>Adjustment Categories</h3>
-                            <p><strong>Merit Increase:</strong> Performance-based raise.<br>
-                            <strong>Equity:</strong> Internal fairness alignment.<br>
-                            <strong>Market Adjustment:</strong> External market response.<br>
-                            <strong>New Hire:</strong> Starting compensation.</p>
-                        </div>
-                        <div class="help-card">
-                            <h3>Saving Your Data</h3>
-                            <p>Click <code>Save Data</code> to download a JSON file. Load it later with <code>Load Saved Data</code> on the landing page—no need to re-paste from Paylocity.</p>
-                        </div>
-                        <div class="help-card">
-                            <h3>Privacy & Security</h3>
-                            <p>All processing happens in your browser. No data is sent to any server. You can verify this by disconnecting from the internet—the dashboard will still work.</p>
-                        </div>
-                        <div class="help-card">
-                            <h3>Keyboard Shortcuts</h3>
-                            <p><strong>Navigation</strong><br>
-                            <code>1</code> Home &nbsp; <code>2</code> Story &nbsp; <code>3</code> Market &nbsp; <code>4</code> History<br>
-                            <code>5</code> Analytics &nbsp; <code>6</code> Projections &nbsp; <code>7</code> Help</p>
-                            <p><strong>Controls</strong><br>
-                            <code>T</code> Toggle theme (Tactical/Artistic)<br>
-                            <code>V</code> or <code>P</code> Toggle privacy mode ($/Index)</p>
-                            <p class="help-note">
-                                <strong>Accessibility:</strong> Shortcuts are disabled when typing in input fields.
-                                All features are accessible via mouse/touch and screen readers.
-                            </p>
+                    </div>
+
+                    <!-- #97: Reference Section -->
+                    <div class="help-section">
+                        <h2 class="help-section-header">Reference</h2>
+                        <div class="help-section-grid">
+                            <div class="help-card help-card--featured">
+                                <h3>Keyboard Shortcuts</h3>
+                                <!-- #99: Proper table format -->
+                                <table class="shortcut-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Key</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><kbd>1</kbd> – <kbd>7</kbd></td>
+                                            <td>Navigate tabs (Home, Story, Market, History, Analytics, Projections, Help)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><kbd>T</kbd></td>
+                                            <td>Toggle theme (Tactical / Artistic)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><kbd>V</kbd> or <kbd>P</kbd></td>
+                                            <td>Toggle privacy mode ($ / Index)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p class="help-note">
+                                    <strong>Accessibility:</strong> Shortcuts are disabled when typing in input fields.
+                                    All features are accessible via mouse/touch and screen readers.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
