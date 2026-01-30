@@ -450,7 +450,33 @@ export function buildYoyChart() {
                     x: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 12 } } },
                     y: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 12 }, callback: (v) => v + '%' } }
                 }
-            }
+            },
+            // #88: Inline plugin to draw data labels above bars
+            plugins: [{
+                id: 'yoyDataLabels',
+                afterDatasetsDraw(chart) {
+                    if (_state.yoyChartType !== 'bar') return; // Only for bar chart
+
+                    const ctx = chart.ctx;
+                    const themeColors = getThemeColors();
+
+                    chart.data.datasets.forEach((dataset, i) => {
+                        const meta = chart.getDatasetMeta(i);
+                        meta.data.forEach((bar, index) => {
+                            const value = dataset.data[index];
+                            const text = value.toFixed(1) + '%';
+
+                            ctx.save();
+                            ctx.fillStyle = themeColors.text;
+                            ctx.font = '11px var(--font-mono, monospace)';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'bottom';
+                            ctx.fillText(text, bar.x, bar.y - 4);
+                            ctx.restore();
+                        });
+                    });
+                }
+            }]
         });
     } catch (error) {
         console.error('Failed to build YoY chart:', error);

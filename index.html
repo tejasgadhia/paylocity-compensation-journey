@@ -678,6 +678,7 @@
             font-size: var(--font-size-sm);
             font-weight: 600;
             color: var(--text-primary);
+            white-space: nowrap;  /* #121: Prevent awkward title breaks */
         }
 
         .chip-desc {
@@ -1985,39 +1986,40 @@
             font-size: var(--font-size-sm);
         }
 
-        /* #72: Chart controls - segmented button group style */
+        /* #72, #89: Chart controls - subtle segmented button group */
         .chart-controls {
             display: inline-flex;
             gap: 0;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
+            background: transparent;
+            border: none;
             border-radius: var(--radius-md);
-            padding: var(--space-1);
+            padding: 0;
         }
 
         .chart-type-btn {
-            padding: var(--space-2) var(--space-3);
+            padding: var(--space-1) var(--space-2);
             background: transparent;
-            border: none;
+            border: 1px solid var(--border-color);
             border-radius: var(--radius-sm);
-            color: var(--text-secondary);
+            color: var(--text-muted);
             font-family: var(--font-mono);
-            font-size: var(--font-size-xs);
+            font-size: 10px;
             cursor: pointer;
             transition: all var(--transition-speed);
             text-transform: uppercase;
-            min-height: 32px;
+            min-height: 28px;
         }
 
         .chart-type-btn.active {
-            background: var(--bg-card);
-            color: var(--text-primary);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border-color: var(--border-color);
         }
 
         .chart-type-btn:hover:not(.active) {
-            color: var(--text-primary);
+            color: var(--text-secondary);
             background: var(--bg-hover);
+            border-color: var(--border-color);
         }
 
         .chart-wrapper {
