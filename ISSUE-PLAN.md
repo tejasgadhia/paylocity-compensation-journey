@@ -20,23 +20,20 @@
 | Help Tab | #97, #98, #99, #100 | ✅ closed |
 | History Tab | #82, #83, #84, #85 | ✅ closed |
 | **Analytics Tab** | #88, #89, #121, #137, #138 | ✅ closed |
+| **Story/Home Tab** | #69, #70, #71, #73 | ✅ closed |
 
-**Total Closed**: 44 issues
+**Total Closed**: 48 issues
 
 ---
 
-## Phase 2: Story/Timeline Tab ← NEXT
+## Phase 2: Chart Button Overlap ← NEXT
 
 | Issue | Title | Effort | Status |
 |-------|-------|--------|--------|
-| #71 | Timeline chart axis labels are too small | easy | pending |
-| #73 | Story tab page title has no visual weight | easy | pending |
-| #69 | Stat cards have cramped typography (HOME tab) | med | pending |
 | #139 | Chart toggle buttons overlap with timeline data line | easy | pending |
 
-**Estimated**: ~1-2 hours
-**Rationale**: Story tab visual polish + Home tab stat cards
-**Note**: #70 closed (already fixed)
+**Estimated**: ~30 min
+**Rationale**: Fix remaining Home tab chart issue
 
 ---
 
