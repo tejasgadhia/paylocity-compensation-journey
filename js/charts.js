@@ -341,6 +341,7 @@ export function buildMainChart() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: { padding: { top: 50 } },  // #139: Reserve space for Line/Bar/Step toggle buttons
                 interaction: { intersect: false, mode: 'index' },
                 plugins: {
                     legend: { display: false },
