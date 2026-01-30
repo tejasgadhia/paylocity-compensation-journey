@@ -108,7 +108,7 @@ let state = {
     yoyChartType: 'bar',
     projectionYears: 5,
     customRate: 8,
-    currentScenarioIndex: 0,
+    currentScenarioIndex: 2,  // Default to Scenario 3 (Established, 8 years) for richer demo
     showOptimistic: false  // #92: Hide Optimistic line by default
 };
 

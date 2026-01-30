@@ -1862,7 +1862,7 @@
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-card);  /* 8px per #106 */
-            padding: var(--space-5) var(--space-6);
+            padding: var(--space-6);  /* #69: Increased from space-5/space-6 to uniform space-6 (24px) */
             transition: all var(--transition-speed);
             position: relative;
         }
@@ -1903,13 +1903,19 @@
         }
 
         .metric-label {
-            display: flex;
-            align-items: center;
             font-size: var(--font-size-xs);
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.1em;
             font-family: var(--font-mono);
+            margin-bottom: var(--space-2);
+        }
+
+        /* #69: Row layout with value left, detail right (matches Analytics tab) */
+        .metric-row {
+            display: flex;
+            align-items: baseline;
+            gap: var(--space-3);
             margin-bottom: var(--space-2);
         }
 
@@ -1919,6 +1925,7 @@
             font-weight: 700;
             color: var(--text-primary);
             line-height: 1.2;
+            flex-shrink: 0;
         }
 
         [data-theme="artistic"] .metric-value {
@@ -1929,10 +1936,18 @@
             color: var(--color-brand);
         }
 
-        .metric-subtext {
+        /* #69: Detail text now sits beside value (matches Analytics tab) */
+        .metric-detail {
             font-size: var(--font-size-sm);
             color: var(--text-secondary);
-            margin-top: var(--space-2);
+        }
+
+        /* #69: Help text replaces tooltip - always visible (matches Analytics tab) */
+        .metric-help {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            line-height: 1.4;
+            opacity: 0.8;
         }
 
         .metric-change {
@@ -2211,14 +2226,14 @@
 
         .story-header h2 {
             font-family: var(--font-display);
-            font-size: var(--font-size-xl);
-            margin-bottom: var(--space-2);
+            font-size: var(--font-size-2xl);  /* #73: Increased from xl (27.6px) to 2xl (33.2px) */
+            margin-bottom: var(--space-4);    /* #73: Increased from space-2 (8px) to space-4 (16px) */
         }
 
         [data-theme="tactical"] .story-header h2 {
             text-transform: uppercase;
             letter-spacing: 0.15em;
-            font-size: var(--font-size-md);
+            font-size: var(--font-size-xl);  /* #73: Keep at xl (27.6px) instead of shrinking to md */
         }
 
         .story-header .subtitle {
@@ -4278,39 +4293,40 @@ History
             <!-- HOME TAB -->
             <div class="tab-content active" id="tab-home" role="tabpanel" aria-labelledby="tab-btn-home">
             <!-- HERO METRICS -->
+            <!-- #69: Restructured to match Analytics tab card layout -->
             <section class="hero-section">
                 <div class="metrics-grid">
                     <div class="metric-card animate-in animate-delay-1">
-                        <div class="metric-label">
-                            Current Compensation
-                            <span class="info-tooltip"><span class="tip-text">Your most recent annual salary as of the last recorded adjustment. This reflects base salary only, excluding bonuses or equity.</span></span>
+                        <div class="metric-label">Current Compensation</div>
+                        <div class="metric-row">
+                            <div class="metric-value highlight" id="currentSalary">$281,600</div>
+                            <div class="metric-detail" id="currentSalaryIndexed">Index: 704</div>
                         </div>
-                        <div class="metric-value highlight" id="currentSalary">$281,600</div>
-                        <div class="metric-subtext" id="currentSalaryIndexed">Index: 704</div>
+                        <div class="metric-help">Most recent annual base salary, excluding bonuses or equity.</div>
                     </div>
                     <div class="metric-card animate-in animate-delay-2">
-                        <div class="metric-label">
-                            Total Growth
-                            <span class="info-tooltip"><span class="tip-text">The percentage increase from your starting salary to your current salary. Calculated as: ((Current - Starting) / Starting) × 100</span></span>
+                        <div class="metric-label">Total Growth</div>
+                        <div class="metric-row">
+                            <div class="metric-value" id="totalGrowth">+604%</div>
+                            <div class="metric-detail" id="totalGrowthSubtext">Since hire</div>
                         </div>
-                        <div class="metric-value" id="totalGrowth">+604%</div>
-                        <div class="metric-subtext" id="totalGrowthSubtext">Since hire</div>
+                        <div class="metric-help">Percentage increase from your starting salary to current.</div>
                     </div>
                     <div class="metric-card animate-in animate-delay-3">
-                        <div class="metric-label">
-                            Years of Service
-                            <span class="info-tooltip"><span class="tip-text">Total time elapsed since your hire date to the most recent compensation record.</span></span>
+                        <div class="metric-label">Years of Service</div>
+                        <div class="metric-row">
+                            <div class="metric-value" id="yearsService">12.8</div>
+                            <div class="metric-detail" id="hireDateText">Since Mar 2012</div>
                         </div>
-                        <div class="metric-value" id="yearsService">12.8</div>
-                        <div class="metric-subtext" id="hireDateText">Since Mar 2012</div>
+                        <div class="metric-help">Time elapsed from hire date to most recent adjustment.</div>
                     </div>
                     <div class="metric-card animate-in animate-delay-4">
-                        <div class="metric-label">
-                            Total Adjustments
-                            <span class="info-tooltip"><span class="tip-text">The number of compensation changes on record, including merit increases, equity adjustments, market adjustments, and your initial hire rate.</span></span>
+                        <div class="metric-label">Total Adjustments</div>
+                        <div class="metric-row">
+                            <div class="metric-value" id="totalRaises">19</div>
+                            <div class="metric-detail" id="avgRaisesPerYear">Avg: 1.5 per year</div>
                         </div>
-                        <div class="metric-value" id="totalRaises">19</div>
-                        <div class="metric-subtext" id="avgRaisesPerYear">Avg: 1.5 per year</div>
+                        <div class="metric-help">All compensation changes: merit, equity, and market adjustments.</div>
                     </div>
                 </div>
             </section>

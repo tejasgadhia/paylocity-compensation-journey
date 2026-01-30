@@ -1,11 +1,11 @@
 # Issue Plan - Paylocity Compensation Journey
 
-**Updated**: 2026-01-29
-**Total Issues**: 18 open (all P4-low)
+**Updated**: 2026-01-30
+**Total Issues**: 15 open (all P4-low)
 
 ---
 
-## Archived: Phase 1-10 (Previous Work) ✅ COMPLETE
+## Archived: Previous Work ✅ COMPLETE
 
 | Phase | Issues | Status |
 |-------|--------|--------|
@@ -19,39 +19,28 @@
 | Projections Tab | #92, #93, #94, #95, #96 | ✅ closed |
 | Help Tab | #97, #98, #99, #100 | ✅ closed |
 | History Tab | #82, #83, #84, #85 | ✅ closed |
+| **Analytics Tab** | #88, #89, #121, #137, #138 | ✅ closed |
 
-**Total Closed**: 39 issues
-
----
-
-## Phase 11: Analytics Tab ← NEXT
-
-| Issue | Title | Effort | Status |
-|-------|-------|--------|--------|
-| #88 | Analytics bar chart has no data labels | easy | pending |
-| #89 | Analytics chart toggle (BAR/LINE) is too prominent | easy | pending |
-| #121 | Growth Analytics card text wraps awkwardly | easy | pending |
-
-**Estimated**: ~1-2 hours
-**Rationale**: Analytics tab polish - all easy
+**Total Closed**: 44 issues
 
 ---
 
-## Phase 12: Story/Timeline Tab
+## Phase 2: Story/Timeline Tab ← NEXT
 
 | Issue | Title | Effort | Status |
 |-------|-------|--------|--------|
-| #69 | Stat cards have cramped typography | med | pending |
-| #70 | "Since hire" badge is out of place | easy | pending |
 | #71 | Timeline chart axis labels are too small | easy | pending |
 | #73 | Story tab page title has no visual weight | easy | pending |
+| #69 | Stat cards have cramped typography (HOME tab) | med | pending |
+| #139 | Chart toggle buttons overlap with timeline data line | easy | pending |
 
 **Estimated**: ~1-2 hours
-**Rationale**: Story tab visual improvements
+**Rationale**: Story tab visual polish + Home tab stat cards
+**Note**: #70 closed (already fixed)
 
 ---
 
-## Phase 13: Market Tab
+## Phase 3: Market Tab
 
 | Issue | Title | Effort | Status |
 |-------|-------|--------|--------|
@@ -61,11 +50,11 @@
 | #81 | Data sources section is an afterthought | easy | pending |
 
 **Estimated**: ~1-2 hours
-**Rationale**: Market tab polish
+**Rationale**: Market tab polish - all easy wins
 
 ---
 
-## Phase 14: Global Typography & Links
+## Phase 4: Global Typography & Links
 
 | Issue | Title | Effort | Status |
 |-------|-------|--------|--------|
@@ -78,7 +67,7 @@
 
 ---
 
-## Phase 15: Landing Page
+## Phase 5: Landing Page
 
 | Issue | Title | Effort | Status |
 |-------|-------|--------|--------|
@@ -94,7 +83,7 @@
 
 | Issue | Title | Effort |
 |-------|-------|--------|
-| #116 | Update landing page screenshots to use Tactical (dark) | hard |
+| #116 | Update landing page screenshots to use Tactical (dark) theme | hard |
 | #117 | Home tab cards: animate tooltip content into card on hover | hard |
 
 **Note**: #116 should wait until all visual work is complete to avoid rework.
@@ -105,17 +94,17 @@
 
 | Priority | Count | Phases |
 |----------|-------|--------|
-| 🟢 P4-low | 18 | Phases 11-15 + Deferred |
+| 🟢 P4-low | 13 | Phases 2-5 |
+| 🟢 P4-low (hard) | 2 | Deferred |
 
 ---
 
 ## Quick Reference
 
-**Phase 11 (Analytics Tab) - Current:**
-- #88, #89, #121
+**Phase 2 (Story/Timeline Tab) - Current:**
+- #70, #71, #73, #69
 
 **Easy wins by area:**
-- Analytics: #88, #89, #121
 - Story: #70, #71, #73
 - Market: #77, #78, #80, #81
 - Typography: #75, #76, #103

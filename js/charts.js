@@ -355,14 +355,15 @@ export function buildMainChart() {
                             color: colors.text,
                             maxRotation: 45,
                             minRotation: 45,
-                            font: { size: 12 } // #71: Larger axis labels
+                            font: { size: 13, weight: 'bold' }  // #71: Increased from 12px, made bold for consistency
                         }
                     },
                     y: {
                         grid: { color: colors.grid, drawBorder: false },
+                        beginAtZero: true,  // Start Y-axis at $0 for better context
                         ticks: {
                             color: colors.text,
-                            font: { size: 12 }, // #71: Larger axis labels
+                            font: { size: 14, weight: 'bold' },  // #71: Increased from 12px, made bold
                             callback: (v) => _state.showDollars ? '$' + (v / 1000) + 'k' : v
                         }
                     }
@@ -458,8 +459,8 @@ export function buildYoyChart() {
                         })
                 },
                 scales: {
-                    x: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 12 } } },
-                    y: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 12 }, callback: (v) => v + '%' }, grace: '10%' }
+                    x: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 13, weight: 'bold' } } },  // #71: Bold for consistency
+                    y: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 14, weight: 'bold' }, callback: (v) => v + '%' }, grace: '10%' }
                 }
             },
             // #88: Inline plugin to draw data labels above bars
@@ -557,8 +558,8 @@ export function buildProjectionChart() {
                     })
                 },
                 scales: {
-                    x: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 12 } } },
-                    y: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 12 }, callback: (v) => '$' + (v/1000) + 'k' } }
+                    x: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 13, weight: 'bold' } } },  // #71: Bold for consistency
+                    y: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 14, weight: 'bold' }, callback: (v) => '$' + (v/1000) + 'k' } }
                 }
             }
         });
