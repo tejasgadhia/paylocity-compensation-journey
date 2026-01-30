@@ -685,6 +685,7 @@
             font-size: var(--font-size-xs);
             color: var(--text-muted);
             line-height: 1.3;
+            white-space: nowrap;  /* #121: Prevent awkward description breaks */
         }
 
         /* How it works - inline steps */
@@ -1996,10 +1997,11 @@
             padding: 0;
         }
 
+        /* #89: Subtle chart type toggle - less prominent than chart content */
         .chart-type-btn {
             padding: var(--space-1) var(--space-2);
             background: transparent;
-            border: 1px solid var(--border-color);
+            border: 1px solid transparent;
             border-radius: var(--radius-sm);
             color: var(--text-muted);
             font-family: var(--font-mono);
@@ -2008,18 +2010,19 @@
             transition: all var(--transition-speed);
             text-transform: uppercase;
             min-height: 28px;
+            opacity: 0.7;
         }
 
         .chart-type-btn.active {
             background: var(--bg-tertiary);
             color: var(--text-secondary);
             border-color: var(--border-color);
+            opacity: 1;
         }
 
         .chart-type-btn:hover:not(.active) {
             color: var(--text-secondary);
-            background: var(--bg-hover);
-            border-color: var(--border-color);
+            opacity: 1;
         }
 
         .chart-wrapper {
@@ -2868,13 +2871,19 @@
         }
 
         .analytics-card-title {
-            display: flex;
-            align-items: center;
             font-size: var(--font-size-xs);
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.1em;
             font-family: var(--font-mono);
+            margin-bottom: var(--space-2);
+        }
+
+        /* #138: Row layout with value left, detail right */
+        .analytics-card-row {
+            display: flex;
+            align-items: baseline;
+            gap: var(--space-3);
             margin-bottom: var(--space-2);
         }
 
@@ -2884,16 +2893,25 @@
             color: var(--text-primary);
             font-family: var(--font-mono);
             line-height: 1.2;
+            flex-shrink: 0;
         }
 
         [data-theme="artistic"] .analytics-card-value {
             font-family: var(--font-display);
         }
 
+        /* #138: Detail text now sits beside value */
         .analytics-card-detail {
             font-size: var(--font-size-sm);
             color: var(--text-secondary);
-            margin-top: var(--space-2);
+        }
+
+        /* #138: Help text replaces tooltip - always visible */
+        .analytics-card-help {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            line-height: 1.4;
+            opacity: 0.8;
         }
 
         /* ========================================
@@ -4417,56 +4435,56 @@ History
                     </div>
                 </div>
 
-                <!-- ANALYTICS TAB -->
+                <!-- ANALYTICS TAB - #138: Redesigned KPI cards with inline help -->
                 <div class="tab-content" id="tab-analytics" role="tabpanel" aria-labelledby="tab-btn-analytics">
                     <div class="analytics-grid">
                         <div class="analytics-card">
-                            <div class="analytics-card-title">
-                                Compound Annual Growth Rate
-                                <span class="info-tooltip"><span class="tip-text">If your salary grew by the same percentage every year, this is what that percentage would be. It smooths out the ups and downs into one number.</span></span>
+                            <div class="analytics-card-title">Compound Annual Growth Rate</div>
+                            <div class="analytics-card-row">
+                                <div class="analytics-card-value" id="cagr">16.4%</div>
+                                <div class="analytics-card-detail">Average annual growth over career</div>
                             </div>
-                            <div class="analytics-card-value" id="cagr">16.4%</div>
-                            <div class="analytics-card-detail">Average annual growth over career</div>
+                            <div class="analytics-card-help">Smoothed annual growth rate across your tenure.</div>
                         </div>
                         <div class="analytics-card">
-                            <div class="analytics-card-title">
-                                Average Raise
-                                <span class="info-tooltip"><span class="tip-text">The arithmetic mean of all your raise percentages.</span></span>
+                            <div class="analytics-card-title">Average Raise</div>
+                            <div class="analytics-card-row">
+                                <div class="analytics-card-value" id="avgRaise">12.7%</div>
+                                <div class="analytics-card-detail" id="avgRaiseDollar">~$12,700 per adjustment</div>
                             </div>
-                            <div class="analytics-card-value" id="avgRaise">12.7%</div>
-                            <div class="analytics-card-detail" id="avgRaiseDollar">~$12,700 per adjustment</div>
+                            <div class="analytics-card-help">Simple average of all your raise percentages.</div>
                         </div>
                         <div class="analytics-card">
-                            <div class="analytics-card-title">
-                                Median Raise
-                                <span class="info-tooltip"><span class="tip-text">The middle value when all raises are sorted.</span></span>
+                            <div class="analytics-card-title">Median Raise</div>
+                            <div class="analytics-card-row">
+                                <div class="analytics-card-value" id="medianRaise">11.2%</div>
+                                <div class="analytics-card-detail">Middle value of all raises</div>
                             </div>
-                            <div class="analytics-card-value" id="medianRaise">11.2%</div>
-                            <div class="analytics-card-detail">Middle value of all raises</div>
+                            <div class="analytics-card-help">The middle value when raises are sorted.</div>
                         </div>
                         <div class="analytics-card">
-                            <div class="analytics-card-title">
-                                Largest Single Increase
-                                <span class="info-tooltip"><span class="tip-text">Your biggest percentage raise in a single adjustment.</span></span>
+                            <div class="analytics-card-title">Largest Single Increase</div>
+                            <div class="analytics-card-row">
+                                <div class="analytics-card-value" id="largestRaise">29.5%</div>
+                                <div class="analytics-card-detail" id="largestRaiseDate">April 2015</div>
                             </div>
-                            <div class="analytics-card-value" id="largestRaise">29.5%</div>
-                            <div class="analytics-card-detail" id="largestRaiseDate">April 2015</div>
+                            <div class="analytics-card-help">Your biggest raise in a single adjustment.</div>
                         </div>
                         <div class="analytics-card">
-                            <div class="analytics-card-title">
-                                Avg. Time Between Raises
-                                <span class="info-tooltip"><span class="tip-text">How frequently you receive compensation adjustments. The industry standard is typically 12 months (annual review cycles).</span></span>
+                            <div class="analytics-card-title">Avg. Time Between Raises</div>
+                            <div class="analytics-card-row">
+                                <div class="analytics-card-value" id="avgTimeBetween">8.1 mo</div>
+                                <div class="analytics-card-detail" id="avgTimeDetail">Industry standard: 12 months</div>
                             </div>
-                            <div class="analytics-card-value" id="avgTimeBetween">8.1 mo</div>
-                            <div class="analytics-card-detail" id="avgTimeDetail">Industry standard: 12 months</div>
+                            <div class="analytics-card-help">How frequently you receive compensation adjustments.</div>
                         </div>
                         <div class="analytics-card">
-                            <div class="analytics-card-title">
-                                Merit Increases
-                                <span class="info-tooltip"><span class="tip-text">Number of raises specifically categorized as merit-based.</span></span>
+                            <div class="analytics-card-title">Merit Increases</div>
+                            <div class="analytics-card-row">
+                                <div class="analytics-card-value" id="meritCount">14</div>
+                                <div class="analytics-card-detail" id="meritPercent">73.7% of all adjustments</div>
                             </div>
-                            <div class="analytics-card-value" id="meritCount">14</div>
-                            <div class="analytics-card-detail" id="meritPercent">73.7% of all adjustments</div>
+                            <div class="analytics-card-help">Raises categorized as performance-based rewards.</div>
                         </div>
                     </div>
 

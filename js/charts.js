@@ -268,6 +268,13 @@ export function updateYoyChartType() {
         const dataset = _charts.yoy.data.datasets[0];
         dataset.backgroundColor = type === 'bar' ? colors.line2 : 'transparent';
 
+        // #137: Toggle tooltip based on chart type (bar has data labels, line needs tooltips)
+        _charts.yoy.options.plugins.tooltip = type === 'bar'
+            ? { enabled: false }
+            : getTooltipConfig({
+                labelCallback: (ctx) => `${ctx.raw.toFixed(1)}% growth`
+            });
+
         // Fast update without animation
         _charts.yoy.update('none');
     } catch (error) {
@@ -443,9 +450,12 @@ export function buildYoyChart() {
                 layout: { padding: { top: 20 } },  // #88: Room for data labels
                 plugins: {
                     legend: { display: false },
-                    tooltip: getTooltipConfig({
-                        labelCallback: (ctx) => `${ctx.raw.toFixed(1)}% growth`
-                    })
+                    // #137: Disable tooltip for bar chart since data labels show values
+                    tooltip: _state.yoyChartType === 'bar'
+                        ? { enabled: false }
+                        : getTooltipConfig({
+                            labelCallback: (ctx) => `${ctx.raw.toFixed(1)}% growth`
+                        })
                 },
                 scales: {
                     x: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 12 } } },
