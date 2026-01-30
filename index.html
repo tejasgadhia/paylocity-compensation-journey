@@ -2786,7 +2786,7 @@
             border-bottom: none;
         }
 
-        /* #83: Badges - reduced visual weight, more subtle */
+        /* #83: Badges - neutral styling, salary column gets emphasis instead */
         .badge {
             display: inline-block;
             padding: var(--space-1) var(--space-2);
@@ -2799,20 +2799,9 @@
             color: var(--text-secondary);
         }
 
-        .badge-merit {
-            color: var(--color-success);
-        }
-
-        .badge-equity {
-            color: var(--color-info);
-        }
-
-        .badge-market {
-            color: var(--color-brand);
-        }
-
-        .badge-new {
-            color: var(--text-muted);
+        /* #83: Bold Annual Salary column (3rd column) for emphasis */
+        .data-table td:nth-child(3) {
+            font-weight: 600;
         }
 
         /* ========================================

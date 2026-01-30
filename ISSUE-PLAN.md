@@ -1,11 +1,11 @@
 # Issue Plan - Paylocity Compensation Journey
 
 **Updated**: 2026-01-29
-**Total Issues**: 36 open (4 P3-medium, 32 P4-low)
+**Total Issues**: 18 open (all P4-low)
 
 ---
 
-## Archived: Phase 1-7 (Previous Work) ✅ COMPLETE
+## Archived: Phase 1-10 (Previous Work) ✅ COMPLETE
 
 | Phase | Issues | Status |
 |-------|--------|--------|
@@ -16,68 +16,69 @@
 | Quick Wins | #66, #104, #108, #111, #120, #123, #124 | ✅ closed |
 | SEO & Demo Polish | #114, #125 | ✅ closed |
 | Cross-Tab Consistency | #72, #74, #79, #86, #87 | ✅ closed |
+| Projections Tab | #92, #93, #94, #95, #96 | ✅ closed |
+| Help Tab | #97, #98, #99, #100 | ✅ closed |
+| History Tab | #82, #83, #84, #85 | ✅ closed |
 
-**Total Closed**: 26 issues
-
----
-
-## Phase 8: Projections Tab ← NEXT
-
-| Issue | Title | Priority | Effort | Status |
-|-------|-------|----------|--------|--------|
-| #92 | Projections chart has too many lines | 🟡 P3 | med | pending |
-| #94 | Projections slider control disappears into background | 🟡 P3 | med | pending |
-| #95 | Projections time period buttons have wrong styling | 🟢 P4 | easy | pending |
-| #96 | Projections CHART/TABLE toggle is an afterthought | 🟢 P4 | easy | pending |
-| #93 | Projections legend uses color + pattern | 🟢 P4 | easy | pending |
-
-**Estimated**: ~4 hours
-**Rationale**: Group all Projections tab improvements together
+**Total Closed**: 39 issues
 
 ---
 
-## Phase 9: Help Tab
-
-| Issue | Title | Priority | Effort | Status |
-|-------|-------|----------|--------|--------|
-| #97 | Help tab cards all look equally important | 🟡 P3 | med | pending |
-| #98 | Help tab formula display is hard to read | 🟢 P4 | easy | pending |
-| #99 | Keyboard shortcuts use inconsistent formatting | 🟢 P4 | easy | pending |
-| #100 | Help tab card headers don't stand out | 🟢 P4 | easy | pending |
-
-**Estimated**: ~2-3 hours
-**Rationale**: Help tab polish - one P3 + three easy P4s
-
----
-
-## Phase 10: History Tab (all P4-low easy)
+## Phase 11: Analytics Tab ← NEXT
 
 | Issue | Title | Effort | Status |
 |-------|-------|--------|--------|
-| #82 | History table columns are left-aligned | easy | pending |
-| #83 | History table REASON badges carry all visual weight | easy | pending |
-| #84 | History table has no row hover state | easy | pending |
-| #85 | History table has no zebra striping | easy | pending |
+| #88 | Analytics bar chart has no data labels | easy | pending |
+| #89 | Analytics chart toggle (BAR/LINE) is too prominent | easy | pending |
+| #121 | Growth Analytics card text wraps awkwardly | easy | pending |
 
 **Estimated**: ~1-2 hours
-**Rationale**: Quick wins - 4 easy table improvements
+**Rationale**: Analytics tab polish - all easy
 
 ---
 
-## Phase 11: Analytics Tab (mostly P4-low)
+## Phase 12: Story/Timeline Tab
 
-| Issue | Title | Priority | Effort | Status |
-|-------|-------|----------|--------|--------|
-| #88 | Analytics bar chart has no data labels | 🟢 P4 | easy | pending |
-| #89 | Analytics chart toggle (BAR/LINE) is too prominent | 🟢 P4 | easy | pending |
-| #121 | Growth Analytics card text wraps awkwardly | 🟢 P4 | easy | pending |
+| Issue | Title | Effort | Status |
+|-------|-------|--------|--------|
+| #69 | Stat cards have cramped typography | med | pending |
+| #70 | "Since hire" badge is out of place | easy | pending |
+| #71 | Timeline chart axis labels are too small | easy | pending |
+| #73 | Story tab page title has no visual weight | easy | pending |
 
 **Estimated**: ~1-2 hours
-**Rationale**: Analytics tab polish
+**Rationale**: Story tab visual improvements
 
 ---
 
-## Phase 12: Landing Page Polish (P4-low)
+## Phase 13: Market Tab
+
+| Issue | Title | Effort | Status |
+|-------|-------|--------|--------|
+| #77 | Note box has wrong visual language | easy | pending |
+| #78 | Market tab summary callout is visually weak | easy | pending |
+| #80 | "↑ ABOVE" badges are too colorful | easy | pending |
+| #81 | Data sources section is an afterthought | easy | pending |
+
+**Estimated**: ~1-2 hours
+**Rationale**: Market tab polish
+
+---
+
+## Phase 14: Global Typography & Links
+
+| Issue | Title | Effort | Status |
+|-------|-------|--------|--------|
+| #75 | Numbers in monospace font stand out too much | easy | pending |
+| #76 | Link text is barely distinguished | easy | pending |
+| #103 | Navigation numbers have no clear purpose | easy | pending |
+
+**Estimated**: ~1 hour
+**Rationale**: Cross-cutting typography fixes
+
+---
+
+## Phase 15: Landing Page
 
 | Issue | Title | Effort | Status |
 |-------|-------|--------|--------|
@@ -85,31 +86,11 @@
 | #122 | CJ logo/icon in header needs improvement | med | pending |
 
 **Estimated**: ~1-2 hours
-**Rationale**: Nice-to-have landing page refinements
+**Rationale**: Landing page refinements
 
 ---
 
-## Backlog: Visual Polish (P4-low)
-
-Nice-to-have improvements - no rush.
-
-| Issue | Title | Effort |
-|-------|-------|--------|
-| #69 | Stat cards have cramped typography | med |
-| #70 | "Since hire" badge is out of place | easy |
-| #71 | Timeline chart axis labels are too small | easy |
-| #73 | Story tab page title has no visual weight | easy |
-| #75 | Numbers in monospace font stand out too much | easy |
-| #76 | Link text is barely distinguished | easy |
-| #77 | Note box has wrong visual language | easy |
-| #78 | Market tab summary callout is visually weak | easy |
-| #80 | "↑ ABOVE" badges are too colorful | easy |
-| #81 | Data sources section is an afterthought | easy |
-| #103 | Navigation numbers have no clear purpose | easy |
-
----
-
-## Deferred: Hard Tasks (P4-low)
+## Deferred: Hard Tasks
 
 | Issue | Title | Effort |
 |-------|-------|--------|
@@ -124,21 +105,21 @@ Nice-to-have improvements - no rush.
 
 | Priority | Count | Phases |
 |----------|-------|--------|
-| 🟡 P3-medium | 4 | Phase 8-9 (primary focus) |
-| 🟢 P4-low | 32 | Phases 8-12 + Backlog |
+| 🟢 P4-low | 18 | Phases 11-15 + Deferred |
 
 ---
 
 ## Quick Reference
 
-**Phase 8 (Projections Tab) - Current:**
-- #92, #94, #95, #96, #93
+**Phase 11 (Analytics Tab) - Current:**
+- #88, #89, #121
 
 **Easy wins by area:**
-- History: #82, #83, #84, #85
-- Help: #98, #99, #100
 - Analytics: #88, #89, #121
-- Projections: #93, #95, #96
+- Story: #70, #71, #73
+- Market: #77, #78, #80, #81
+- Typography: #75, #76, #103
+- Landing: #119
 
 ---
 
