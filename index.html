@@ -1217,22 +1217,22 @@
             color: var(--text-primary);
         }
 
-        /* Legal warning callout in modal */
+        /* Legal notice in modal */
         .legal-callout {
             display: flex;
             align-items: flex-start;
             gap: var(--space-2);
             padding: var(--space-3);
-            background: rgba(251, 191, 36, 0.15);
-            border: 1px solid rgba(251, 191, 36, 0.3);
+            background: transparent;
+            border: none;
             border-radius: var(--radius-md);
             font-size: var(--font-size-sm);
             margin-bottom: var(--space-4);
         }
 
         [data-theme="artistic"] .legal-callout {
-            background: rgba(251, 146, 60, 0.15);
-            border-color: rgba(251, 146, 60, 0.3);
+            background: transparent;
+            border: none;
         }
 
         .legal-callout-icon {
@@ -4308,19 +4308,15 @@
                 </div>
 
                 <div class="legal-callout">
-                    <span class="legal-callout-icon">⚠️</span>
                     <div class="legal-callout-content">
-                        <span class="legal-callout-title">Legal Notice: Using this tool with Paylocity data</span>
                         <div class="legal-callout-text">
-                            <p>This tool parses data exported from Paylocity. Before using:</p>
-                            <p>• Review Paylocity's Terms of Service<br>
-                               • Verify you have permission to export your compensation data<br>
-                               • Use at your own risk</p>
-                            <p><em>This tool is not affiliated with, endorsed by, or supported by Paylocity.</em></p>
+                            <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary);">
+                                ℹ️ Not affiliated with Paylocity. For personal use only.
+                            </p>
                         </div>
                         <div class="legal-consent">
                             <input type="checkbox" id="legalConsentCheckbox" aria-describedby="legalConsentLabel">
-                            <label for="legalConsentCheckbox" id="legalConsentLabel">I understand and accept responsibility for using this tool with my data</label>
+                            <label for="legalConsentCheckbox" id="legalConsentLabel">I'm using my own compensation data</label>
                         </div>
                     </div>
                 </div>
