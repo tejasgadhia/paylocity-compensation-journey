@@ -1266,25 +1266,97 @@
             margin-bottom: 0;
         }
 
-        /* Legal consent checkbox */
+        /* Legal consent checkbox - premium custom styling */
         .legal-consent {
             display: flex;
             align-items: flex-start;
-            gap: var(--space-2);
+            gap: var(--space-3);
             padding: 0;
             cursor: pointer;
+            position: relative;
         }
 
+        /* Hide native checkbox but keep accessible */
         .legal-consent input[type="checkbox"] {
-            margin-top: 2px;
+            position: absolute;
+            opacity: 0;
+            width: 20px;
+            height: 20px;
+            margin: 0;
             cursor: pointer;
         }
 
+        /* Label with space for custom checkbox */
         .legal-consent label {
             font-size: var(--font-size-sm);
             color: var(--text-secondary);
             cursor: pointer;
             user-select: none;
+            position: relative;
+            padding-left: 32px;
+            display: inline-block;
+            transition: color var(--transition-speed);
+        }
+
+        /* Custom checkbox box */
+        .legal-consent label::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-accent);
+            border-radius: var(--radius-sm);
+            background: var(--bg-secondary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Custom checkmark */
+        .legal-consent label::after {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 3px;
+            transform: scale(0) rotate(45deg);
+            width: 5px;
+            height: 10px;
+            border: solid var(--text-on-brand);
+            border-width: 0 3px 3px 0;
+            opacity: 0;
+            transition: all 0.25s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        /* Hover state */
+        .legal-consent:hover label::before {
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px var(--color-brand-muted);
+        }
+
+        /* Checked state - checkbox box */
+        .legal-consent input[type="checkbox"]:checked ~ label::before {
+            background: var(--color-brand);
+            border-color: var(--color-brand);
+            box-shadow: 0 2px 8px var(--color-brand-muted),
+                        0 0 0 3px var(--color-brand-muted);
+        }
+
+        /* Checked state - checkmark animation */
+        .legal-consent input[type="checkbox"]:checked ~ label::after {
+            opacity: 1;
+            transform: scale(1) rotate(45deg);
+        }
+
+        /* Checked state - label emphasis */
+        .legal-consent input[type="checkbox"]:checked ~ label {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Focus state for accessibility */
+        .legal-consent input[type="checkbox"]:focus ~ label::before {
+            outline: 2px solid var(--color-brand);
+            outline-offset: 2px;
         }
 
         /* Landing page footer disclaimer */
