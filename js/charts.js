@@ -560,7 +560,11 @@ export function buildProjectionChart() {
                 },
                 scales: {
                     x: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 13, weight: 'bold' } } },  // #71: Bold for consistency
-                    y: { grid: { color: colors.grid, drawBorder: false }, ticks: { color: colors.text, font: { size: 14, weight: 'bold' }, callback: (v) => '$' + (v/1000) + 'k' } }
+                    y: {
+                        beginAtZero: true,  // Start Y-axis at $0 for consistency with home tab
+                        grid: { color: colors.grid, drawBorder: false },
+                        ticks: { color: colors.text, font: { size: 14, weight: 'bold' }, callback: (v) => '$' + (v/1000) + 'k' }
+                    }
                 }
             }
         });
