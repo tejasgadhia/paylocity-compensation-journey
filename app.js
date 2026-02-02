@@ -308,6 +308,8 @@ async function parseAndGenerate() {
         document.getElementById('demoBanner').classList.add('hidden');
         // Update URL (removes demo flag)
         updateUrlParams();
+        // Save backup to localStorage
+        saveBackup();
     } catch (e) {
         console.error('Parse error:', e);
         messageDiv.className = 'validation-message error visible';
@@ -535,6 +537,129 @@ function updateScenarioLabel() {
 }
 
 // ========================================
+// DATA BACKUP & RECOVERY
+// ========================================
+
+/**
+ * Save employeeData to localStorage as backup
+ * Called after successful parse or data load
+ */
+function saveBackup() {
+    if (!employeeData) return;
+
+    try {
+        const backup = {
+            data: employeeData,
+            timestamp: Date.now(),
+            version: 1
+        };
+        localStorage.setItem('cj-backup', JSON.stringify(backup));
+        console.log('Data backup saved to localStorage');
+    } catch (err) {
+        // Quota exceeded or localStorage disabled - fail gracefully
+        console.warn('Failed to save backup to localStorage:', err.message);
+    }
+}
+
+/**
+ * Load employeeData from localStorage backup
+ * Returns null if no backup exists or backup is invalid
+ */
+function loadBackup() {
+    try {
+        const backupStr = localStorage.getItem('cj-backup');
+        if (!backupStr) return null;
+
+        const backup = JSON.parse(backupStr);
+        if (!backup.data || !backup.data.records || !backup.data.hireDate) {
+            throw new Error('Invalid backup format');
+        }
+
+        return backup;
+    } catch (err) {
+        console.warn('Failed to load backup from localStorage:', err.message);
+        return null;
+    }
+}
+
+/**
+ * Clear localStorage backup
+ * Called after successful restore or when user clicks "Start Over"
+ */
+function clearBackup() {
+    try {
+        localStorage.removeItem('cj-backup');
+        console.log('Backup cleared from localStorage');
+    } catch (err) {
+        console.warn('Failed to clear backup:', err.message);
+    }
+}
+
+/**
+ * Check if backup exists and update UI
+ * Called on page load and when import modal opens
+ */
+function updateBackupUI() {
+    const backup = loadBackup();
+    const restoreBtn = document.getElementById('restoreBackupBtn');
+
+    if (restoreBtn) {
+        if (backup) {
+            const date = new Date(backup.timestamp);
+            const dateStr = date.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+            restoreBtn.textContent = `Restore Last Session (from ${dateStr})`;
+            restoreBtn.classList.remove('hidden');
+        } else {
+            restoreBtn.classList.add('hidden');
+        }
+    }
+}
+
+/**
+ * Restore data from localStorage backup
+ * Called when user clicks "Restore Last Session" button
+ */
+function restoreFromBackup() {
+    const backup = loadBackup();
+    if (!backup) {
+        showUserMessage('No backup found', 'error');
+        return;
+    }
+
+    try {
+        employeeData = backup.data;
+        employeeData.isDemo = false;
+        showDashboard();
+
+        // Hide demo banner
+        document.getElementById('demoBanner').classList.add('hidden');
+
+        // Update URL (removes demo flag)
+        updateUrlParams();
+
+        // Close import modal
+        const modal = document.getElementById('importModal');
+        if (modal) {
+            modal.classList.remove('visible');
+            document.body.style.overflow = '';
+        }
+
+        // Clear backup after successful restore
+        clearBackup();
+        updateBackupUI();
+
+        showUserMessage('Session restored successfully', 'success');
+    } catch (err) {
+        showUserMessage('Error restoring session: ' + err.message, 'error');
+    }
+}
+
+// ========================================
 // FILE HANDLING
 // ========================================
 
@@ -555,6 +680,8 @@ function loadJsonFile(event) {
             document.getElementById('demoBanner').classList.add('hidden');
             // Update URL (removes demo flag)
             updateUrlParams();
+            // Save backup to localStorage
+            saveBackup();
             // Auto-close import modal after successful load (#66)
             const modal = document.getElementById('importModal');
             if (modal) {
@@ -1830,6 +1957,8 @@ function initEventListeners() {
         if (importModal) {
             importModal.classList.add('visible');
             document.body.style.overflow = 'hidden';
+            // Update backup UI (show/hide restore button)
+            updateBackupUI();
             // Focus the textarea for immediate pasting
             const pasteInput = document.getElementById('pasteInput');
             if (pasteInput) {
@@ -1933,12 +2062,18 @@ function initEventListeners() {
         btnSaveData.addEventListener('click', downloadData);
     }
 
-    // Start over button with confirmation (#20)
+    // Start over button with confirmation (#20, #142)
     const btnStartOver = document.querySelector('.btn-start-over');
     if (btnStartOver) {
         btnStartOver.addEventListener('click', () => {
-            if (confirm('Start over? This will clear your current data.\n\nYou can save your data first using the "Save Data" button.')) {
+            const backup = loadBackup();
+            const backupMsg = backup
+                ? '\n\nNote: A backup was saved and can be restored later.'
+                : '';
+
+            if (confirm(`Start over? This will clear your current data.${backupMsg}\n\nYou can save your data first using the "Save Data" button.`)) {
                 resetDashboard();
+                // Don't clear backup - let user restore if needed
             }
         });
     }
@@ -1947,6 +2082,12 @@ function initEventListeners() {
     const jsonFileInput = document.getElementById('jsonFileInput');
     if (jsonFileInput) {
         jsonFileInput.addEventListener('change', loadJsonFile);
+    }
+
+    // Restore backup button (#142)
+    const restoreBackupBtn = document.getElementById('restoreBackupBtn');
+    if (restoreBackupBtn) {
+        restoreBackupBtn.addEventListener('click', restoreFromBackup);
     }
 
     // Custom rate slider
@@ -2012,6 +2153,9 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     });
 
     initFromUrl();
+
+    // Update backup UI on page load (#142)
+    updateBackupUI();
 
     // Initialize event listeners when DOM is ready
     if (document.readyState === 'loading') {
