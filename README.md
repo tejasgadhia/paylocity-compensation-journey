@@ -85,6 +85,28 @@ The tool works entirely offline. Open your browser's DevTools (F12) → **Networ
 
 **Privacy promise**: Your salary data never touches a server. It processes in your browser tab and disappears when you close it (unless you explicitly save it).
 
+## Security
+
+This tool implements multiple security layers to protect against XSS and data injection attacks:
+
+### Defense-in-Depth Approach
+
+1. **Content Security Policy (CSP)**: Blocks inline scripts and external connections
+2. **Input Validation**: Parser uses whitelist approach and range validation
+3. **Output Escaping**: All user-controlled strings escaped before display
+4. **Template Validation**: Type checking on all template interpolations
+
+### XSS Protection
+
+All user input (from Paylocity paste) goes through:
+- **Parser validation** (`js/parser.js`): HTML tag stripping, whitelist-only reason strings
+- **Range checks**: Salary values must be within realistic ranges ($1K-$10M annual)
+- **Output escaping** (`escapeHTML()`): Applied before any `innerHTML` insertion
+
+**Tested against**: Script injection, event handlers, JavaScript URLs, HTML entities
+
+See [SECURITY.md](SECURITY.md) for complete security documentation, threat model, and verification steps.
+
 ## File Structure
 
 ```
