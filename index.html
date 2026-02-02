@@ -1217,6 +1217,99 @@
             color: var(--text-primary);
         }
 
+        /* Legal warning callout in modal */
+        .legal-callout {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-2);
+            padding: var(--space-3);
+            background: rgba(251, 191, 36, 0.15);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-sm);
+            margin-bottom: var(--space-4);
+        }
+
+        [data-theme="artistic"] .legal-callout {
+            background: rgba(251, 146, 60, 0.15);
+            border-color: rgba(251, 146, 60, 0.3);
+        }
+
+        .legal-callout-icon {
+            flex-shrink: 0;
+            font-size: var(--font-size-lg);
+            line-height: 1;
+        }
+
+        .legal-callout-content {
+            flex: 1;
+        }
+
+        .legal-callout-title {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .legal-callout-text {
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: var(--space-3);
+        }
+
+        .legal-callout-text p {
+            margin: 0 0 var(--space-2) 0;
+        }
+
+        .legal-callout-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Legal consent checkbox */
+        .legal-consent {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-2);
+            padding: var(--space-2);
+            cursor: pointer;
+        }
+
+        .legal-consent input[type="checkbox"] {
+            margin-top: 2px;
+            cursor: pointer;
+        }
+
+        .legal-consent label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* Landing page footer disclaimer */
+        .landing-footer {
+            padding: var(--space-6) var(--space-4);
+            text-align: center;
+            font-size: var(--font-size-xs);
+            color: var(--text-tertiary);
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .landing-footer p {
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .landing-footer a {
+            color: var(--text-secondary);
+            text-decoration: underline;
+        }
+
+        .landing-footer a:hover {
+            color: var(--color-brand);
+        }
+
         /* ===== BUTTON SYSTEM (#105) ===== */
         /*
          * Unified button system with 3 semantic levels:
@@ -4172,6 +4265,15 @@
                 </div>
             </div>
         </main>
+
+        <!-- Footer Disclaimer -->
+        <footer class="landing-footer">
+            <p>
+                <strong>Legal Notice:</strong> This tool is not affiliated with, endorsed by, or supported by Paylocity.
+                Use of this tool with Paylocity data is at your own risk. Review Paylocity's Terms of Service before proceeding.
+                By using this tool, you accept full responsibility for ensuring compliance with applicable terms and policies.
+            </p>
+        </footer>
     </div>
 
     <!-- ==========================================
@@ -4203,6 +4305,24 @@
                 <div class="privacy-callout">
                     <span class="privacy-callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></g></svg></span>
                     <span class="privacy-callout-text"><strong>Your data stays on your device</strong> — nothing is sent anywhere.</span>
+                </div>
+
+                <div class="legal-callout">
+                    <span class="legal-callout-icon">⚠️</span>
+                    <div class="legal-callout-content">
+                        <span class="legal-callout-title">Legal Notice: Using this tool with Paylocity data</span>
+                        <div class="legal-callout-text">
+                            <p>This tool parses data exported from Paylocity. Before using:</p>
+                            <p>• Review Paylocity's Terms of Service<br>
+                               • Verify you have permission to export your compensation data<br>
+                               • Use at your own risk</p>
+                            <p><em>This tool is not affiliated with, endorsed by, or supported by Paylocity.</em></p>
+                        </div>
+                        <div class="legal-consent">
+                            <input type="checkbox" id="legalConsentCheckbox" aria-describedby="legalConsentLabel">
+                            <label for="legalConsentCheckbox" id="legalConsentLabel">I understand and accept responsibility for using this tool with my data</label>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="paste-area">

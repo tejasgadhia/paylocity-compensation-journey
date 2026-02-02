@@ -323,22 +323,23 @@ function validatePasteInput() {
     const input = document.getElementById('pasteInput').value.trim();
     const messageDiv = document.getElementById('validationMessage');
     const generateBtn = document.getElementById('generateBtn');
-    
+    const legalConsent = document.getElementById('legalConsentCheckbox').checked;
+
     if (!input) {
         messageDiv.className = 'validation-message';
         messageDiv.textContent = '';
         generateBtn.disabled = true;
         return;
     }
-    
+
     // Check for date patterns (MM/DD/YYYY)
     const datePattern = /\d{2}\/\d{2}\/\d{4}/g;
     const dates = input.match(datePattern) || [];
-    
+
     // Check for dollar amounts with exactly 2 decimal places (standard currency)
     const dollarPattern = /\$[0-9,]+\.\d{2}/g;
     const dollars = input.match(dollarPattern) || [];
-    
+
     // Check for key structural indicators
     const hasSalary = /salary/i.test(input);
     const hasHistory = /history/i.test(input);
@@ -350,35 +351,43 @@ function validatePasteInput() {
         generateBtn.disabled = true;
         return;
     }
-    
+
     if (dollars.length === 0) {
         messageDiv.className = 'validation-message error visible';
         messageDiv.textContent = '✗ No salary amounts found. Make sure "Show Private Data" is enabled in Paylocity.';
         generateBtn.disabled = true;
         return;
     }
-    
+
     if (!hasSalary) {
         messageDiv.className = 'validation-message warning visible';
         messageDiv.textContent = '⚠ Data looks incomplete. Make sure you copied from the Rates tab.';
-        generateBtn.disabled = false;
+        generateBtn.disabled = !legalConsent;
         return;
     }
-    
+
     if (!hasHistory && dates.length < 3) {
         messageDiv.className = 'validation-message warning visible';
         messageDiv.textContent = '⚠ Only ' + dates.length + ' record(s) found. Did you include the History table?';
-        generateBtn.disabled = false;
+        generateBtn.disabled = !legalConsent;
         return;
     }
-    
+
     if (dollars.length < dates.length) {
         messageDiv.className = 'validation-message warning visible';
         messageDiv.textContent = '⚠ Found ' + dates.length + ' dates but only ' + dollars.length + ' salary values. Some data may be missing.';
-        generateBtn.disabled = false;
+        generateBtn.disabled = !legalConsent;
         return;
     }
-    
+
+    // Check legal consent before enabling button
+    if (!legalConsent) {
+        messageDiv.className = 'validation-message warning visible';
+        messageDiv.textContent = '✓ Found ' + dates.length + ' compensation records. Please accept the legal notice to continue.';
+        generateBtn.disabled = true;
+        return;
+    }
+
     // Success
     messageDiv.className = 'validation-message success visible';
     messageDiv.textContent = '✓ Found ' + dates.length + ' compensation records. Ready to generate!';
@@ -631,6 +640,12 @@ function resetDashboard() {
     document.getElementById('pasteInput').value = '';
     document.getElementById('validationMessage').className = 'validation-message';
     document.getElementById('generateBtn').disabled = true;
+
+    // Reset legal consent checkbox
+    const legalConsentCheckbox = document.getElementById('legalConsentCheckbox');
+    if (legalConsentCheckbox) {
+        legalConsentCheckbox.checked = false;
+    }
 }
 
 // ========================================
@@ -1827,6 +1842,12 @@ function initEventListeners() {
         if (importModal) {
             importModal.classList.remove('visible');
             document.body.style.overflow = '';
+
+            // Reset legal consent checkbox when closing modal
+            const legalConsentCheckbox = document.getElementById('legalConsentCheckbox');
+            if (legalConsentCheckbox) {
+                legalConsentCheckbox.checked = false;
+            }
         }
     }
 
@@ -1972,6 +1993,12 @@ function initEventListeners() {
     const pasteInput = document.getElementById('pasteInput');
     if (pasteInput) {
         pasteInput.addEventListener('input', validatePasteInput);
+    }
+
+    // Legal consent checkbox
+    const legalConsentCheckbox = document.getElementById('legalConsentCheckbox');
+    if (legalConsentCheckbox) {
+        legalConsentCheckbox.addEventListener('change', validatePasteInput);
     }
 }
 
