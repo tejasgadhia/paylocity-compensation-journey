@@ -498,21 +498,66 @@
             font-family: var(--font-mono);
             font-size: var(--font-size-sm);
             transform: rotate(-3deg);
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: default;
+        }
+
+        .landing-logo-icon::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            padding: 2px;
+            background: linear-gradient(
+                135deg,
+                var(--color-brand) 0%,
+                var(--color-success) 50%,
+                var(--color-info) 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .landing-logo-icon:hover {
+            transform: rotate(-3deg) scale(1.08);
+        }
+
+        .landing-logo-icon:hover::before {
+            opacity: 1;
         }
 
         [data-theme="tactical"] .landing-logo-icon {
             background: linear-gradient(135deg, var(--color-brand), var(--color-brand-hover));
             color: var(--text-inverse);
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.2);
+        }
+
+        [data-theme="tactical"] .landing-logo-icon:hover {
+            box-shadow: 0 4px 16px rgba(255, 193, 7, 0.4);
         }
 
         [data-theme="artistic"] .landing-logo-icon {
             background: var(--color-brand);
             color: var(--text-inverse);
+            box-shadow: 0 2px 8px rgba(247, 127, 0, 0.2);
+        }
+
+        [data-theme="artistic"] .landing-logo-icon:hover {
+            box-shadow: 0 4px 16px rgba(247, 127, 0, 0.4);
         }
 
         .landing-logo-text {
             font-size: var(--font-size-base);
             font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .landing-logo:hover .landing-logo-text {
+            color: var(--color-brand);
         }
 
         .landing-header-right {
@@ -1850,6 +1895,37 @@
             font-size: var(--font-size-sm);
             background: linear-gradient(135deg, var(--color-brand), var(--color-brand-hover));
             color: var(--text-on-brand);
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            padding: 2px;
+            background: linear-gradient(
+                135deg,
+                var(--color-brand) 0%,
+                var(--color-success) 50%,
+                var(--color-info) 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .logo-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .logo-icon:hover::before {
+            opacity: 1;
         }
 
         .logo-text h1 {
@@ -1857,12 +1933,17 @@
             font-size: var(--font-size-md);
             font-weight: 600;
             letter-spacing: -0.02em;
+            transition: color 0.3s ease;
         }
 
         [data-theme="tactical"] .logo-text h1 {
             letter-spacing: 0.05em;
             text-transform: uppercase;
             font-size: var(--font-size-base);
+        }
+
+        .logo:hover .logo-text h1 {
+            color: var(--color-brand);
         }
 
         .logo-text span {
@@ -2002,8 +2083,24 @@
             to { opacity: 1; }
         }
 
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes helpPulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 0.9; }
+        }
+
         .animate-in {
-            animation: fadeInUp 0.5s ease forwards;
+            animation: slideUpFade 0.6s ease forwards;
             opacity: 0;
         }
 
@@ -2044,8 +2141,19 @@
             border: 1px solid var(--border-color);
             border-radius: var(--radius-card);  /* 8px per #106 */
             padding: var(--space-6);  /* #69: Increased from space-5/space-6 to uniform space-6 (24px) */
-            transition: all var(--transition-speed);
+            transition: all var(--transition-speed) ease;
             position: relative;
+            cursor: pointer;
+        }
+
+        .metric-card:focus {
+            outline: 2px solid var(--border-focus);
+            outline-offset: 2px;
+        }
+
+        .metric-card:focus-visible {
+            outline: 2px solid var(--border-focus);
+            outline-offset: 2px;
         }
 
         [data-theme="tactical"] .metric-card {
@@ -2056,8 +2164,9 @@
             box-shadow: var(--shadow-card);
         }
 
-        .metric-card:hover {
-            transform: translateY(-2px);
+        .metric-card:hover,
+        .metric-card:focus {
+            transform: translateY(-4px);
             box-shadow: var(--shadow-hover);
             border-color: var(--accent-primary);
         }
@@ -2070,6 +2179,14 @@
             right: 0;
             height: 2px;
             background: linear-gradient(90deg, var(--accent-primary), transparent);
+            transition: opacity 0.3s ease;
+            opacity: 0.5;
+        }
+
+        [data-theme="tactical"] .metric-card:hover::before,
+        [data-theme="tactical"] .metric-card:focus::before {
+            opacity: 1;
+            height: 3px;
         }
 
         [data-theme="artistic"] .metric-card::before {
@@ -2090,6 +2207,12 @@
             letter-spacing: 0.1em;
             font-family: var(--font-mono);
             margin-bottom: var(--space-2);
+            transition: color 0.3s ease;
+        }
+
+        .metric-card:hover .metric-label,
+        .metric-card:focus .metric-label {
+            color: var(--text-secondary);
         }
 
         /* #69: Row layout with value left, detail right (matches Analytics tab) */
@@ -2097,7 +2220,7 @@
             display: flex;
             align-items: baseline;
             gap: var(--space-3);
-            margin-bottom: var(--space-2);
+            margin-bottom: var(--space-3);
         }
 
         .metric-value {
@@ -2108,24 +2231,62 @@
             line-height: 1.2;
             flex-shrink: 0;
             font-variant-numeric: tabular-nums;  /* #75: Keep column alignment */
+            transition: all 0.3s ease;
         }
 
         .metric-value.highlight {
             color: var(--color-brand);
         }
 
+        .metric-card:hover .metric-value,
+        .metric-card:focus .metric-value {
+            transform: scale(1.02);
+        }
+
         /* #69: Detail text now sits beside value (matches Analytics tab) */
         .metric-detail {
             font-size: var(--font-size-sm);
             color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .metric-card:hover .metric-detail,
+        .metric-card:focus .metric-detail {
+            color: var(--text-primary);
         }
 
         /* #69: Help text replaces tooltip - always visible (matches Analytics tab) */
         .metric-help {
             font-size: var(--font-size-xs);
             color: var(--text-muted);
-            line-height: 1.4;
-            opacity: 0.8;
+            line-height: 1.5;
+            opacity: 0.7;
+            transition: all 0.4s ease;
+            margin-top: var(--space-2);
+            padding-top: var(--space-2);
+            border-top: 1px solid transparent;
+            animation: helpPulse 2s ease-in-out 1s 2;
+        }
+
+        .metric-card:hover .metric-help,
+        .metric-card:focus .metric-help {
+            opacity: 1;
+            color: var(--text-secondary);
+            border-top-color: var(--border-color);
+            transform: translateY(-2px);
+        }
+
+        [data-theme="artistic"] .metric-card:hover .metric-help,
+        [data-theme="artistic"] .metric-card:focus .metric-help {
+            background: var(--bg-hover);
+            padding: var(--space-2);
+            margin: var(--space-2) calc(var(--space-6) * -1) 0;
+            border-radius: 0 0 var(--radius-card) var(--radius-card);
+        }
+
+        [data-theme="tactical"] .metric-card:hover .metric-help,
+        [data-theme="tactical"] .metric-card:focus .metric-help {
+            text-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
         }
 
         .metric-change {
@@ -4495,6 +4656,50 @@
                 padding: var(--space-6);
             }
         }
+
+        /* Respect user preference for reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .landing-logo-icon,
+            .logo-icon {
+                transition: none;
+            }
+
+            .landing-logo-icon:hover,
+            .logo-icon:hover {
+                transform: none;
+            }
+
+            .landing-logo-icon:hover {
+                transform: rotate(-3deg);
+            }
+
+            .animate-in {
+                animation: none;
+                opacity: 1;
+            }
+
+            .metric-card,
+            .metric-value,
+            .metric-label,
+            .metric-detail,
+            .metric-help {
+                transition: none;
+            }
+
+            .metric-card:hover,
+            .metric-card:focus {
+                transform: none;
+            }
+
+            .metric-card:hover .metric-help,
+            .metric-card:focus .metric-help {
+                transform: none;
+            }
+
+            .metric-help {
+                animation: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -4770,37 +4975,37 @@ History
             <!-- #69: Restructured to match Analytics tab card layout -->
             <section class="hero-section">
                 <div class="metrics-grid">
-                    <div class="metric-card animate-in animate-delay-1">
+                    <div class="metric-card animate-in animate-delay-1" tabindex="0" role="group" aria-label="Current compensation information">
                         <div class="metric-label">Current Compensation</div>
                         <div class="metric-row">
                             <div class="metric-value highlight" id="currentSalary">$281,600</div>
                             <div class="metric-detail" id="currentSalaryIndexed">Index: 704</div>
                         </div>
-                        <div class="metric-help">Most recent annual base salary, excluding bonuses or equity.</div>
+                        <div class="metric-help" aria-live="polite">Most recent annual base salary, excluding bonuses or equity.</div>
                     </div>
-                    <div class="metric-card animate-in animate-delay-2">
+                    <div class="metric-card animate-in animate-delay-2" tabindex="0" role="group" aria-label="Career growth information">
                         <div class="metric-label">Total Growth</div>
                         <div class="metric-row">
                             <div class="metric-value" id="totalGrowth">+604%</div>
                             <div class="metric-detail" id="totalGrowthSubtext">Since hire</div>
                         </div>
-                        <div class="metric-help">Percentage increase from your starting salary to current.</div>
+                        <div class="metric-help" aria-live="polite">Percentage increase from your starting salary to current.</div>
                     </div>
-                    <div class="metric-card animate-in animate-delay-3">
+                    <div class="metric-card animate-in animate-delay-3" tabindex="0" role="group" aria-label="Years of service information">
                         <div class="metric-label">Years of Service</div>
                         <div class="metric-row">
                             <div class="metric-value" id="yearsService">12.8</div>
                             <div class="metric-detail" id="hireDateText">Since Mar 2012</div>
                         </div>
-                        <div class="metric-help">Time elapsed from hire date to most recent adjustment.</div>
+                        <div class="metric-help" aria-live="polite">Time elapsed from hire date to most recent adjustment.</div>
                     </div>
-                    <div class="metric-card animate-in animate-delay-4">
+                    <div class="metric-card animate-in animate-delay-4" tabindex="0" role="group" aria-label="Total adjustments information">
                         <div class="metric-label">Total Adjustments</div>
                         <div class="metric-row">
                             <div class="metric-value" id="totalRaises">19</div>
                             <div class="metric-detail" id="avgRaisesPerYear">Avg: 1.5 per year</div>
                         </div>
-                        <div class="metric-help">All compensation changes: merit, equity, and market adjustments.</div>
+                        <div class="metric-help" aria-live="polite">All compensation changes: merit, equity, and market adjustments.</div>
                     </div>
                 </div>
             </section>
