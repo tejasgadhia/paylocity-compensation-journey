@@ -1063,7 +1063,7 @@ function updateAllDisplays() {
     updateStory();
     updateMainChartData();  // #150: Use update() instead of destroy/rebuild for better performance
     if (charts.projection) {
-        buildProjectionChart();
+        updateProjectionChartData();  // #150: Use update() for better performance
         buildProjectionTable();
     }
 }
