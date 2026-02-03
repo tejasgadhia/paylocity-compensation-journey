@@ -4348,13 +4348,27 @@
             font-weight: bold;
         }
 
+        /* #77: Benchmark disclaimer - upgraded to story-insight pattern */
         .benchmark-disclaimer {
-            margin-top: 0.75rem;
-            padding-top: 0.75rem;
-            border-top: 1px dashed var(--border-color);
+            margin-top: var(--space-6);
+            padding: var(--space-4) var(--space-5);
+            background: var(--color-info-muted);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
             font-size: var(--font-size-sm);
-            color: var(--text-muted);
-            font-style: italic;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .benchmark-disclaimer-label {
+            font-family: var(--font-mono);
+            font-size: var(--font-size-xs);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-info);
+            display: block;
+            margin-bottom: var(--space-2);
+            font-weight: 600;
         }
 
         /* Market Footnote (#147) */
@@ -4908,7 +4922,8 @@ History
                                 </div>
                             </details>
                             <div class="benchmark-disclaimer">
-                                <strong>Important Limitations:</strong> Benchmarks are derived from
+                                <span class="benchmark-disclaimer-label">Important Limitations</span>
+                                Benchmarks are derived from
                                 <strong>United States</strong> B2B SaaS market data (2023-2024), primarily
                                 from major tech hubs. Individual compensation varies significantly by:
                                 <ul style="margin-top: var(--space-2); padding-left: var(--space-5);">
