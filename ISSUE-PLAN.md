@@ -1,8 +1,8 @@
 # Issue Plan - Paylocity Compensation Journey
 
-**Updated**: 2026-02-02 (refreshed after Phase 1 completion)
-**Total Issues**: 22 open
-**Priority Breakdown**: 4 HIGH, 10 MED, 8 LOW
+**Updated**: 2026-02-03 (refreshed after #150 completion)
+**Total Issues**: 19 open
+**Priority Breakdown**: 2 HIGH, 7 MED, 10 LOW
 
 ---
 
@@ -23,34 +23,26 @@
 | Analytics Tab | #88, #89, #121, #137, #138 | ✅ closed |
 | Story/Home Tab | #69, #70, #71, #73 | ✅ closed |
 | **Critical Security & Legal** | **#141, #140, #142** | ✅ **closed** |
+| **Phase 1: Landing Page Polish** | **#154, #103, #119, #155** | ✅ **closed** |
+| **Phase 2: Trust & Transparency** | **#144, #147** | ✅ **closed** |
 
-**Total Closed**: 51 issues
-
----
-
-## Phase 2: Trust & Transparency ← NEXT
-
-| Issue | Title | Effort | Priority | Status |
-|-------|-------|--------|----------|--------|
-| #144 | Prove privacy claims with verifiable transparency | easy | 🔴 HIGH | pending |
-| #147 | Add benchmark data sources and provenance | med | 🔴 HIGH | pending |
-
-**Estimated**: ~2-3 hours
-**Rationale**: Build credibility - show where data comes from, prove privacy promises. Now HIGH priority after Phase 1 completion.
+**Total Closed**: 58 issues
 
 ---
 
-## Phase 3: User Experience Quick Wins
+## Phase 3: User Experience Quick Wins ← NEXT
 
 | Issue | Title | Effort | Priority | Status |
 |-------|-------|--------|----------|--------|
-| #150 | Use Chart.js update() instead of destroy/rebuild | easy | 🟡 MED | pending |
-| #154 | Add user feedback and bug reporting mechanisms | easy | 🟡 MED | pending |
-| #155 | Rewrite value proposition with specific pain points | easy | 🟡 MED | pending |
 | #157 | Refactor Import Modal middle section to reduce visual noise | med | 🟡 MED | pending |
 
-**Estimated**: ~3-5 hours
-**Rationale**: High-impact wins - performance, feedback loop, clearer messaging, modal UX
+**Estimated**: ~1-2 hours (1 issue remaining)
+**Rationale**: High-impact wins - performance and modal UX
+
+**Completed in Phase 3:**
+- ✅ #154 - User feedback mechanism (closed)
+- ✅ #155 - Value proposition rewrite (closed)
+- ✅ #150 - Chart.js update() optimization (closed)
 
 ---
 
@@ -103,16 +95,18 @@
 
 ---
 
-## Phase 8: Global Typography & Navigation
+## Phase 8: Global Typography
 
 | Issue | Title | Effort | Priority | Status |
 |-------|-------|--------|----------|--------|
 | #75 | Numbers in monospace font stand out too much | easy | 🟢 LOW | pending |
 | #76 | Link text is barely distinguished | easy | 🟢 LOW | pending |
-| #103 | Navigation numbers have no clear purpose | easy | 🟢 LOW | pending |
 
-**Estimated**: ~1 hour
+**Estimated**: ~30 min (1 issue closed)
 **Rationale**: Cross-cutting typography fixes
+
+**Completed:**
+- ✅ #103 - Navigation numbers removed (closed)
 
 ---
 
@@ -120,11 +114,13 @@
 
 | Issue | Title | Effort | Priority | Status |
 |-------|-------|--------|----------|--------|
-| #119 | Before/After labels in browser preview look out of place | easy | 🟢 LOW | pending |
 | #122 | CJ logo/icon in header needs improvement | med | 🟢 LOW | pending |
 
-**Estimated**: ~1-2 hours
+**Estimated**: ~1-2 hours (1 issue closed)
 **Rationale**: Landing page refinements
+
+**Completed:**
+- ✅ #119 - Before/After labels removed (closed)
 
 ---
 
@@ -147,25 +143,22 @@
 
 | Priority | Count | Phases |
 |----------|-------|--------|
-| 🔴 HIGH | 4 | Phase 2 (2), Deferred (2) |
-| 🟡 MED | 10 | Phases 3-5 (product improvements) |
-| 🟢 LOW | 8 | Phases 6-9 (polish) |
+| 🔴 HIGH | 2 | Deferred (2 hard tasks needing user data) |
+| 🟡 MED | 7 | Phases 3-5 (product improvements) |
+| 🟢 LOW | 10 | Phases 6-9 (polish) |
 | Deferred | 6 | Hard tasks (2 HIGH, 2 MED, 2 LOW) |
 
 ---
 
 ## Quick Reference
 
-**Phase 2 (Trust & Transparency) - START HERE:**
-- #144 (privacy transparency, easy), #147 (benchmark sources, med)
+**Phase 3 (User Experience Quick Wins) - START HERE:**
+- #157 (Import Modal, med)
 
 **Easy wins (< 1 hour each):**
-- High: #144
-- Medium: #150, #154, #155
-- Polish: #77, #78, #80, #81, #139, #75, #76, #103, #119
+- Polish: #77, #78, #80, #81, #139, #75, #76
 
 **Medium effort (1-4 hours):**
-- High: #147
 - Product: #149, #151, #152, #153, #157
 - Polish: #122
 
@@ -178,13 +171,13 @@
 
 ## Recommended Path
 
-1. **This week**: Phase 2 (trust, ~2-3hrs) → Phase 3 (quick wins, ~3-5hrs)
-2. **Next week**: Phase 4 (demo/onboarding, ~4-6hrs) → Phase 5 (performance, ~2-4hrs)
-3. **Later**: Phases 6-9 (polish, ~4-6hrs total) as time allows
+1. **Now**: Phase 3 (1 remaining issue, ~1-2hrs)
+2. **This week**: Phase 4 (demo/onboarding, ~4-6hrs) → Phase 5 (performance, ~2-4hrs)
+3. **Next week**: Phases 6-9 (polish, ~3-5hrs total) as time allows
 4. **After user feedback**: Tackle deferred HIGH issues (#145, #146)
 
-**Next step**: "Let's start Phase 2" or "Let's tackle #144"
+**Next step**: "Let's tackle #157" or "Let's start Phase 4"
 
 ---
 
-*Plan updated 2026-02-02 after Phase 1 completion. Re-run `/tg-issues` to refresh.*
+*Plan updated 2026-02-03 after Phase 2 completion. Re-run `/tg-issues` to refresh.*
