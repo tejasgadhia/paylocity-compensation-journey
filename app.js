@@ -34,6 +34,8 @@ import {
     updateChartTheme,
     updateMainChartType,
     updateYoyChartType,
+    updateMainChartData,
+    updateYoyChartData,
     buildMainChart,
     buildYoyChart,
     buildProjectionChart,
@@ -1059,7 +1061,7 @@ function updateAllDisplays() {
     buildHistoryTable();
     updateAnalytics();
     updateStory();
-    buildMainChart();
+    updateMainChartData();  // #150: Use update() instead of destroy/rebuild for better performance
     if (charts.projection) {
         buildProjectionChart();
         buildProjectionTable();

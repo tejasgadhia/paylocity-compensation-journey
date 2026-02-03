@@ -20,7 +20,7 @@
     <!-- Open Graph meta tags for social sharing (#125) -->
     <meta property="og:title" content="Compensation Journey - Visualize Your Paylocity Data">
     <meta property="og:description" content="Transform your Paylocity pay history into beautiful charts, growth analytics, and future projections. 100% private - data never leaves your device.">
-    <meta property="og:image" content="https://tejasgadhia.github.io/paylocity-compensation-journey/assets/og-image.png">
+    <meta property="og:image" content="https://tejasgadhia.github.io/paylocity-compensation-journey/assets/og-image.webp">
     <meta property="og:url" content="https://tejasgadhia.github.io/paylocity-compensation-journey/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Compensation Journey">
@@ -29,7 +29,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Compensation Journey - Visualize Your Paylocity Data">
     <meta name="twitter:description" content="Transform your Paylocity pay history into charts, analytics, and projections. 100% private.">
-    <meta name="twitter:image" content="https://tejasgadhia.github.io/paylocity-compensation-journey/assets/og-image.png">
+    <meta name="twitter:image" content="https://tejasgadhia.github.io/paylocity-compensation-journey/assets/og-image.webp">
 
     <!-- Chart.js self-hosted, lazy-loaded dynamically when needed for faster landing page -->
     <style>
@@ -37,47 +37,48 @@
            SELF-HOSTED FONTS (Closes #33)
            ======================================== */
 
+        /* #149: Fonts optimized to WOFF2 (80% size reduction: 531KB → 104KB) */
         @font-face {
             font-family: 'JetBrains Mono';
             font-style: normal;
             font-weight: 400;
             font-display: swap;
-            src: url('assets/fonts/jetbrains-mono-400.ttf') format('truetype');
+            src: url('assets/fonts/jetbrains-mono-400.woff2') format('woff2');
         }
         @font-face {
             font-family: 'JetBrains Mono';
             font-style: normal;
             font-weight: 600;
             font-display: swap;
-            src: url('assets/fonts/jetbrains-mono-600.ttf') format('truetype');
+            src: url('assets/fonts/jetbrains-mono-600.woff2') format('woff2');
         }
         @font-face {
             font-family: 'JetBrains Mono';
             font-style: normal;
             font-weight: 700;
             font-display: swap;
-            src: url('assets/fonts/jetbrains-mono-700.ttf') format('truetype');
+            src: url('assets/fonts/jetbrains-mono-700.woff2') format('woff2');
         }
         @font-face {
             font-family: 'Space Grotesk';
             font-style: normal;
             font-weight: 400;
             font-display: swap;
-            src: url('assets/fonts/space-grotesk-400.ttf') format('truetype');
+            src: url('assets/fonts/space-grotesk-400.woff2') format('woff2');
         }
         @font-face {
             font-family: 'Space Grotesk';
             font-style: normal;
             font-weight: 600;
             font-display: swap;
-            src: url('assets/fonts/space-grotesk-600.ttf') format('truetype');
+            src: url('assets/fonts/space-grotesk-600.woff2') format('woff2');
         }
         @font-face {
             font-family: 'Space Grotesk';
             font-style: normal;
             font-weight: 700;
             font-display: swap;
-            src: url('assets/fonts/space-grotesk-700.ttf') format('truetype');
+            src: url('assets/fonts/space-grotesk-700.woff2') format('woff2');
         }
     </style>
     <!-- Image Comparison Slider (self-hosted) -->
@@ -2213,7 +2214,7 @@
         /* #72: Inline chart controls positioned inside chart area */
         .chart-controls-inline {
             position: absolute;
-            top: var(--space-2);
+            top: var(--space-4);  /* #139: Increased from var(--space-2) to prevent overlap with data line */
             right: var(--space-2);
             z-index: 10;
         }
