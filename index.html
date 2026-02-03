@@ -1383,6 +1383,19 @@
             color: var(--color-brand);
         }
 
+        .feedback-link-container {
+            margin-top: var(--space-4);
+            padding-top: var(--space-3);
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .feedback-link {
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
         /* ===== BUTTON SYSTEM (#105) ===== */
         /*
          * Unified button system with 3 semantic levels:
@@ -4558,10 +4571,6 @@
                                 <span id="browserUrl">tejasgadhia.github.io/paylocity-compensation-journey</span>
                             </div>
                         </div>
-                        <div class="slider-labels">
-                            <span class="slider-label before">Before</span>
-                            <span class="slider-label after">After</span>
-                        </div>
                         <div class="browser-content">
                             <img-comparison-slider id="comparisonSlider">
                                 <!-- Before: Paylocity raw data -->
@@ -4587,6 +4596,14 @@
                 <strong>Legal Notice:</strong> This tool is not affiliated with, endorsed by, or supported by Paylocity.
                 Use of this tool with Paylocity data is at your own risk. Review Paylocity's Terms of Service before proceeding.
                 By using this tool, you accept full responsibility for ensuring compliance with applicable terms and policies.
+            </p>
+            <p class="feedback-link-container">
+                <a href="https://github.com/tejasgadhia/paylocity-compensation-journey/issues/new?labels=bug&template=bug_report.md"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="feedback-link">
+                    Report a bug or request a feature →
+                </a>
             </p>
         </footer>
     </div>
@@ -4701,13 +4718,13 @@ History
         <!-- TAB NAVIGATION -->
         <nav class="tabs-nav" aria-label="Dashboard sections">
             <div class="tabs-header" role="tablist">
-                <button class="tab-btn active" id="tab-btn-home" data-tab="home" role="tab" aria-selected="true" aria-controls="tab-home">Home<span class="tab-shortcut" aria-hidden="true">1</span></button>
-                <button class="tab-btn" id="tab-btn-story" data-tab="story" role="tab" aria-selected="false" aria-controls="tab-story">Story<span class="tab-shortcut" aria-hidden="true">2</span></button>
-                <button class="tab-btn" id="tab-btn-market" data-tab="market" role="tab" aria-selected="false" aria-controls="tab-market">Market<span class="tab-shortcut" aria-hidden="true">3</span></button>
-                <button class="tab-btn" id="tab-btn-history" data-tab="history" role="tab" aria-selected="false" aria-controls="tab-history">History<span class="tab-shortcut" aria-hidden="true">4</span></button>
-                <button class="tab-btn" id="tab-btn-analytics" data-tab="analytics" role="tab" aria-selected="false" aria-controls="tab-analytics">Analytics<span class="tab-shortcut" aria-hidden="true">5</span></button>
-                <button class="tab-btn" id="tab-btn-projections" data-tab="projections" role="tab" aria-selected="false" aria-controls="tab-projections">Projections<span class="tab-shortcut" aria-hidden="true">6</span></button>
-                <button class="tab-btn" id="tab-btn-help" data-tab="help" role="tab" aria-selected="false" aria-controls="tab-help">Help<span class="tab-shortcut" aria-hidden="true">7</span></button>
+                <button class="tab-btn active" id="tab-btn-home" data-tab="home" role="tab" aria-selected="true" aria-controls="tab-home">Home</button>
+                <button class="tab-btn" id="tab-btn-story" data-tab="story" role="tab" aria-selected="false" aria-controls="tab-story">Story</button>
+                <button class="tab-btn" id="tab-btn-market" data-tab="market" role="tab" aria-selected="false" aria-controls="tab-market">Market</button>
+                <button class="tab-btn" id="tab-btn-history" data-tab="history" role="tab" aria-selected="false" aria-controls="tab-history">History</button>
+                <button class="tab-btn" id="tab-btn-analytics" data-tab="analytics" role="tab" aria-selected="false" aria-controls="tab-analytics">Analytics</button>
+                <button class="tab-btn" id="tab-btn-projections" data-tab="projections" role="tab" aria-selected="false" aria-controls="tab-projections">Projections</button>
+                <button class="tab-btn" id="tab-btn-help" data-tab="help" role="tab" aria-selected="false" aria-controls="tab-help">Help</button>
             </div>
         </nav>
 
