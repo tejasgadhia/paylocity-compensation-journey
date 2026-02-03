@@ -2099,16 +2099,13 @@
         }
 
         .metric-value {
-            font-family: var(--font-mono);
+            font-family: var(--font-display);
             font-size: var(--font-size-2xl);
             font-weight: 700;
             color: var(--text-primary);
             line-height: 1.2;
             flex-shrink: 0;
-        }
-
-        [data-theme="artistic"] .metric-value {
-            font-family: var(--font-display);
+            font-variant-numeric: tabular-nums;  /* #75: Keep column alignment */
         }
 
         .metric-value.highlight {
@@ -2978,12 +2975,9 @@
         .data-table td {
             padding: var(--space-4);
             border-bottom: 1px solid var(--border-color);
-            font-family: var(--font-mono);
-            color: var(--text-primary);
-        }
-
-        [data-theme="artistic"] .data-table td {
             font-family: var(--font-body);
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;  /* #75: Keep column alignment */
         }
 
         /* #84: Row hover state */
@@ -3104,13 +3098,10 @@
             font-size: var(--font-size-2xl);
             font-weight: 700;
             color: var(--text-primary);
-            font-family: var(--font-mono);
+            font-family: var(--font-display);
             line-height: 1.2;
             flex-shrink: 0;
-        }
-
-        [data-theme="artistic"] .analytics-card-value {
-            font-family: var(--font-display);
+            font-variant-numeric: tabular-nums;  /* #75: Keep column alignment */
         }
 
         /* #138: Detail text now sits beside value */
