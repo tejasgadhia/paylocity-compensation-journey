@@ -77,18 +77,36 @@ Save as JSON to your computer if you want. Load it later. That's it.
 
 Fair. Here's how to verify this tool is truly private:
 
-**Download for offline use:**
+**Quick verification (2 minutes):**
+1. Open the app in your browser
+2. Press `F12` (or `Cmd+Option+I` on Mac) to open DevTools
+3. Click the **Network** tab
+4. Clear existing requests (trash icon)
+5. Import your Paylocity data and interact with the dashboard
+6. **Expected result**: Zero new network requests after initial page load
+
+**Thorough verification (offline test):**
 1. Click the **"Download this tool"** button on the splash screen (or right-click → Save Page As)
 2. **Disconnect from the internet** (turn off Wi-Fi, unplug ethernet)
 3. **Open the downloaded HTML file** in your browser
 4. **Paste your Paylocity data** and generate your dashboard
+5. **If it works offline, nothing was sent to a server**
 
-The tool works entirely offline. Open your browser's DevTools (F12) → **Network tab** → you'll see zero outgoing requests after the initial page load.
+**Audit the source code:**
+- **View on GitHub**: [Source code](https://github.com/tejasgadhia/paylocity-compensation-journey) — all code is public and unminified
+- **Search for network calls**: Run these commands (if cloned locally):
+  ```bash
+  grep -r "fetch(" .
+  grep -r "XMLHttpRequest" .
+  grep -r "navigator.sendBeacon" .
+  ```
+  **Expected result**: Zero matches in application code
+- **Files to review**: `app.js`, `js/parser.js`, `js/charts.js`, `js/calculations.js`, `js/security.js`
 
-**Verify the code:**
-- **Inspect the source**: The code is split into modular JS files (`app.js`, `js/*.js`)
-- **Check network activity**: No API calls, no tracking, no external requests (except Chart.js CDN on initial load)
-- **Audit it yourself**: The code is unminified and readable—search for `fetch(`, `XMLHttpRequest`, or `navigator.sendBeacon` to confirm no data leaves your browser
+**Read detailed verification guides:**
+- **Privacy Audit Checklist**: [SECURITY.md Privacy Audit Checklist](SECURITY.md#privacy-audit-checklist) — Step-by-step verification instructions
+- **Network Monitoring Guide**: [SECURITY.md Network Monitoring](SECURITY.md#network-monitoring-guide) — Real-time monitoring for paranoid users (DevTools, system-level, proxy methods)
+- **Third-Party Audits**: [Audit Status](SECURITY.md#third-party-audit-status) — Current status and how to commission an independent audit
 
 **Privacy promise**: Your salary data never touches a server. It processes in your browser tab and disappears when you close it (unless you explicitly save it).
 

@@ -141,6 +141,257 @@ export function validateTemplateData(data) {
 - ✅ Rejects executable code
 - ✅ Additional safety layer for template strings
 
+## Privacy Audit Checklist
+
+Follow these steps to independently verify our privacy claims:
+
+### 1. Network Activity Audit (DevTools)
+
+**Easiest method** — Real-time monitoring:
+
+1. Open the app in your browser
+2. Press `F12` (or `Cmd+Option+I` on Mac) to open DevTools
+3. Click the **Network** tab
+4. Clear existing requests (trash icon)
+5. Import your Paylocity data and interact with the dashboard
+6. **Expected result**: Zero new network requests after initial page load
+
+**What you should NOT see**:
+- No POST/PUT requests to external servers
+- No analytics beacons (Google Analytics, Mixpanel, etc.)
+- No tracking pixels
+- No API calls to backend services
+
+**What you WILL see**:
+- Initial page load (HTML, CSS, JS, fonts)
+- Requests to `blob:` URLs (Chart.js generated images for download)
+- That's it!
+
+### 2. Code Audit (Search for Network APIs)
+
+**For technical users** — Verify source code contains no network calls:
+
+1. Visit [GitHub repository](https://github.com/tejasgadhia/paylocity-compensation-journey)
+2. Use GitHub's code search or clone locally
+3. Search for these JavaScript network APIs:
+
+```bash
+# Commands to run in terminal (if cloned locally):
+grep -r "fetch(" .
+grep -r "XMLHttpRequest" .
+grep -r "navigator.sendBeacon" .
+grep -r "axios" .
+grep -r "\.ajax" .
+```
+
+**Expected result**: Zero matches in application code (only in comments/documentation)
+
+**Files to check**:
+- `app.js` — Main application logic
+- `js/parser.js` — Data parsing
+- `js/charts.js` — Chart rendering
+- `js/calculations.js` — Financial calculations
+- `js/security.js` — Input validation
+
+### 3. Storage Audit (What's Stored Locally)
+
+**Check localStorage** — Only theme preference is stored:
+
+1. Open DevTools → **Application** tab
+2. Expand **Local Storage** → Select the app's origin
+3. **Expected contents**:
+   - `theme`: `"tactical"` or `"artistic"`
+   - Nothing else (no salary data, no user info)
+
+**Verify**:
+- No cookies set (check **Cookies** section)
+- No IndexedDB databases created
+- No session storage used
+
+### 4. Offline Test (Proof of Client-Side Only)
+
+**Ultimate verification** — Works without internet:
+
+1. Right-click the page → **Save Page As** → Save complete webpage
+2. Disconnect from the internet (turn off WiFi, unplug ethernet)
+3. Open the saved HTML file in your browser
+4. Import your Paylocity data
+5. **Expected result**: Everything works perfectly offline
+
+**Why this matters**: If the app needed to send data anywhere, it would fail without internet. The fact that it works completely offline proves all processing is local.
+
+### 5. Third-Party Security Scan
+
+**Independent verification** — Use automated security tools:
+
+**Option A: OWASP ZAP (Free)**
+1. Install [OWASP ZAP](https://www.zaproxy.org/)
+2. Configure ZAP as a proxy
+3. Browse the app through ZAP
+4. Check for unexpected network requests
+
+**Option B: Mozilla Observatory**
+1. Visit [Mozilla Observatory](https://observatory.mozilla.org/)
+2. Scan the deployed URL
+3. Review security headers and CSP policy
+
+**Option C: Browser Extensions**
+- **uBlock Origin**: Shows blocked requests in real-time
+- **Privacy Badger**: Detects tracking attempts
+- **NoScript**: See which scripts are loaded
+
+## Network Monitoring Guide
+
+For paranoid users who want real-time proof:
+
+### Method 1: Browser DevTools (Easiest)
+
+**Step-by-step**:
+1. Open app in Chrome/Firefox/Edge
+2. `F12` → **Network** tab
+3. Filter: Click **All** to see everything
+4. Clear log (trash icon)
+5. Import data and use dashboard
+6. **Watch**: Nothing appears except Chart.js blob URLs
+
+**Tips**:
+- Enable "Preserve log" to keep history across page reloads
+- Filter by **XHR** or **Fetch** to see only AJAX requests (should be empty)
+- Right-click any request → **Copy as cURL** to inspect
+
+### Method 2: System-Level Monitoring (Advanced)
+
+**macOS/Linux** — Monitor all network traffic from your browser:
+
+```bash
+# List all network connections (run while using app)
+lsof -i -P | grep -i "chrome\|firefox"
+
+# Monitor DNS lookups
+sudo tcpdump -i any port 53
+
+# Monitor HTTP/HTTPS traffic
+sudo tcpdump -i any port 80 or port 443 -A
+```
+
+**Expected result**: No traffic after initial page load
+
+**Windows** — Use Resource Monitor:
+1. Press `Win+R` → type `resmon` → Enter
+2. **Network** tab → Find your browser process
+3. Watch **TCP Connections** while using the app
+4. **Expected**: No new connections after page loads
+
+### Method 3: Proxy Monitoring (Most Thorough)
+
+**Using mitmproxy** (intercepts all HTTP/HTTPS):
+
+```bash
+# Install mitmproxy
+pip install mitmproxy
+
+# Start proxy
+mitmproxy
+
+# Configure browser to use proxy (localhost:8080)
+# Install mitmproxy CA certificate
+# Use the app and watch proxy logs
+```
+
+**Expected result**: Only initial page load, no subsequent requests
+
+**Alternative**: Charles Proxy, Fiddler, Burp Suite (all free versions available)
+
+### What You Should See
+
+**Normal behavior**:
+- Initial page load: HTML, CSS, JavaScript, fonts, Chart.js library
+- Subsequent interactions: **Nothing**
+- Chart downloads: `blob:` URLs (browser-generated, not network requests)
+
+**Red flags** (if you see these, something is wrong):
+- POST/PUT/PATCH requests to external domains
+- Requests to analytics domains (google-analytics.com, mixpanel.com, etc.)
+- Requests to CDNs after initial load
+- DNS lookups for unknown domains
+- WebSocket connections
+
+### Common Questions
+
+**Q: I see Chart.js requests on initial load. Is that okay?**
+A: Yes! Chart.js is self-hosted (served from this domain with SRI hash). After initial load, no more Chart.js requests occur.
+
+**Q: The page refreshes and makes new requests. Is data being sent?**
+A: No. Browser refreshes reload the page (HTML/CSS/JS), but your imported data stays in browser memory and is NOT sent anywhere.
+
+**Q: I see `blob:` URLs in Network tab. What are those?**
+A: Blob URLs are browser-generated temporary URLs for downloads (e.g., saving charts as images). They're created locally and never sent to a server.
+
+**Q: What about DNS lookups?**
+A: Initial page load may cause DNS lookups to resolve the domain. After that, no new DNS lookups should occur because there are no network requests.
+
+**Q: Does Content Security Policy guarantee privacy?**
+A: CSP blocks unauthorized network requests at the browser level. Even if malicious code existed, the browser would block it. Check CSP header in DevTools → Network → select page → Headers tab → Look for `Content-Security-Policy`.
+
+## Third-Party Audit Status
+
+### Current Status
+**Self-audited** — No paid third-party security audit has been commissioned.
+
+**Why**: This is an open-source personal tool. Professional security audits cost $5,000-$20,000 and are typically commissioned by companies with budgets.
+
+### How to Commission an Audit
+
+If you or your organization want an independent audit:
+
+1. **Choose a security firm**:
+   - [Trail of Bits](https://www.trailofbits.com/)
+   - [NCC Group](https://www.nccgroup.com/)
+   - [Cure53](https://cure53.de/)
+   - [Bishop Fox](https://bishopfox.com/)
+
+2. **Scope the audit**:
+   - Privacy verification (no data exfiltration)
+   - XSS/injection vulnerability testing
+   - CSP effectiveness
+   - localStorage security
+   - Supply chain analysis (Chart.js dependency)
+
+3. **Share results publicly**:
+   - If you commission an audit, please share findings via GitHub Issues
+   - We'll link the report here and address any findings
+
+### What Should Be Audited
+
+**Privacy verification**:
+- [ ] Confirm zero network requests after initial load
+- [ ] Verify no data leaves browser (network monitoring)
+- [ ] Test offline functionality works as claimed
+- [ ] Inspect all JavaScript for hidden network calls
+- [ ] Verify CSP blocks all external connections
+
+**Security testing**:
+- [ ] XSS injection attempts (user input fields)
+- [ ] Template injection attacks
+- [ ] localStorage manipulation attacks
+- [ ] Supply chain analysis (Chart.js integrity)
+- [ ] Browser compatibility security (Safari, Firefox, Chrome)
+
+**Transparency verification**:
+- [ ] Confirm source code on GitHub matches deployed version
+- [ ] Verify no obfuscation or hidden functionality
+- [ ] Check all external links are properly disclosed
+
+### Invitation to Share Results
+
+**If you perform an independent security audit** (whether formal or informal):
+1. Open a GitHub Issue titled "Security Audit Results"
+2. Share methodology, tools used, and findings
+3. We'll link to your report in this document
+4. Community benefits from independent verification
+
+**Responsible Disclosure**: If you discover vulnerabilities, please follow our [responsible disclosure process](#reporting-a-vulnerability) before public disclosure.
+
 ## Verification
 
 ### XSS Test Cases

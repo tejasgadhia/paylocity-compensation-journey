@@ -2088,6 +2088,47 @@ function initEventListeners() {
         });
     }
 
+    // Footer Security & Privacy link (#144)
+    const footerSecurityLink = document.getElementById('footerSecurityLink');
+    if (footerSecurityLink) {
+        footerSecurityLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            setTab('tab-help');
+            setTimeout(() => {
+                const securitySection = document.getElementById('security-privacy-section');
+                if (securitySection) {
+                    securitySection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }, 100); // Small delay to ensure tab is rendered
+        });
+    }
+
+    // Import modal "How to verify" link (#144)
+    const importModalVerifyLink = document.getElementById('importModalVerifyLink');
+    if (importModalVerifyLink) {
+        importModalVerifyLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const modal = document.getElementById('importModal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('visible');
+            }
+            setTab('tab-help');
+            setTimeout(() => {
+                const securitySection = document.getElementById('security-privacy-section');
+                if (securitySection) {
+                    securitySection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }, 100);
+        });
+    }
+
     // JSON file input
     const jsonFileInput = document.getElementById('jsonFileInput');
     if (jsonFileInput) {
