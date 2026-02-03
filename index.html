@@ -37,47 +37,49 @@
            SELF-HOSTED FONTS (Closes #33)
            ======================================== */
 
-        /* #149: Fonts optimized to WOFF2 (80% size reduction: 531KB → 104KB) */
+        /* #149: Font loading optimized for initial page load performance
+         * Critical fonts (swap): Load immediately, needed on landing page
+         * Deferred fonts (optional): Only load if dashboard is shown, saves ~35KB initial load
+         */
+
+        /* Critical: JetBrains Mono 400 & 600 for landing page labels */
         @font-face {
             font-family: 'JetBrains Mono';
             font-style: normal;
             font-weight: 400;
-            font-display: swap;
+            font-display: swap;  /* Critical for landing page */
             src: url('assets/fonts/jetbrains-mono-400.woff2') format('woff2');
         }
         @font-face {
             font-family: 'JetBrains Mono';
             font-style: normal;
             font-weight: 600;
-            font-display: swap;
+            font-display: swap;  /* Critical for landing page */
             src: url('assets/fonts/jetbrains-mono-600.woff2') format('woff2');
         }
-        @font-face {
-            font-family: 'JetBrains Mono';
-            font-style: normal;
-            font-weight: 700;
-            font-display: swap;
-            src: url('assets/fonts/jetbrains-mono-700.woff2') format('woff2');
-        }
+        /* JetBrains Mono 700 removed - unused weight, saves ~21KB */
+
+        /* Critical: Space Grotesk 400 for landing page body text */
         @font-face {
             font-family: 'Space Grotesk';
             font-style: normal;
             font-weight: 400;
-            font-display: swap;
+            font-display: swap;  /* Critical for landing page */
             src: url('assets/fonts/space-grotesk-400.woff2') format('woff2');
         }
+        /* Deferred: Space Grotesk 600 & 700 only needed in dashboard */
         @font-face {
             font-family: 'Space Grotesk';
             font-style: normal;
             font-weight: 600;
-            font-display: swap;
+            font-display: optional;  /* #149: Deferred until dashboard loads */
             src: url('assets/fonts/space-grotesk-600.woff2') format('woff2');
         }
         @font-face {
             font-family: 'Space Grotesk';
             font-style: normal;
             font-weight: 700;
-            font-display: swap;
+            font-display: optional;  /* #149: Deferred until dashboard loads */
             src: url('assets/fonts/space-grotesk-700.woff2') format('woff2');
         }
     </style>
