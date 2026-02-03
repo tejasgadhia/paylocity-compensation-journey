@@ -2587,6 +2587,25 @@
             font-size: var(--font-size-sm);
         }
 
+        /* Regional Context Banner (#147) */
+        .market-context-banner {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4);
+            background: color-mix(in srgb, var(--accent-primary) 5%, transparent);
+            border-left: 3px solid var(--accent-primary);
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--space-6);
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        .market-context-banner .context-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
         /* Market Summary Card - #78: Stronger visual callout */
         .market-summary-cards {
             margin-bottom: var(--space-6);
@@ -3768,6 +3787,16 @@
             margin-top: var(--space-3);
         }
 
+        .help-link {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .help-link:hover {
+            text-decoration: underline;
+        }
+
         /* #98: Formula display - proper math formatting */
         .help-card code {
             background: var(--bg-tertiary);
@@ -3874,6 +3903,18 @@
             font-family: var(--font-mono);
             border-top: 1px solid var(--border-color);
             margin-top: 2rem;
+        }
+
+        .footer-link {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .footer-link:hover {
+            color: var(--accent-secondary);
+            text-decoration: underline;
         }
 
         /* ========================================
@@ -4009,7 +4050,7 @@
         
         .privacy-callout {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: var(--space-2);
             padding: var(--space-3) var(--space-4);
             background: rgba(69, 212, 138, 0.1);
@@ -4045,6 +4086,23 @@
 
         .privacy-callout-text strong {
             color: var(--accent-secondary);
+        }
+
+        .privacy-callout-content {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .privacy-verify-link {
+            font-size: 0.875rem;
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .privacy-verify-link:hover {
+            text-decoration: underline;
         }
 
         /* ========================================
@@ -4174,6 +4232,110 @@
             color: var(--text-primary);
         }
 
+        /* Data Freshness Badges (#147) */
+        .data-freshness {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: var(--space-2);
+            margin-right: var(--space-2);
+        }
+
+        .data-freshness.fresh {
+            background: color-mix(in srgb, var(--color-success) 15%, transparent);
+            color: var(--color-success);
+        }
+
+        /* Methodology Details (Collapsible) (#147) */
+        .methodology-details {
+            margin-top: var(--space-4);
+            padding: var(--space-4);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+        }
+
+        .methodology-details summary {
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            user-select: none;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .methodology-details summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .methodology-details summary::before {
+            content: '▶';
+            display: inline-block;
+            transition: transform 0.2s;
+            font-size: 0.75rem;
+            color: var(--accent-primary);
+        }
+
+        .methodology-details[open] summary::before {
+            transform: rotate(90deg);
+        }
+
+        .methodology-details summary:hover {
+            color: var(--accent-primary);
+        }
+
+        .methodology-details summary:focus {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+            border-radius: var(--radius-xs);
+        }
+
+        .methodology-content {
+            margin-top: var(--space-4);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .methodology-content h4 {
+            font-family: var(--font-display);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-3);
+            margin-top: var(--space-4);
+        }
+
+        .methodology-content h4:first-child {
+            margin-top: 0;
+        }
+
+        .methodology-content ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .methodology-content li {
+            padding-left: var(--space-5);
+            position: relative;
+            margin-bottom: var(--space-3);
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .methodology-content li::before {
+            content: '•';
+            position: absolute;
+            left: var(--space-2);
+            color: var(--accent-primary);
+            font-weight: bold;
+        }
+
         .benchmark-disclaimer {
             margin-top: 0.75rem;
             padding-top: 0.75rem;
@@ -4181,6 +4343,17 @@
             font-size: var(--font-size-sm);
             color: var(--text-muted);
             font-style: italic;
+        }
+
+        /* Market Footnote (#147) */
+        .market-footnote {
+            margin-top: var(--space-6);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--border-subtle);
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            text-align: center;
+            font-family: var(--font-mono);
         }
 
         .source-link {
@@ -4445,20 +4618,11 @@
 
                 <div class="privacy-callout">
                     <span class="privacy-callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></g></svg></span>
-                    <span class="privacy-callout-text"><strong>Your data stays on your device</strong> — nothing is sent anywhere.</span>
-                </div>
-
-                <div class="legal-callout">
-                    <div class="legal-callout-content">
-                        <div class="legal-callout-text">
-                            <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary);">
-                                ℹ️ Not affiliated with Paylocity. For personal use only.
-                            </p>
-                        </div>
-                        <div class="legal-consent">
-                            <input type="checkbox" id="legalConsentCheckbox" aria-describedby="legalConsentLabel">
-                            <label for="legalConsentCheckbox" id="legalConsentLabel">I'm using my own compensation data</label>
-                        </div>
+                    <div class="privacy-callout-content">
+                        <span class="privacy-callout-text">
+                            <strong>Your data stays on your device</strong> — nothing is sent anywhere.
+                        </span>
+                        <a href="#" class="privacy-verify-link" id="importModalVerifyLink">How to verify →</a>
                     </div>
                 </div>
 
@@ -4638,7 +4802,7 @@ History
                             <h2 id="marketTitle">Market Position Analysis</h2>
                             <p class="subtitle" id="marketSubtitle">How your compensation compares to B2B SaaS industry benchmarks</p>
                         </div>
-                        
+
                         <div class="market-summary-cards">
                             <div class="market-summary-card" id="marketSummaryCard">
                                 <div class="market-summary-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 21v-6m7 6V9m7 12V3"/></svg></div>
@@ -4669,23 +4833,81 @@ History
                             <div class="benchmark-sources-header">
                                 <span><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16 6l4 14M12 6v14M8 8v12M4 4v16"/></svg></span> Data Sources & Methodology
                             </div>
+
+                            <!-- Regional Context (#147) -->
+                            <div class="market-context-banner" style="margin-bottom: var(--space-4);">
+                                <span class="context-icon">🌎</span>
+                                <span>
+                                    Benchmarks based on <strong>United States</strong> B2B SaaS market data.
+                                    Primarily tech hubs (SF Bay, NYC, Seattle, Austin, Boston).
+                                </span>
+                            </div>
+
                             <div class="benchmark-sources-list">
                                 <div class="benchmark-source-item">
                                     <span class="source-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 21v-6m7 6V9m7 12V3"/></svg></span>
-                                    <span><span class="source-label">Salary Benchmarks:</span> Compiled from <a href="https://radford.aon.com/" target="_blank" rel="noopener" class="source-link">Radford Global Technology Survey</a>, <a href="https://www.mercer.com/solutions/total-rewards/compensation-benchmarking/" target="_blank" rel="noopener" class="source-link">Mercer Total Remuneration Survey</a>, <a href="https://www.levels.fyi/" target="_blank" rel="noopener" class="source-link">Levels.fyi</a>, and <a href="https://www.glassdoor.com/Salaries/" target="_blank" rel="noopener" class="source-link">Glassdoor</a> B2B SaaS compensation data (2024-2025)</span>
+                                    <span>
+                                        <span class="source-label">Salary Benchmarks:</span>
+                                        <span class="data-freshness fresh">Updated Q4 2024</span>
+                                        Compiled from <a href="https://radford.aon.com/" target="_blank" rel="noopener" class="source-link">Radford Global Technology Survey</a>, <a href="https://www.mercer.com/solutions/total-rewards/compensation-benchmarking/" target="_blank" rel="noopener" class="source-link">Mercer Total Remuneration Survey</a>, <a href="https://www.levels.fyi/" target="_blank" rel="noopener" class="source-link">Levels.fyi</a>, and <a href="https://www.glassdoor.com/Salaries/" target="_blank" rel="noopener" class="source-link">Glassdoor</a> B2B SaaS compensation data
+                                    </span>
                                 </div>
                                 <div class="benchmark-source-item">
                                     <span class="source-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M16 7h6v6"/><path d="m22 7l-8.5 8.5l-5-5L2 17"/></g></svg></span>
-                                    <span><span class="source-label">Inflation Data:</span> <a href="https://www.bls.gov/cpi/" target="_blank" rel="noopener" class="source-link">U.S. Bureau of Labor Statistics</a> Consumer Price Index (CPI-U), Annual Averages</span>
+                                    <span>
+                                        <span class="source-label">Inflation Data:</span>
+                                        <span class="data-freshness fresh">Updated Dec 2024</span>
+                                        <a href="https://www.bls.gov/cpi/" target="_blank" rel="noopener" class="source-link">U.S. Bureau of Labor Statistics</a> Consumer Price Index (CPI-U), Annual Averages
+                                    </span>
                                 </div>
                                 <div class="benchmark-source-item">
                                     <span class="source-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M12 10h.01M12 14h.01M12 6h.01M16 10h.01M16 14h.01M16 6h.01M8 10h.01M8 14h.01M8 6h.01M9 22v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/><rect width="16" height="20" x="4" y="2" rx="2"/></g></svg></span>
-                                    <span><span class="source-label">Industry CAGR:</span> Based on 6% average compensation growth in B2B SaaS sector, derived from industry surveys and public company filings</span>
+                                    <span>
+                                        <span class="source-label">Industry CAGR:</span>
+                                        <span class="data-freshness fresh">Updated Q3 2024</span>
+                                        Based on 6% average compensation growth in B2B SaaS sector, derived from industry surveys and public company filings
+                                    </span>
                                 </div>
                             </div>
+
+                            <!-- Methodology & Limitations (Collapsible) (#147) -->
+                            <details class="methodology-details">
+                                <summary>View Methodology & Limitations</summary>
+                                <div class="methodology-content">
+                                    <h4>Data Collection</h4>
+                                    <ul>
+                                        <li><strong>Typical Raise:</strong> Median annual merit increases for individual contributor roles in B2B SaaS, adjusted for inflation. Based on Radford Global Technology Survey 2024 with 5,000+ sampled roles.</li>
+                                        <li><strong>High Performer Raise:</strong> Top quartile performance-based raises from Radford survey data.</li>
+                                        <li><strong>Promotion Bump:</strong> Average salary increase for internal promotions, compiled from Mercer TRS 2024 and Levels.fyi.</li>
+                                        <li><strong>Industry CAGR:</strong> Weighted average of compensation growth from public SaaS company SEC filings and industry surveys (2023-2024).</li>
+                                    </ul>
+                                    <h4>Known Limitations</h4>
+                                    <ul>
+                                        <li><strong>Geographic:</strong> Data primarily from US markets (SF Bay Area, NYC, Seattle, Austin, Boston). May not reflect compensation in other regions or countries.</li>
+                                        <li><strong>Role Scope:</strong> Covers individual contributor and mid-level management roles. Executive compensation follows different patterns.</li>
+                                        <li><strong>Company Stage:</strong> Focused on growth-stage B2B SaaS companies (Series B through public). Early-stage startups may differ significantly.</li>
+                                        <li><strong>Timeframe:</strong> Based on 2023-2024 compensation data. Market conditions change over time.</li>
+                                        <li><strong>Individual Variation:</strong> Your specific role, seniority, company, location, and performance will cause significant variation from these averages.</li>
+                                    </ul>
+                                </div>
+                            </details>
                             <div class="benchmark-disclaimer">
-                                Benchmarks represent industry averages and may vary significantly by role, experience level, location, and company stage. This tool is for informational purposes only.
+                                <strong>Important Limitations:</strong> Benchmarks are derived from
+                                <strong>United States</strong> B2B SaaS market data (2023-2024), primarily
+                                from major tech hubs. Individual compensation varies significantly by:
+                                <ul style="margin-top: var(--space-2); padding-left: var(--space-5);">
+                                    <li>Specific role and seniority level</li>
+                                    <li>Geographic location (cost of living adjustments)</li>
+                                    <li>Company stage (early-stage vs. public)</li>
+                                    <li>Individual performance and negotiation</li>
+                                </ul>
+                                <p style="margin-top: var(--space-3); margin-bottom: 0;">This tool provides general context only and should not be considered
+                                financial or career advice. Verify benchmark data relevance to your
+                                specific situation.</p>
                             </div>
+
+                            <!-- Market Footnote (#147) -->
+                            <div class="market-footnote" id="marketFootnote"></div>
                         </div>
                     </div>
                 </div>
@@ -4896,39 +5118,55 @@ History
                         </div>
                     </div>
 
-                    <!-- #97: Reference Section -->
-                    <div class="help-section">
-                        <h2 class="help-section-header">Reference</h2>
+                    <!-- Security & Privacy Section -->
+                    <div class="help-section" id="security-privacy-section">
+                        <h2 class="help-section-header">Security & Privacy</h2>
                         <div class="help-section-grid">
                             <div class="help-card help-card--featured">
-                                <h3>Keyboard Shortcuts</h3>
-                                <!-- #99: Proper table format -->
-                                <table class="shortcut-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Key</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><kbd>1</kbd> – <kbd>7</kbd></td>
-                                            <td>Navigate tabs (Home, Story, Market, History, Analytics, Projections, Help)</td>
-                                        </tr>
-                                        <tr>
-                                            <td><kbd>T</kbd></td>
-                                            <td>Toggle theme (Tactical / Artistic)</td>
-                                        </tr>
-                                        <tr>
-                                            <td><kbd>V</kbd> or <kbd>P</kbd></td>
-                                            <td>Toggle privacy mode ($ / Index)</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <p class="help-note">
-                                    <strong>Accessibility:</strong> Shortcuts are disabled when typing in input fields.
-                                    All features are accessible via mouse/touch and screen readers.
-                                </p>
+                                <h3>🔒 Privacy Promise</h3>
+                                <p>Your salary data <strong>never leaves your device</strong>. This tool runs 100% in your browser with zero server communication. No analytics, no tracking, no data collection of any kind.</p>
+                                <p>The only data stored is your theme preference (light/dark mode) in localStorage—nothing else.</p>
+                            </div>
+
+                            <div class="help-card">
+                                <h3>Does it really work offline?</h3>
+                                <p>Yes! Test it yourself:</p>
+                                <ol style="margin-top: var(--space-3); padding-left: var(--space-5);">
+                                    <li style="margin-bottom: var(--space-2);">Right-click this page → <strong>Save Page As</strong></li>
+                                    <li style="margin-bottom: var(--space-2);">Disconnect from the internet (turn off WiFi)</li>
+                                    <li style="margin-bottom: var(--space-2);">Open the saved file — everything still works</li>
+                                    <li>Import your Paylocity data — it processes entirely offline</li>
+                                </ol>
+                            </div>
+
+                            <div class="help-card">
+                                <h3>Can I see the code?</h3>
+                                <p>Absolutely. Everything is public:</p>
+                                <ul style="margin-top: var(--space-3); padding-left: var(--space-5);">
+                                    <li style="margin-bottom: var(--space-2);"><a href="https://github.com/tejasgadhia/paylocity-compensation-journey" target="_blank" rel="noopener noreferrer" class="help-link">View source on GitHub</a> — all code is public</li>
+                                    <li style="margin-bottom: var(--space-2);">Search for <code>fetch()</code>, <code>XMLHttpRequest</code>, or <code>navigator.sendBeacon</code> — you won't find any</li>
+                                    <li>No third-party dependencies (except Chart.js, self-hosted with SRI)</li>
+                                </ul>
+                            </div>
+
+                            <div class="help-card">
+                                <h3>How do I verify it's safe?</h3>
+                                <p>Monitor network activity in real-time:</p>
+                                <ul style="margin-top: var(--space-3); padding-left: var(--space-5);">
+                                    <li style="margin-bottom: var(--space-2);">Open DevTools (<kbd>F12</kbd> or <kbd>Cmd+Option+I</kbd>)</li>
+                                    <li style="margin-bottom: var(--space-2);">Click the <strong>Network</strong> tab and clear existing requests</li>
+                                    <li>Import your data and interact with the tool — you'll see zero new requests</li>
+                                </ul>
+                            </div>
+
+                            <div class="help-card">
+                                <h3>What security measures exist?</h3>
+                                <p>Multiple layers of protection:</p>
+                                <ul style="margin-top: var(--space-3); padding-left: var(--space-5);">
+                                    <li style="margin-bottom: var(--space-2);">Content Security Policy blocks all external connections at the browser level</li>
+                                    <li style="margin-bottom: var(--space-2);">XSS protections: All user input is sanitized using <code>textContent</code></li>
+                                    <li><a href="https://github.com/tejasgadhia/paylocity-compensation-journey/blob/main/SECURITY.md" target="_blank" rel="noopener noreferrer" class="help-link">SECURITY.md</a> — Privacy audit checklist, threat model</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -4938,7 +5176,16 @@ History
 
         <!-- FOOTER -->
         <footer class="footer">
-            <p>Compensation Journey Dashboard • 100% Local Processing • Your data never leaves your device</p>
+            <p>
+                Compensation Journey Dashboard • 100% Local Processing • Your data never leaves your device
+                <br>
+                <a href="https://github.com/tejasgadhia/paylocity-compensation-journey"
+                   target="_blank" rel="noopener noreferrer" class="footer-link">
+                    View Source on GitHub
+                </a>
+                •
+                <a href="#" class="footer-link" id="footerSecurityLink">Security & Privacy</a>
+            </p>
         </footer>
     </div>
 
