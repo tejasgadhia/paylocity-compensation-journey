@@ -553,7 +553,21 @@ export function buildProjectionChart() {
                 maintainAspectRatio: false,
                 interaction: { intersect: false, mode: 'index' },
                 plugins: {
-                    legend: { position: 'top', labels: { color: colors.text, padding: 20, font: { family: _state.theme === 'tactical' ? 'JetBrains Mono' : 'Space Grotesk', size: 11 } } },
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            color: colors.text,
+                            padding: 20,
+                            font: { family: _state.theme === 'tactical' ? 'JetBrains Mono' : 'Space Grotesk', size: 11 },
+                            // Hide Optimistic from legend when checkbox is unchecked
+                            filter: (legendItem) => {
+                                if (legendItem.text.includes('Optimistic') && !_state.showOptimistic) {
+                                    return false;
+                                }
+                                return true;
+                            }
+                        }
+                    },
                     tooltip: getTooltipConfig({
                         labelCallback: (ctx) => `${ctx.dataset.label}: $${Math.round(ctx.raw).toLocaleString()}`
                     })
