@@ -196,30 +196,6 @@ function escapeHTML(str) {
 }
 
 /**
- * #149: Debounce function to limit how often a function can fire.
- * Used for projection slider input to prevent chart rebuilds on every pixel of drag.
- *
- * @param {Function} func - Function to debounce
- * @param {number} wait - Milliseconds to wait before executing
- * @returns {Function} Debounced function
- *
- * @example
- * const debouncedUpdate = debounce(updateProjection, 100);
- * slider.addEventListener('input', debouncedUpdate);
- */
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-/**
  * Validates that dynamic data used in HTML templates contains only safe types.
  *
  * Defense-in-depth security check: Ensures template interpolations receive only
