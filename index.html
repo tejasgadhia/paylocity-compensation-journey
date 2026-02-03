@@ -2094,11 +2094,6 @@
             }
         }
 
-        @keyframes helpPulse {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 0.9; }
-        }
-
         .animate-in {
             animation: slideUpFade 0.6s ease forwards;
             opacity: 0;
@@ -2141,19 +2136,7 @@
             border: 1px solid var(--border-color);
             border-radius: var(--radius-card);  /* 8px per #106 */
             padding: var(--space-6);  /* #69: Increased from space-5/space-6 to uniform space-6 (24px) */
-            transition: all var(--transition-speed) ease;
             position: relative;
-            cursor: pointer;
-        }
-
-        .metric-card:focus {
-            outline: 2px solid var(--border-focus);
-            outline-offset: 2px;
-        }
-
-        .metric-card:focus-visible {
-            outline: 2px solid var(--border-focus);
-            outline-offset: 2px;
         }
 
         [data-theme="tactical"] .metric-card {
@@ -2164,13 +2147,6 @@
             box-shadow: var(--shadow-card);
         }
 
-        .metric-card:hover,
-        .metric-card:focus {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-hover);
-            border-color: var(--accent-primary);
-        }
-
         [data-theme="tactical"] .metric-card::before {
             content: '';
             position: absolute;
@@ -2179,14 +2155,6 @@
             right: 0;
             height: 2px;
             background: linear-gradient(90deg, var(--accent-primary), transparent);
-            transition: opacity 0.3s ease;
-            opacity: 0.5;
-        }
-
-        [data-theme="tactical"] .metric-card:hover::before,
-        [data-theme="tactical"] .metric-card:focus::before {
-            opacity: 1;
-            height: 3px;
         }
 
         [data-theme="artistic"] .metric-card::before {
@@ -2207,12 +2175,6 @@
             letter-spacing: 0.1em;
             font-family: var(--font-mono);
             margin-bottom: var(--space-2);
-            transition: color 0.3s ease;
-        }
-
-        .metric-card:hover .metric-label,
-        .metric-card:focus .metric-label {
-            color: var(--text-secondary);
         }
 
         /* #69: Row layout with value left, detail right (matches Analytics tab) */
@@ -2220,7 +2182,7 @@
             display: flex;
             align-items: baseline;
             gap: var(--space-3);
-            margin-bottom: var(--space-3);
+            margin-bottom: var(--space-2);
         }
 
         .metric-value {
@@ -2231,62 +2193,24 @@
             line-height: 1.2;
             flex-shrink: 0;
             font-variant-numeric: tabular-nums;  /* #75: Keep column alignment */
-            transition: all 0.3s ease;
         }
 
         .metric-value.highlight {
             color: var(--color-brand);
         }
 
-        .metric-card:hover .metric-value,
-        .metric-card:focus .metric-value {
-            transform: scale(1.02);
-        }
-
         /* #69: Detail text now sits beside value (matches Analytics tab) */
         .metric-detail {
             font-size: var(--font-size-sm);
             color: var(--text-secondary);
-            transition: color 0.3s ease;
-        }
-
-        .metric-card:hover .metric-detail,
-        .metric-card:focus .metric-detail {
-            color: var(--text-primary);
         }
 
         /* #69: Help text replaces tooltip - always visible (matches Analytics tab) */
         .metric-help {
             font-size: var(--font-size-xs);
             color: var(--text-muted);
-            line-height: 1.5;
-            opacity: 0.7;
-            transition: all 0.4s ease;
-            margin-top: var(--space-2);
-            padding-top: var(--space-2);
-            border-top: 1px solid transparent;
-            animation: helpPulse 2s ease-in-out 1s 2;
-        }
-
-        .metric-card:hover .metric-help,
-        .metric-card:focus .metric-help {
-            opacity: 1;
-            color: var(--text-secondary);
-            border-top-color: var(--border-color);
-            transform: translateY(-2px);
-        }
-
-        [data-theme="artistic"] .metric-card:hover .metric-help,
-        [data-theme="artistic"] .metric-card:focus .metric-help {
-            background: var(--bg-hover);
-            padding: var(--space-2);
-            margin: var(--space-2) calc(var(--space-6) * -1) 0;
-            border-radius: 0 0 var(--radius-card) var(--radius-card);
-        }
-
-        [data-theme="tactical"] .metric-card:hover .metric-help,
-        [data-theme="tactical"] .metric-card:focus .metric-help {
-            text-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+            line-height: 1.4;
+            opacity: 0.8;
         }
 
         .metric-change {
@@ -4677,28 +4601,6 @@
                 animation: none;
                 opacity: 1;
             }
-
-            .metric-card,
-            .metric-value,
-            .metric-label,
-            .metric-detail,
-            .metric-help {
-                transition: none;
-            }
-
-            .metric-card:hover,
-            .metric-card:focus {
-                transform: none;
-            }
-
-            .metric-card:hover .metric-help,
-            .metric-card:focus .metric-help {
-                transform: none;
-            }
-
-            .metric-help {
-                animation: none;
-            }
         }
     </style>
 </head>
@@ -4975,37 +4877,37 @@ History
             <!-- #69: Restructured to match Analytics tab card layout -->
             <section class="hero-section">
                 <div class="metrics-grid">
-                    <div class="metric-card animate-in animate-delay-1" tabindex="0" role="group" aria-label="Current compensation information">
+                    <div class="metric-card animate-in animate-delay-1">
                         <div class="metric-label">Current Compensation</div>
                         <div class="metric-row">
                             <div class="metric-value highlight" id="currentSalary">$281,600</div>
                             <div class="metric-detail" id="currentSalaryIndexed">Index: 704</div>
                         </div>
-                        <div class="metric-help" aria-live="polite">Most recent annual base salary, excluding bonuses or equity.</div>
+                        <div class="metric-help">Most recent annual base salary, excluding bonuses or equity.</div>
                     </div>
-                    <div class="metric-card animate-in animate-delay-2" tabindex="0" role="group" aria-label="Career growth information">
+                    <div class="metric-card animate-in animate-delay-2">
                         <div class="metric-label">Total Growth</div>
                         <div class="metric-row">
                             <div class="metric-value" id="totalGrowth">+604%</div>
                             <div class="metric-detail" id="totalGrowthSubtext">Since hire</div>
                         </div>
-                        <div class="metric-help" aria-live="polite">Percentage increase from your starting salary to current.</div>
+                        <div class="metric-help">Percentage increase from your starting salary to current.</div>
                     </div>
-                    <div class="metric-card animate-in animate-delay-3" tabindex="0" role="group" aria-label="Years of service information">
+                    <div class="metric-card animate-in animate-delay-3">
                         <div class="metric-label">Years of Service</div>
                         <div class="metric-row">
                             <div class="metric-value" id="yearsService">12.8</div>
                             <div class="metric-detail" id="hireDateText">Since Mar 2012</div>
                         </div>
-                        <div class="metric-help" aria-live="polite">Time elapsed from hire date to most recent adjustment.</div>
+                        <div class="metric-help">Time elapsed from hire date to most recent adjustment.</div>
                     </div>
-                    <div class="metric-card animate-in animate-delay-4" tabindex="0" role="group" aria-label="Total adjustments information">
+                    <div class="metric-card animate-in animate-delay-4">
                         <div class="metric-label">Total Adjustments</div>
                         <div class="metric-row">
                             <div class="metric-value" id="totalRaises">19</div>
                             <div class="metric-detail" id="avgRaisesPerYear">Avg: 1.5 per year</div>
                         </div>
-                        <div class="metric-help" aria-live="polite">All compensation changes: merit, equity, and market adjustments.</div>
+                        <div class="metric-help">All compensation changes: merit, equity, and market adjustments.</div>
                     </div>
                 </div>
             </section>
