@@ -38,7 +38,7 @@ export const CONSTANTS = {
     DEFAULT_CPI_RATE: 2.5,              // Default CPI when data missing (%)
 
     // Projection rates
-    PROJECTION_RATE_CONSERVATIVE: 0.05,  // 5% conservative growth
+    PROJECTION_RATE_CONSERVATIVE: 0.03,  // 3% conservative growth
     PROJECTION_RATE_OPTIMISTIC: 0.12,    // 12% optimistic growth
 
     // Chart configuration

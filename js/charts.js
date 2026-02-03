@@ -641,7 +641,7 @@ export function buildProjectionChart() {
                 labels,
                 datasets: [
                     { label: `Historical CAGR (${(cagr * 100).toFixed(1)}%)`, data: historical, datasetType: 'historicalCAGR', borderColor: colors.line1, backgroundColor: 'transparent', borderWidth: 3, tension: 0.3, pointRadius: 4 },
-                    { label: 'Conservative (5%)', data: conservative, datasetType: 'conservative', borderColor: _state.theme === 'tactical' ? '#666' : '#8a837a', backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 3 },
+                    { label: 'Conservative (3%)', data: conservative, datasetType: 'conservative', borderColor: _state.theme === 'tactical' ? '#666' : '#8a837a', backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 3 },
                     { label: `Custom (${_state.customRate}%)`, data: custom, datasetType: 'custom', borderColor: colors.line2, backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 4 }
                 ]
             },

@@ -1532,16 +1532,20 @@ function initProjections() {
     // Set slider to historical CAGR
     const historicalCAGR = Math.round(calculateCAGR(employeeData));
     state.cagr = historicalCAGR;
-    state.customRate = historicalCAGR;
+
+    // Set custom rate to halfway between historical and conservative (3%)
+    // This prevents custom line from overlapping with historical line
+    const conservativeRate = 3;
+    state.customRate = Math.round((historicalCAGR + conservativeRate) / 2);
 
     // Update slider and display
     const slider = document.getElementById('customRateSlider');
-    slider.value = historicalCAGR;
-    document.getElementById('customRateValue').textContent = historicalCAGR + '%';
+    slider.value = state.customRate;
+    document.getElementById('customRateValue').textContent = state.customRate + '%';
     document.getElementById('historicalRateDisplay').textContent = historicalCAGR + '%';
 
     // Initialize slider track fill
-    const progress = (historicalCAGR / 25) * 100;
+    const progress = (state.customRate / 25) * 100;
     slider.style.setProperty('--range-progress', `${progress}%`);
 }
 
