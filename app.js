@@ -2099,7 +2099,7 @@ function initEventListeners() {
     if (footerSecurityLink) {
         footerSecurityLink.addEventListener('click', (e) => {
             e.preventDefault();
-            setTab('tab-help');
+            setTab('help');
             setTimeout(() => {
                 const securitySection = document.getElementById('security-privacy-section');
                 if (securitySection) {
@@ -2122,7 +2122,7 @@ function initEventListeners() {
                 modal.style.display = 'none';
                 modal.classList.remove('visible');
             }
-            setTab('tab-help');
+            setTab('help');
             setTimeout(() => {
                 const securitySection = document.getElementById('security-privacy-section');
                 if (securitySection) {
