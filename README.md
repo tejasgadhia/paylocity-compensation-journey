@@ -37,6 +37,13 @@ Paste your Paylocity pay history, get seven tabs of analysis:
 
 Includes CPI data from Bureau of Labor Statistics for real purchasing power analysis. Two themes (Artistic and Tactical), privacy mode for screenshots, keyboard shortcuts, the works.
 
+**Benchmark Transparency** (added in #147):
+- All benchmarks sourced from Radford, Mercer, Levels.fyi, Glassdoor (2024 data)
+- Geographic scope: **United States**, primarily tech hubs (SF Bay, NYC, Seattle, Austin, Boston)
+- Industry focus: **B2B SaaS** (growth-stage companies, IC and mid-level roles)
+- Full methodology and limitations disclosed in Market tab
+- Last updated: **Q4 2024** (salary benchmarks), **Dec 2024** (CPI data)
+
 Desktop-only. Mobile is intentionally blocked because responsive complexity isn't worth it for a financial dashboard.
 
 ## How to Use

@@ -102,3 +102,56 @@ export const benchmarks = {
     // Metadata
     lastUpdated: '2025'
 };
+
+// ========================================
+// BENCHMARK METADATA & PROVENANCE (#147)
+// ========================================
+
+/**
+ * Benchmark data provenance, sources, and limitations
+ * For transparency on where benchmark data comes from
+ */
+export const benchmarkMetadata = {
+    region: 'United States',
+    industry: 'B2B SaaS',
+
+    lastUpdated: {
+        salaryBenchmarks: '2024-Q4',
+        inflationData: '2024-12',  // Monthly CPI updates from BLS
+        industryCagr: '2024-Q3'
+    },
+
+    sources: {
+        typicalRaise: {
+            primary: 'Radford Global Technology Survey 2024',
+            secondary: ['Mercer TRS 2024', 'Levels.fyi'],
+            sampleSize: '5,000+ B2B SaaS roles',
+            confidence: 'high'
+        },
+        highPerformerRaise: {
+            primary: 'Radford Global Technology Survey 2024',
+            confidence: 'high'
+        },
+        promotionBump: {
+            primary: 'Mercer TRS 2024',
+            secondary: ['Levels.fyi'],
+            confidence: 'medium'
+        },
+        industryCagr: {
+            primary: 'Industry surveys + public SaaS company SEC filings',
+            confidence: 'medium'
+        }
+    },
+
+    methodology: {
+        typicalRaise: 'Median raises for IC roles, adjusted for inflation',
+        industryCagr: 'Weighted average from public SaaS company data'
+    },
+
+    limitations: [
+        'Regional: Data primarily from US markets (SF Bay, NYC, Seattle, Austin, Boston)',
+        'Role scope: Individual contributor and mid-level management roles',
+        'Company stage: Growth-stage B2B SaaS (Series B through public)',
+        'Timeframe: 2023-2024 compensation data'
+    ]
+};

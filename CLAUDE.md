@@ -292,13 +292,47 @@ export function buildNewChart() {
 
 ### Updating Benchmarks
 
-Modify `BENCHMARKS` object:
+**Benchmark Values** (`js/constants.js`):
 ```javascript
-const BENCHMARKS = {
+export const benchmarks = {
   typicalRaise: { min: 3, max: 5, avg: 4 },
+  highPerformerRaise: { min: 6, max: 10, avg: 8 },
+  promotionBump: { min: 10, max: 20, avg: 15 },
+  industryCagr: 6,
   // Update with latest industry data
 };
 ```
+
+**Benchmark Provenance** (`js/constants.js` - added in #147):
+```javascript
+export const benchmarkMetadata = {
+  region: 'United States',
+  industry: 'B2B SaaS',
+  lastUpdated: {
+    salaryBenchmarks: '2024-Q4',
+    inflationData: '2024-12',
+    industryCagr: '2024-Q3'
+  },
+  sources: {
+    typicalRaise: {
+      primary: 'Radford Global Technology Survey 2024',
+      secondary: ['Mercer TRS 2024', 'Levels.fyi'],
+      sampleSize: '5,000+ B2B SaaS roles',
+      confidence: 'high'
+    },
+    // ... see js/constants.js for full structure
+  },
+  methodology: { /* ... */ },
+  limitations: [ /* ... */ ]
+};
+```
+
+**When updating benchmarks**:
+1. Update `benchmarks` object values
+2. Update `benchmarkMetadata.lastUpdated` with specific quarters/months
+3. Update `benchmarkMetadata.sources` if data sources changed
+4. Update Market tab HTML if adding new data source links
+5. Test `marketFootnote` renders correctly
 
 ## Deployment
 

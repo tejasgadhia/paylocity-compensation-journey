@@ -9,7 +9,7 @@
 // IMPORTS
 // ========================================
 
-import { CONSTANTS, benchmarks } from './js/constants.js';
+import { CONSTANTS, benchmarks, benchmarkMetadata } from './js/constants.js';
 import {
     calculateInflationOverPeriod,
     calculateRealGrowth,
@@ -1216,9 +1216,19 @@ function updateMarket() {
     
     // Build comparison cards
     buildMarketComparison();
-    
+
     // Build inflation analysis
     buildInflationAnalysis(bench, start, current, years);
+
+    // Populate market footnote with metadata (#147)
+    const footnote = document.getElementById('marketFootnote');
+    if (footnote) {
+        footnote.textContent =
+            `Benchmarks: ${benchmarkMetadata.lastUpdated.salaryBenchmarks} | ` +
+            `CPI Data: ${benchmarkMetadata.lastUpdated.inflationData} | ` +
+            `Region: ${benchmarkMetadata.region} | ` +
+            `Industry: ${benchmarkMetadata.industry}`;
+    }
 }
 
 function buildInflationAnalysis(bench, start, current, years) {
