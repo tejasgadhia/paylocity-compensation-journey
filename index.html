@@ -4194,24 +4194,29 @@
            BENCHMARK SOURCES
            ======================================== */
         
+        /* #81: Data sources - elevated with clear hierarchy */
         .benchmark-sources {
-            margin-top: 1.5rem;
-            padding: var(--space-4);
-            background: var(--bg-tertiary);
+            margin-top: var(--space-8);  /* #81: More generous spacing (was 1.5rem) */
+            padding: var(--space-6);  /* #81: More generous padding (was space-4) */
+            background: var(--bg-card);  /* #81: Elevated from tertiary to card */
             border-radius: var(--radius-md);
             border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-card);  /* #81: Added elevation */
         }
 
         .benchmark-sources-header {
             display: flex;
             align-items: center;
             gap: var(--space-2);
-            margin-bottom: 0.75rem;
+            margin-bottom: var(--space-4);  /* #81: More spacing (was 0.75rem) */
+            padding-bottom: var(--space-3);  /* #81: Space for underline */
+            border-bottom: 1px solid var(--border-color);  /* #81: Underline separator */
             font-family: var(--font-mono);
-            font-size: var(--font-size-xs);
+            font-size: var(--font-size-sm);  /* #81: Larger (was xs) */
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: var(--text-muted);
+            color: var(--text-secondary);  /* #81: Less muted (was text-muted) */
+            font-weight: 600;  /* #81: Stronger presence */
         }
 
         .benchmark-sources-header span {
@@ -4228,16 +4233,16 @@
 
         .benchmark-sources-list {
             display: grid;
-            gap: var(--space-2);
+            gap: var(--space-4);  /* #81: More breathing room (was space-2) */
         }
 
         .benchmark-source-item {
             display: flex;
             align-items: flex-start;
-            gap: var(--space-2);
+            gap: var(--space-3);  /* #81: More spacing (was space-2) */
             font-size: var(--font-size-sm);
             color: var(--text-secondary);
-            line-height: 1.4;
+            line-height: 1.6;  /* #81: More generous (was 1.4) */
         }
 
         .benchmark-source-item .source-icon {
