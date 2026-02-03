@@ -3183,9 +3183,10 @@
         }
 
         .interval-btn.active {
-            background: var(--bg-card);
-            color: var(--text-primary);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: var(--color-brand);
+            color: var(--bg-primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            font-weight: 600;
         }
 
         .interval-btn:hover:not(.active) {
@@ -3503,7 +3504,8 @@
             display: flex;
             flex-wrap: wrap;
             align-items: flex-start;
-            gap: var(--space-6);
+            justify-content: center;
+            gap: var(--space-8);
         }
 
         .projections-control-group {
@@ -5057,15 +5059,6 @@ History
                                     <button class="chart-type-btn" data-view="table">Table</button>
                                 </div>
                             </div>
-
-                            <!-- #92: Optimistic toggle -->
-                            <div class="projections-control-group">
-                                <span class="control-group-label">Scenarios</span>
-                                <label class="checkbox-control">
-                                    <input type="checkbox" id="showOptimisticToggle">
-                                    <span class="checkbox-label">Show Optimistic (12%)</span>
-                                </label>
-                            </div>
                         </div>
                     </div>
 
@@ -5081,7 +5074,6 @@ History
                                         <th>Historical CAGR</th>
                                         <th>Conservative (5%)</th>
                                         <th>Custom Rate</th>
-                                        <th>Optimistic (12%)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="projectionTableBody"></tbody>

@@ -609,7 +609,14 @@ export function buildProjectionChart() {
 
         const colors = getThemeColors();
 
-        const currentSalary = getCurrentSalary(employeeData);
+        const currentSalaryRaw = getCurrentSalary(employeeData);
+        const startingSalary = getStartingSalary(employeeData);
+
+        // Convert to indexed values if privacy mode enabled (same as main chart)
+        const currentSalary = _state.showDollars
+            ? currentSalaryRaw
+            : (currentSalaryRaw / startingSalary) * 100;
+
         const cagr = calculateCAGR(employeeData) / 100;
         const years = _state.projectionYears;
         const customRate = _state.customRate / 100;
@@ -618,14 +625,12 @@ export function buildProjectionChart() {
         const historical = [currentSalary];
         const conservative = [currentSalary];
         const custom = [currentSalary];
-        const optimistic = [currentSalary];
 
         for (let i = 1; i <= years; i++) {
             labels.push(`+${i}yr`);
             historical.push(currentSalary * Math.pow(1 + cagr, i));
             conservative.push(currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_CONSERVATIVE, i));
             custom.push(currentSalary * Math.pow(1 + customRate, i));
-            optimistic.push(currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_OPTIMISTIC, i));
         }
 
         if (_charts.projection) _charts.projection.destroy();
@@ -637,8 +642,7 @@ export function buildProjectionChart() {
                 datasets: [
                     { label: `Historical CAGR (${(cagr * 100).toFixed(1)}%)`, data: historical, datasetType: 'historicalCAGR', borderColor: colors.line1, backgroundColor: 'transparent', borderWidth: 3, tension: 0.3, pointRadius: 4 },
                     { label: 'Conservative (5%)', data: conservative, datasetType: 'conservative', borderColor: _state.theme === 'tactical' ? '#666' : '#8a837a', backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 3 },
-                    { label: `Custom (${_state.customRate}%)`, data: custom, datasetType: 'custom', borderColor: colors.line2, backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 4 },
-                    { label: 'Optimistic (12%)', data: optimistic, datasetType: 'optimistic', borderColor: _state.theme === 'tactical' ? '#4598d4' : '#7b2cbf', backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 3, hidden: !_state.showOptimistic }
+                    { label: `Custom (${_state.customRate}%)`, data: custom, datasetType: 'custom', borderColor: colors.line2, backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 4 }
                 ]
             },
             options: {
@@ -651,18 +655,13 @@ export function buildProjectionChart() {
                         labels: {
                             color: colors.text,
                             padding: 20,
-                            font: { family: _state.theme === 'tactical' ? 'JetBrains Mono' : 'Space Grotesk', size: 11 },
-                            // Hide Optimistic from legend when checkbox is unchecked
-                            filter: (legendItem) => {
-                                if (legendItem.text.includes('Optimistic') && !_state.showOptimistic) {
-                                    return false;
-                                }
-                                return true;
-                            }
+                            font: { family: _state.theme === 'tactical' ? 'JetBrains Mono' : 'Space Grotesk', size: 11 }
                         }
                     },
                     tooltip: getTooltipConfig({
-                        labelCallback: (ctx) => `${ctx.dataset.label}: $${Math.round(ctx.raw).toLocaleString()}`
+                        labelCallback: (ctx) => _state.showDollars ?
+                            `${ctx.dataset.label}: $${Math.round(ctx.raw).toLocaleString()}` :
+                            `${ctx.dataset.label}: ${ctx.raw.toFixed(0)}`
                     })
                 },
                 scales: {
@@ -670,7 +669,11 @@ export function buildProjectionChart() {
                     y: {
                         beginAtZero: true,  // Start Y-axis at $0 for consistency with home tab
                         grid: { color: colors.grid, drawBorder: false },
-                        ticks: { color: colors.text, font: { size: 14, weight: 'bold' }, callback: (v) => '$' + (v/1000) + 'k' }
+                        ticks: {
+                            color: colors.text,
+                            font: { size: 14, weight: 'bold' },
+                            callback: (v) => _state.showDollars ? '$' + (v / 1000).toFixed(0) + 'k' : v.toFixed(0)
+                        }
                     }
                 }
             }
@@ -701,7 +704,14 @@ export function updateProjectionChartData() {
     }
 
     try {
-        const currentSalary = getCurrentSalary(employeeData);
+        const currentSalaryRaw = getCurrentSalary(employeeData);
+        const startingSalary = getStartingSalary(employeeData);
+
+        // Convert to indexed values if privacy mode enabled (same as main chart)
+        const currentSalary = _state.showDollars
+            ? currentSalaryRaw
+            : (currentSalaryRaw / startingSalary) * 100;
+
         const cagr = calculateCAGR(employeeData) / 100;
         const years = _state.projectionYears;
         const customRate = _state.customRate / 100;
@@ -710,14 +720,12 @@ export function updateProjectionChartData() {
         const historical = [currentSalary];
         const conservative = [currentSalary];
         const custom = [currentSalary];
-        const optimistic = [currentSalary];
 
         for (let i = 1; i <= years; i++) {
             labels.push(`+${i}yr`);
             historical.push(currentSalary * Math.pow(1 + cagr, i));
             conservative.push(currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_CONSERVATIVE, i));
             custom.push(currentSalary * Math.pow(1 + customRate, i));
-            optimistic.push(currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_OPTIMISTIC, i));
         }
 
         // Update data in place
@@ -726,8 +734,16 @@ export function updateProjectionChartData() {
         _charts.projection.data.datasets[1].data = conservative;
         _charts.projection.data.datasets[2].data = custom;
         _charts.projection.data.datasets[2].label = `Custom (${_state.customRate}%)`;
-        _charts.projection.data.datasets[3].data = optimistic;
-        _charts.projection.data.datasets[3].hidden = !_state.showOptimistic;  // #92: Respect toggle state
+
+        // Update Y-axis and tooltip formatting based on privacy mode
+        _charts.projection.options.scales.y.ticks.callback = (v) =>
+            _state.showDollars ? '$' + (v / 1000).toFixed(0) + 'k' : v.toFixed(0);
+
+        _charts.projection.options.plugins.tooltip = getTooltipConfig({
+            labelCallback: (ctx) => _state.showDollars ?
+                `$${ctx.raw.toLocaleString('en-US', { maximumFractionDigits: 0 })}` :
+                `Index: ${ctx.raw.toFixed(0)}`
+        });
 
         // Fast update without animation
         _charts.projection.update('none');

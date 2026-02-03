@@ -110,8 +110,7 @@ let state = {
     yoyChartType: 'bar',
     projectionYears: 5,
     customRate: 8,
-    currentScenarioIndex: 2,  // Default to Scenario 3 (Established, 8 years) for richer demo
-    showOptimistic: false  // #92: Hide Optimistic line by default
+    currentScenarioIndex: 2  // Default to Scenario 3 (Established, 8 years) for richer demo
 };
 
 let charts = {
@@ -1584,22 +1583,34 @@ function getBadgeClass(reason) {
 
 function buildProjectionTable() {
     const tbody = document.getElementById('projectionTableBody');
-    const currentSalary = getCurrentSalary(employeeData);
+    const currentSalaryRaw = getCurrentSalary(employeeData);
+    const startingSalary = getStartingSalary(employeeData);
+
+    // Convert to indexed values if privacy mode enabled (same as chart)
+    const currentSalary = state.showDollars
+        ? currentSalaryRaw
+        : (currentSalaryRaw / startingSalary) * 100;
+
     const cagr = calculateCAGR(employeeData) / 100;
     const customRate = state.customRate / 100;
-    
+
     // Fixed intervals: 1-5 yearly, then 10, 15, 20
     const intervals = [1, 2, 3, 4, 5, 10, 15, 20];
-    
-    tbody.innerHTML = intervals.map(year => `
-        <tr>
-            <td>${year} year${year > 1 ? 's' : ''}</td>
-            <td>${formatCurrency(currentSalary * Math.pow(1 + cagr, year))}</td>
-            <td>${formatCurrency(currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_CONSERVATIVE, year))}</td>
-            <td>${formatCurrency(currentSalary * Math.pow(1 + customRate, year))}</td>
-            <td>${formatCurrency(currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_OPTIMISTIC, year))}</td>
-        </tr>
-    `).join('');
+
+    tbody.innerHTML = intervals.map(year => {
+        const historicalValue = currentSalary * Math.pow(1 + cagr, year);
+        const conservativeValue = currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_CONSERVATIVE, year);
+        const customValue = currentSalary * Math.pow(1 + customRate, year);
+
+        return `
+            <tr>
+                <td>${year} year${year > 1 ? 's' : ''}</td>
+                <td>${state.showDollars ? formatCurrency(historicalValue) : historicalValue.toFixed(0)}</td>
+                <td>${state.showDollars ? formatCurrency(conservativeValue) : conservativeValue.toFixed(0)}</td>
+                <td>${state.showDollars ? formatCurrency(customValue) : customValue.toFixed(0)}</td>
+            </tr>
+        `;
+    }).join('');
 }
 
 // ========================================
@@ -2179,15 +2190,6 @@ function initEventListeners() {
     document.querySelectorAll('.chart-type-btn[data-view]').forEach(btn => {
         btn.addEventListener('click', () => setProjectionView(btn.dataset.view));
     });
-
-    // #92: Optimistic toggle checkbox
-    const optimisticToggle = document.getElementById('showOptimisticToggle');
-    if (optimisticToggle) {
-        optimisticToggle.addEventListener('change', () => {
-            state.showOptimistic = optimisticToggle.checked;
-            buildProjectionChart();
-        });
-    }
 
     // Paste input textarea
     const pasteInput = document.getElementById('pasteInput');
