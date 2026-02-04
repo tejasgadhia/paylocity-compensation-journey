@@ -91,8 +91,8 @@ export async function assertThemeColors(page, theme) {
     // Tactical theme: #0a0a0b
     expect(bgPrimary).toMatch(/rgb\(10,\s*10,\s*11\)|#0a0a0b/i);
   } else {
-    // Artistic theme: #faf8f5
-    expect(bgPrimary).toMatch(/rgb\(250,\s*248,\s*245\)|#faf8f5/i);
+    // Artistic theme: #FAF9F7 (updated from #faf8f5)
+    expect(bgPrimary).toMatch(/rgb\(250,\s*249,\s*247\)|#faf9f7/i);
   }
 }
 

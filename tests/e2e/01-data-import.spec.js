@@ -30,6 +30,9 @@ import { checkA11y } from './helpers/a11y.js';
 test.describe('Data Import & Validation', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
+    // Open import modal (required since landing page redesign)
+    await page.locator('#openImportBtn').click();
+    await page.locator('#importModal').waitFor({ state: 'visible' });
   });
 
   test('imports valid Paylocity data and renders dashboard', async ({ page }) => {

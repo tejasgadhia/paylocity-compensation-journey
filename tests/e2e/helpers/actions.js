@@ -14,6 +14,12 @@ export async function importData(page, dataText) {
   // Navigate to home if not already there
   await page.goto('/');
 
+  // Click "Import Your Data" button to open modal
+  await page.locator('#openImportBtn').click();
+
+  // Wait for modal to be visible
+  await page.locator('#importModal').waitFor({ state: 'visible' });
+
   // Fill the paste input textarea
   await page.locator('#pasteInput').fill(dataText);
 

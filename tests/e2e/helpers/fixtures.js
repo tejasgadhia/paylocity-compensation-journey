@@ -146,7 +146,7 @@ export const THEME_COLORS = {
     accent: 'rgb(212, 175, 55)', // gold #d4af37
   },
   artistic: {
-    bgPrimary: 'rgb(250, 248, 245)', // #faf8f5
+    bgPrimary: 'rgb(250, 249, 247)', // #FAF9F7 (updated from #faf8f5)
     textPrimary: 'rgb(51, 51, 51)', // #333333
     accent: 'rgb(255, 87, 51)', // orange #ff5733
   },
