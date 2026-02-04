@@ -334,6 +334,35 @@ export const benchmarkMetadata = {
 4. Update Market tab HTML if adding new data source links
 5. Test `marketFootnote` renders correctly
 
+### Closing GitHub Issues
+
+**Always add a closing comment** with the standardized schema before closing an issue:
+
+```markdown
+**Resolution Type:** Fixed
+
+**Root Cause:** [1 sentence why issue existed]
+
+**Fix Description:** [1-2 sentences what changed]
+
+**Verification:** [How to verify the fix]
+
+**Related Artifacts:** [PR #XXX or commit SHA]
+```
+
+**See full template**: `.github/ISSUE_CLOSURE_TEMPLATE.md`
+
+**Why this matters**:
+- Provides audit trail for future reference
+- Documents root causes to prevent recurrence
+- Enables verification testing
+- Builds institutional knowledge
+
+**Using GitHub CLI**:
+```bash
+gh issue close 123 --comment "[closing schema here]"
+```
+
 ## Deployment
 
 **GitHub Pages**:
