@@ -23,7 +23,7 @@ jobs:
           node-version: '20'
 
       - name: Fetch and update CPI data
-        run: node .github/scripts/update-cpi.js
+        run: node .github/scripts/update-cpi.cjs
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
