@@ -1539,6 +1539,106 @@
             font-size: var(--font-size-xs);
         }
 
+        /* ========================================
+           USER MESSAGE BANNERS (#174)
+           Fixed notification banners for errors, warnings, success, info
+           ======================================== */
+
+        .user-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10000;
+            padding: var(--space-4) var(--space-8);
+            color: white;
+            text-align: center;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-message--error { background: var(--color-danger); }
+        .user-message--warning { background: var(--color-warning); }
+        .user-message--success { background: var(--color-success); }
+        .user-message--info { background: var(--color-info); }
+
+        .user-message-dismiss {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: var(--font-size-lg);
+            cursor: pointer;
+            padding: 0 var(--space-2);
+            margin-left: var(--space-4);
+            min-width: var(--size-touch-target);
+            min-height: var(--size-touch-target);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-message-dismiss:hover { opacity: 0.8; }
+
+        /* ========================================
+           STALE DATA WARNING TOAST (#174)
+           Dismissible notification for stale CPI data
+           ======================================== */
+
+        .stale-data-warning {
+            position: fixed;
+            bottom: var(--space-4);
+            right: var(--space-4);
+            z-index: 9000;
+            padding: var(--space-3) var(--space-4);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            box-shadow: var(--shadow-card);
+            max-width: 360px;
+        }
+
+        .stale-warning-icon {
+            color: var(--color-warning);
+            font-size: var(--font-size-md);
+            display: flex;
+            align-items: center;
+        }
+
+        .stale-warning-link {
+            color: var(--color-brand);
+            text-decoration: none;
+            margin-left: var(--space-1);
+        }
+
+        .stale-warning-link:hover { text-decoration: underline; }
+
+        .stale-warning-dismiss {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: var(--font-size-md);
+            cursor: pointer;
+            padding: 0 var(--space-1);
+            margin-left: var(--space-2);
+            opacity: 0.7;
+            transition: opacity var(--transition-speed);
+            min-width: var(--size-touch-target);
+            min-height: var(--size-touch-target);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stale-warning-dismiss:hover { opacity: 1; }
+
         .help-note {
             font-size: var(--font-size-xs);
             color: var(--text-muted);

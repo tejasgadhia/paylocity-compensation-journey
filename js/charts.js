@@ -201,6 +201,49 @@ export function updateChartTheme(chart) {
 }
 
 // ========================================
+// CHART UPDATER FACTORY (#166)
+// ========================================
+
+/**
+ * Factory for chart updaters with standardized error handling.
+ * Pattern: check data → check existence → try update → fallback to rebuild
+ *
+ * DRY pattern used by all chart update functions to eliminate repetitive
+ * boilerplate for data checking, chart existence checking, and error recovery.
+ *
+ * @param {string} chartKey - Key in _charts ('main', 'yoy', 'projection')
+ * @param {Function} buildFn - Build function to call on fallback
+ * @param {Function} updateFn - Update logic (receives chart instance)
+ * @param {Object} options - Configuration options
+ * @param {boolean} [options.requiresData=true] - Whether to check employeeData first
+ * @returns {Function} Wrapped updater function
+ */
+function createChartUpdater(chartKey, buildFn, updateFn, options = {}) {
+    const { requiresData = true } = options;
+
+    return function() {
+        if (requiresData) {
+            const employeeData = _getEmployeeData();
+            if (!employeeData) return;
+        }
+
+        const chart = _charts[chartKey];
+        if (!chart) {
+            buildFn();
+            return;
+        }
+
+        try {
+            updateFn(chart);
+            chart.update('none');
+        } catch (error) {
+            console.warn(`Chart update failed for ${chartKey}, rebuilding:`, error.message);
+            buildFn();
+        }
+    };
+}
+
+// ========================================
 // CHART TYPE UPDATE FUNCTIONS
 // ========================================
 
@@ -211,37 +254,27 @@ export function updateChartTheme(chart) {
  *
  * Performance: ~5-10ms vs 20-40ms for full rebuild
  */
-export function updateMainChartType() {
-    // Fall back to full build if chart doesn't exist
-    if (!_charts.main) {
-        buildMainChart();
-        return;
-    }
-
-    try {
+export const updateMainChartType = createChartUpdater(
+    'main',
+    buildMainChart,
+    (chart) => {
         const colors = getThemeColors();
         const type = _state.mainChartType;
 
         // Update chart type (Chart.js 3+ supports this)
-        _charts.main.config.type = type === 'bar' ? 'bar' : 'line';
+        chart.config.type = type === 'bar' ? 'bar' : 'line';
 
         // Update dataset properties based on chart type
-        const dataset = _charts.main.data.datasets[0];
+        const dataset = chart.data.datasets[0];
         dataset.backgroundColor = type === 'area' ? colors.fill1 :
                                   type === 'bar' ? colors.line1 : 'transparent';
         dataset.fill = type === 'area';
         dataset.tension = type === 'step' ? 0 : 0.3;
         dataset.stepped = type === 'step' ? 'before' : false;
         dataset.pointRadius = type === 'bar' ? 0 : 4;
-
-        // Fast update without animation
-        _charts.main.update('none');
-    } catch (error) {
-        console.error('Failed to update main chart type:', error);
-        // Fall back to full rebuild on error
-        buildMainChart();
-    }
-}
+    },
+    { requiresData: false }
+);
 
 /**
  * Efficiently updates YoY chart type without full rebuild.
@@ -250,39 +283,29 @@ export function updateMainChartType() {
  *
  * Performance: ~5-10ms vs 20-40ms for full rebuild
  */
-export function updateYoyChartType() {
-    // Fall back to full build if chart doesn't exist
-    if (!_charts.yoy) {
-        buildYoyChart();
-        return;
-    }
-
-    try {
+export const updateYoyChartType = createChartUpdater(
+    'yoy',
+    buildYoyChart,
+    (chart) => {
         const colors = getThemeColors();
         const type = _state.yoyChartType;
 
         // Update chart type
-        _charts.yoy.config.type = type;
+        chart.config.type = type;
 
         // Update dataset properties based on chart type
-        const dataset = _charts.yoy.data.datasets[0];
+        const dataset = chart.data.datasets[0];
         dataset.backgroundColor = type === 'bar' ? colors.line2 : 'transparent';
 
         // #137: Toggle tooltip based on chart type (bar has data labels, line needs tooltips)
-        _charts.yoy.options.plugins.tooltip = type === 'bar'
+        chart.options.plugins.tooltip = type === 'bar'
             ? { enabled: false }
             : getTooltipConfig({
                 labelCallback: (ctx) => `${ctx.raw.toFixed(1)}% growth`
             });
-
-        // Fast update without animation
-        _charts.yoy.update('none');
-    } catch (error) {
-        console.error('Failed to update YoY chart type:', error);
-        // Fall back to full rebuild on error
-        buildYoyChart();
-    }
-}
+    },
+    { requiresData: false }
+);
 
 // ========================================
 // CHART BUILD FUNCTIONS
@@ -400,17 +423,11 @@ export function buildMainChart() {
  *
  * @returns {void}
  */
-export function updateMainChartData() {
-    const employeeData = _getEmployeeData();
-    if (!employeeData) return;
-
-    // Fallback to full build if chart doesn't exist
-    if (!_charts.main) {
-        buildMainChart();
-        return;
-    }
-
-    try {
+export const updateMainChartData = createChartUpdater(
+    'main',
+    buildMainChart,
+    (chart) => {
+        const employeeData = _getEmployeeData();
         const data = [...employeeData.records].reverse();
         const labels = data.map(r => formatDateCompact(r.date));
         const values = data.map(r =>
@@ -418,28 +435,21 @@ export function updateMainChartData() {
         );
 
         // Update data in place
-        _charts.main.data.labels = labels;
-        _charts.main.data.datasets[0].data = values;
-        _charts.main.data.datasets[0].label = _state.showDollars ? 'Annual Salary' : 'Index Value';
+        chart.data.labels = labels;
+        chart.data.datasets[0].data = values;
+        chart.data.datasets[0].label = _state.showDollars ? 'Annual Salary' : 'Index Value';
 
         // Update Y-axis formatting
-        _charts.main.options.scales.y.ticks.callback = (v) =>
+        chart.options.scales.y.ticks.callback = (v) =>
             _state.showDollars ? '$' + (v / 1000) + 'k' : v;
 
         // Update tooltip formatting
-        _charts.main.options.plugins.tooltip = getTooltipConfig({
+        chart.options.plugins.tooltip = getTooltipConfig({
             labelCallback: (ctx) => _state.showDollars ?
                 `$${ctx.raw.toLocaleString()}` : `Index: ${ctx.raw.toFixed(0)}`
         });
-
-        // Fast update without animation
-        _charts.main.update('none');
-    } catch (error) {
-        console.error('Failed to update main chart data:', error);
-        // Fall back to full rebuild on error
-        buildMainChart();
     }
-}
+);
 
 /**
  * Builds the year-over-year salary growth chart.
@@ -560,35 +570,19 @@ export function buildYoyChart() {
  *
  * @returns {void}
  */
-export function updateYoyChartData() {
-    const employeeData = _getEmployeeData();
-    if (!employeeData) return;
-
-    // Fallback to full build if chart doesn't exist
-    if (!_charts.yoy) {
-        buildYoyChart();
-        return;
-    }
-
-    try {
+export const updateYoyChartData = createChartUpdater(
+    'yoy',
+    buildYoyChart,
+    (chart) => {
         // YoY chart data doesn't change with privacy toggle (always percentages)
         // But we update tooltips to maintain consistency
-
-        // Update tooltip configuration
-        _charts.yoy.options.plugins.tooltip = _state.yoyChartType === 'bar'
+        chart.options.plugins.tooltip = _state.yoyChartType === 'bar'
             ? { enabled: false }
             : getTooltipConfig({
                 labelCallback: (ctx) => `${ctx.raw.toFixed(1)}% growth`
             });
-
-        // Fast update without animation
-        _charts.yoy.update('none');
-    } catch (error) {
-        console.error('Failed to update YoY chart data:', error);
-        // Fall back to full rebuild on error
-        buildYoyChart();
     }
-}
+);
 
 /**
  * Builds the salary projection chart with multiple scenarios.
@@ -693,17 +687,11 @@ export function buildProjectionChart() {
  *
  * @returns {void}
  */
-export function updateProjectionChartData() {
-    const employeeData = _getEmployeeData();
-    if (!employeeData) return;
-
-    // Fall back to full build if chart doesn't exist
-    if (!_charts.projection) {
-        buildProjectionChart();
-        return;
-    }
-
-    try {
+export const updateProjectionChartData = createChartUpdater(
+    'projection',
+    buildProjectionChart,
+    (chart) => {
+        const employeeData = _getEmployeeData();
         const currentSalaryRaw = getCurrentSalary(employeeData);
         const startingSalary = getStartingSalary(employeeData);
 
@@ -729,27 +717,20 @@ export function updateProjectionChartData() {
         }
 
         // Update data in place
-        _charts.projection.data.labels = labels;
-        _charts.projection.data.datasets[0].data = historical;
-        _charts.projection.data.datasets[1].data = conservative;
-        _charts.projection.data.datasets[2].data = custom;
-        _charts.projection.data.datasets[2].label = `Custom (${_state.customRate}%)`;
+        chart.data.labels = labels;
+        chart.data.datasets[0].data = historical;
+        chart.data.datasets[1].data = conservative;
+        chart.data.datasets[2].data = custom;
+        chart.data.datasets[2].label = `Custom (${_state.customRate}%)`;
 
         // Update Y-axis and tooltip formatting based on privacy mode
-        _charts.projection.options.scales.y.ticks.callback = (v) =>
+        chart.options.scales.y.ticks.callback = (v) =>
             _state.showDollars ? '$' + (v / 1000).toFixed(0) + 'k' : v.toFixed(0);
 
-        _charts.projection.options.plugins.tooltip = getTooltipConfig({
+        chart.options.plugins.tooltip = getTooltipConfig({
             labelCallback: (ctx) => _state.showDollars ?
                 `$${ctx.raw.toLocaleString('en-US', { maximumFractionDigits: 0 })}` :
                 `Index: ${ctx.raw.toFixed(0)}`
         });
-
-        // Fast update without animation
-        _charts.projection.update('none');
-    } catch (error) {
-        console.error('Failed to update projection chart:', error);
-        // Fall back to full rebuild on error
-        buildProjectionChart();
     }
-}
+);

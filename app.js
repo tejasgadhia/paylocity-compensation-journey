@@ -964,35 +964,11 @@ function showUserMessage(message, type = 'error') {
     document.querySelectorAll('.user-message').forEach(el => el.remove());
 
     const banner = document.createElement('div');
-    banner.className = `user-message user-message-${type}`;
+    // #174: Use CSS classes instead of inline styles (BEM modifier pattern)
+    banner.className = `user-message user-message--${type}`;
     banner.innerHTML = `
         <span>${escapeHTML(message)}</span>
-        <button onclick="this.parentElement.remove()" aria-label="Dismiss message">✕</button>
-    `;
-    banner.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 10000;
-        padding: 1rem 2rem;
-        background: ${type === 'error' ? '#d32f2f' : type === 'warning' ? '#f57c00' : type === 'success' ? '#388e3c' : '#1976d2'};
-        color: white;
-        text-align: center;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    `;
-    banner.querySelector('button').style.cssText = `
-        background: transparent;
-        border: none;
-        color: white;
-        font-size: 1.5rem;
-        cursor: pointer;
-        padding: 0 0.5rem;
-        margin-left: 1rem;
+        <button class="user-message-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss message">✕</button>
     `;
 
     document.body.prepend(banner);
@@ -1047,6 +1023,7 @@ function showStaleDataWarning(lastUpdated) {
     const banner = document.createElement('div');
     banner.className = 'stale-data-warning';
     banner.setAttribute('role', 'alert');
+    // #174: Use CSS classes instead of inline styles
     banner.innerHTML = `
         <span class="stale-warning-icon" aria-hidden="true">
             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
@@ -1055,57 +1032,12 @@ function showStaleDataWarning(lastUpdated) {
         </span>
         <span class="stale-warning-text">
             Inflation data last updated ${formattedDate}.
-            <a href="https://www.bls.gov/cpi/" target="_blank" rel="noopener noreferrer">View latest</a>
+            <a class="stale-warning-link" href="https://www.bls.gov/cpi/" target="_blank" rel="noopener noreferrer">View latest</a>
         </span>
         <button class="stale-warning-dismiss" aria-label="Dismiss stale data warning">✕</button>
     `;
 
-    banner.style.cssText = `
-        position: fixed;
-        bottom: 1rem;
-        right: 1rem;
-        z-index: 9000;
-        padding: 0.75rem 1rem;
-        background: var(--secondary-bg, #1a1a1b);
-        border: 1px solid var(--border-color, #333);
-        border-radius: 8px;
-        color: var(--text-secondary, #a0a0a0);
-        font-size: 0.875rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        max-width: 360px;
-    `;
-
-    const icon = banner.querySelector('.stale-warning-icon');
-    icon.style.cssText = `
-        color: #f5a623;
-        font-size: 1.25rem;
-        display: flex;
-        align-items: center;
-    `;
-
-    const link = banner.querySelector('a');
-    link.style.cssText = `
-        color: var(--accent-color, #f5a623);
-        text-decoration: none;
-        margin-left: 0.25rem;
-    `;
-
     const dismissBtn = banner.querySelector('.stale-warning-dismiss');
-    dismissBtn.style.cssText = `
-        background: transparent;
-        border: none;
-        color: var(--text-secondary, #a0a0a0);
-        font-size: 1.25rem;
-        cursor: pointer;
-        padding: 0 0.25rem;
-        margin-left: 0.5rem;
-        opacity: 0.7;
-        transition: opacity 0.2s;
-    `;
-
     dismissBtn.addEventListener('click', () => {
         localStorage.setItem(CONSTANTS.STORAGE_KEY_CPI_WARNING, Date.now().toString());
         banner.remove();
