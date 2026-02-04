@@ -2,6 +2,12 @@
 // CONSTANTS
 // ========================================
 
+/**
+ * Valid tab names for navigation
+ * Used for URL parameter validation and keyboard navigation
+ */
+export const VALID_TABS = ['home', 'story', 'market', 'history', 'analytics', 'projections', 'help'];
+
 export const CONSTANTS = {
     // Salary validation
     MIN_REALISTIC_SALARY: 1000,         // $1K minimum (sanity check)

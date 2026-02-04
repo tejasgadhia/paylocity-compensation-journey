@@ -9,7 +9,7 @@
 // IMPORTS
 // ========================================
 
-import { CONSTANTS, benchmarks, benchmarkMetadata, cpiMetadata } from './js/constants.js';
+import { CONSTANTS, benchmarks, benchmarkMetadata, cpiMetadata, VALID_TABS } from './js/constants.js';
 import {
     calculateInflationOverPeriod,
     calculateRealGrowth,
@@ -343,7 +343,9 @@ function validatePasteInput() {
     const input = document.getElementById('pasteInput').value.trim();
     const messageDiv = document.getElementById('validationMessage');
     const generateBtn = document.getElementById('generateBtn');
-    const legalConsent = document.getElementById('legalConsentCheckbox').checked;
+    // Checkbox was removed in 5d189c9 but JS still expected it - default to true if missing
+    const legalConsentCheckbox = document.getElementById('legalConsentCheckbox');
+    const legalConsent = legalConsentCheckbox ? legalConsentCheckbox.checked : true;
 
     if (!input) {
         messageDiv.className = 'validation-message';
@@ -504,8 +506,7 @@ async function loadDemoData(scenarioIndex = null) {
     // #79 fix: Preserve tab from URL before it gets overwritten
     const params = new URLSearchParams(window.location.search);
     const initialTab = params.get('tab');
-    const validTabs = ['home', 'story', 'market', 'history', 'analytics', 'projections', 'help'];
-    if (initialTab && validTabs.includes(initialTab)) {
+    if (initialTab && VALID_TABS.includes(initialTab)) {
         state.currentTab = initialTab;
     }
 
@@ -1571,8 +1572,7 @@ function setTab(tabId, pushHistory = true) {
 function handleTabFromUrl() {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab');
-    const validTabs = ['home', 'story', 'market', 'history', 'analytics', 'projections', 'help'];
-    if (tab && validTabs.includes(tab) && employeeData) {
+    if (tab && VALID_TABS.includes(tab) && employeeData) {
         setTab(tab, false); // false = don't push history (initial load)
     }
 }
@@ -1591,9 +1591,8 @@ if (typeof window !== 'undefined') {
         if (!employeeData) return; // Only handle if dashboard is active
 
         const tab = event.state?.tab || new URLSearchParams(window.location.search).get('tab') || 'home';
-        const validTabs = ['home', 'story', 'market', 'history', 'analytics', 'projections', 'help'];
 
-        if (validTabs.includes(tab)) {
+        if (VALID_TABS.includes(tab)) {
             setTab(tab, false); // false = don't push another history entry
         }
     });
@@ -1956,8 +1955,7 @@ function initFromUrl() {
     }
 
     // Set tab from URL BEFORE loading demo (so showDashboard can use it)
-    const validTabs = ['home', 'story', 'market', 'history', 'analytics', 'projections', 'help'];
-    if (params.tab && validTabs.includes(params.tab)) {
+    if (params.tab && VALID_TABS.includes(params.tab)) {
         state.currentTab = params.tab;
     }
 
