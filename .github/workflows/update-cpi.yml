@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   update-cpi:
@@ -25,17 +24,15 @@ jobs:
       - name: Fetch and update CPI data
         run: node .github/scripts/update-cpi.cjs
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
-        with:
-          commit-message: 'chore: Update CPI inflation data from BLS API'
-          title: 'chore: Update CPI inflation data'
-          body: |
-            Automated quarterly CPI update from Bureau of Labor Statistics.
-
-            **Review**: Verify the new inflation values look reasonable before merging.
-
-            [View BLS CPI Data](https://www.bls.gov/cpi/data.htm)
-          branch: 'chore/update-cpi-data'
-          delete-branch: true
-          labels: 'automation,data'
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add js/constants.js
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: Update CPI inflation data from BLS API"
+            git push
+            echo "CPI data updated and pushed to main"
+          fi
