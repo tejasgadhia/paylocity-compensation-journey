@@ -681,6 +681,102 @@ function restoreFromBackup() {
 // FILE HANDLING
 // ========================================
 
+/**
+ * Valid change reasons for compensation records.
+ * Must match parser.js extractReason() whitelist.
+ */
+const VALID_REASONS = ['Merit Increase', 'Promotion', 'Market Adjustment', 'Equity', 'New Hire'];
+
+/**
+ * Validates imported JSON data structure and values (#176).
+ *
+ * Performs schema validation to prevent:
+ * - Malformed data crashing the app
+ * - Invalid field types causing calculation errors
+ * - Unrealistic salary values from corrupted data
+ *
+ * @param {Object} data - Parsed JSON data to validate
+ * @returns {{ valid: boolean, errors: string[] }} Validation result
+ *
+ * @example
+ * const result = validateImportedData({ records: [...], hireDate: '2020-01-15' });
+ * if (!result.valid) console.error(result.errors.join(', '));
+ */
+function validateImportedData(data) {
+    const errors = [];
+
+    // Top-level structure validation
+    if (!data || typeof data !== 'object') {
+        errors.push('Invalid data format: expected object');
+        return { valid: false, errors };
+    }
+
+    if (!Array.isArray(data.records)) {
+        errors.push('Missing or invalid "records" array');
+    } else if (data.records.length < 2) {
+        errors.push('Need at least 2 records for analysis');
+    }
+
+    if (!data.hireDate || typeof data.hireDate !== 'string') {
+        errors.push('Missing or invalid "hireDate" field');
+    } else if (!/^\d{4}-\d{2}-\d{2}$/.test(data.hireDate)) {
+        errors.push('hireDate must be in YYYY-MM-DD format');
+    }
+
+    // Stop early if top-level invalid (can't validate records)
+    if (errors.length > 0) {
+        return { valid: false, errors };
+    }
+
+    // Per-record validation
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+    data.records.forEach((record, index) => {
+        const prefix = `Record ${index + 1}`;
+
+        // Required fields check
+        if (!record.date) {
+            errors.push(`${prefix}: missing "date"`);
+        } else if (!dateRegex.test(record.date)) {
+            errors.push(`${prefix}: date "${record.date}" must be YYYY-MM-DD`);
+        }
+
+        if (!record.reason) {
+            errors.push(`${prefix}: missing "reason"`);
+        } else if (!VALID_REASONS.includes(record.reason)) {
+            errors.push(`${prefix}: invalid reason "${record.reason}". Valid: ${VALID_REASONS.join(', ')}`);
+        }
+
+        if (record.annual === undefined || record.annual === null) {
+            errors.push(`${prefix}: missing "annual" salary`);
+        } else if (typeof record.annual !== 'number') {
+            errors.push(`${prefix}: annual must be a number`);
+        } else {
+            // Reuse existing salary range validation
+            try {
+                validateSalaryRange(record.annual, 'annual');
+            } catch (e) {
+                errors.push(`${prefix}: ${e.message}`);
+            }
+        }
+
+        if (record.perCheck === undefined || record.perCheck === null) {
+            errors.push(`${prefix}: missing "perCheck" amount`);
+        } else if (typeof record.perCheck !== 'number') {
+            errors.push(`${prefix}: perCheck must be a number`);
+        } else if (record.perCheck > 0) {
+            // Only validate if positive (some records may have 0)
+            try {
+                validateSalaryRange(record.perCheck, 'perCheck');
+            } catch (e) {
+                errors.push(`${prefix}: ${e.message}`);
+            }
+        }
+    });
+
+    return { valid: errors.length === 0, errors };
+}
+
 function loadJsonFile(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -688,10 +784,15 @@ function loadJsonFile(event) {
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
-            employeeData = JSON.parse(e.target.result);
-            if (!employeeData.records || !employeeData.hireDate) {
-                throw new Error('Invalid data format');
+            const parsed = JSON.parse(e.target.result);
+
+            // Schema validation (#176)
+            const validation = validateImportedData(parsed);
+            if (!validation.valid) {
+                throw new Error(validation.errors.join('; '));
             }
+
+            employeeData = parsed;
             employeeData.isDemo = false;
             showDashboard();
             // Hide demo banner for loaded data

@@ -1,7 +1,127 @@
 # Issue Plan - Paylocity Compensation Journey
 
-**Updated**: 2026-02-03
-**Total Issues**: 3 open, 129 closed (97.7% completion rate)
+**Updated**: 2026-02-04
+**Total Issues**: 18 open, 129 closed (87.8% completion rate)
+
+---
+
+## Phase 1: Security Hardening (~2-3 hours) ✅ COMPLETE
+
+| Issue | Title | Effort | Priority | Status |
+|-------|-------|--------|----------|--------|
+| #169 | Add data: URL to security validation patterns | easy | 🟡 MED | ✅ Done |
+| #173 | Consider encrypting localStorage backup data | medium | 🟡 MED | ⏭️ Skipped (unnecessary for personal tool) |
+| #176 | Add JSON schema validation on file import | easy | 🟢 LOW | ✅ Done |
+
+**Rationale**: Security issues first. Quick wins that harden the app before adding more features.
+
+**Completed 2026-02-04**:
+- #169: Added `/data:/i` pattern to `js/security.js` + 5 test cases
+- #176: Added `validateImportedData()` schema validator to `app.js`
+
+---
+
+## Phase 2: Testing Infrastructure (~3-4 hours)
+
+| Issue | Title | Effort | Priority |
+|-------|-------|--------|----------|
+| #168 | Unskip 3 inflation tests in calculations.test.js | medium | 🟡 MED |
+| #167 | Add performance testing (benchmarks and load tests) | medium | 🟡 MED |
+
+**Rationale**: Fix existing tests + add performance baselines BEFORE refactoring code.
+
+---
+
+## Phase 3: Quick Code Quality Wins (~2-3 hours)
+
+| Issue | Title | Effort | Priority |
+|-------|-------|--------|----------|
+| #172 | Debounce paste input validation | easy | 🟡 MED |
+| #174 | Move inline styles to CSS classes | easy | 🟢 LOW |
+| #166 | Create chart updater factory function (DRY pattern) | medium | 🟡 MED |
+
+**Rationale**: Small, self-contained improvements. Low risk changes that improve maintainability.
+
+---
+
+## Phase 4: Documentation (~2-3 hours)
+
+| Issue | Title | Effort | Priority |
+|-------|-------|--------|----------|
+| #171 | Add architecture diagrams to CLAUDE.md | medium | 🟡 MED |
+| #170 | Create CONTRIBUTING.md for contributor guidelines | medium | 🟡 MED |
+| #175 | Increase inline comment density in app.js (14% → 20%) | easy | 🟢 LOW |
+
+**Rationale**: Document current architecture BEFORE major refactoring in Phase 5.
+
+---
+
+## Phase 5: Major Refactoring (~6-8 hours)
+
+| Issue | Title | Effort | Priority |
+|-------|-------|--------|----------|
+| #165 | Split initEventListeners() into feature-specific functions | medium | 🟡 MED |
+| #164 | Split app.js into focused modules (reduce 2,400 lines) | hard | 🟡 MED |
+
+**Rationale**: Big changes that touch core app structure. Do after tests pass and architecture is documented.
+
+---
+
+## Phase 6: Performance Optimization (~4-6 hours)
+
+| Issue | Title | Effort | Priority |
+|-------|-------|--------|----------|
+| #181 | Implement lazy rendering for tab content | medium | 🟢 LOW |
+| #180 | Implement code splitting for app.js | hard | 🟢 LOW |
+
+**Rationale**: Optimize after modularization complete. These build on Phase 5 changes.
+
+---
+
+## Backlog: Hard Items (Defer)
+
+| Issue | Title | Effort | Priority | Defer Reason |
+|-------|-------|--------|----------|--------------|
+| #148 | Refactor to testable architecture with dependency injection | hard | 🟡 MED | After Phase 5 modularization |
+| #145 | Make parser resilient to Paylocity format changes | hard | 🟢 LOW | No format issues reported |
+| #116 | Update landing page screenshots to Tactical theme | hard | 🟢 LOW | After all visual work complete |
+
+---
+
+## Priority Summary
+
+| Priority | Count | Issues |
+|----------|-------|--------|
+| 🔴 HIGH | 0 | — |
+| 🟡 MED | 12 | #169, #173, #168, #167, #172, #166, #171, #170, #165, #164, #148 |
+| 🟢 LOW | 6 | #176, #174, #175, #181, #180, #145, #116 |
+
+---
+
+## Issue Categories
+
+| Category | Count | Issues |
+|----------|-------|--------|
+| Security | 3 | #169, #173, #176 |
+| Testing | 2 | #167, #168 |
+| Code Quality | 4 | #164, #165, #166, #174 |
+| Performance | 3 | #172, #180, #181 |
+| Documentation | 3 | #170, #171, #175 |
+| Hard/Backlog | 3 | #116, #145, #148 |
+
+---
+
+## Recommended Path
+
+1. **Phase 1** → Security first (protects users)
+2. **Phase 2** → Testing infrastructure (catches regressions)
+3. **Phase 3** → Quick wins (immediate code quality)
+4. **Phase 4** → Documentation (captures current state)
+5. **Phase 5** → Major refactoring (with tests + docs in place)
+6. **Phase 6** → Performance (builds on modular code)
+7. **Backlog** → When time/need arises
+
+**Project Status**: Active development. Core features complete, focusing on maintainability and performance.
 
 ---
 
@@ -35,34 +155,4 @@
 
 ---
 
-## Backlog: Architecture & Polish
-
-| Issue | Title | Effort | Priority | Defer Reason |
-|-------|-------|--------|----------|--------------|
-| #148 | Refactor to testable architecture with dependency injection | hard | 🟡 MED | Do when feature set stabilizes |
-| #145 | Make parser resilient to Paylocity format changes | hard | 🟢 LOW | No format changes anticipated |
-| #116 | Update landing page screenshots to Tactical theme | hard | 🟢 LOW | Wait until all visual work complete |
-
----
-
-## Priority Summary
-
-| Priority | Count | Issues |
-|----------|-------|--------|
-| 🔴 HIGH | 0 | — |
-| 🟡 MED | 1 | #148 (testable architecture) |
-| 🟢 LOW | 2 | #145 (parser), #116 (screenshots) |
-
----
-
-## Recommended Path
-
-1. **When adding features**: #148 (architecture) - enables unit testing
-2. **If format issues reported**: #145 (parser resilience)
-3. **After visual work complete**: #116 (screenshots)
-
-**Project Status**: Stable. All user-facing features complete.
-
----
-
-*Plan updated 2026-02-03 after #146 completion. Re-run `/tg-issues` to refresh.*
+*Plan updated 2026-02-04. Re-run `/tg-issues` to refresh.*

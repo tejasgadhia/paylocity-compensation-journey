@@ -37,7 +37,8 @@ export function validateTemplateData(data) {
                 /<script/i,
                 /javascript:/i,
                 /on\w+\s*=/i,  // onclick=, onerror=, etc.
-                /<iframe/i
+                /<iframe/i,
+                /data:/i       // Prevent data: URL XSS attacks (#169)
             ];
 
             for (const pattern of suspiciousPatterns) {

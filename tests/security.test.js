@@ -202,6 +202,38 @@ describe('validateTemplateData (XSS Prevention)', () => {
         });
     });
 
+    describe('Data URL Attacks (#169)', () => {
+        it('rejects data:text/html XSS', () => {
+            expect(() => validateTemplateData({
+                link: "data:text/html,<script>alert('XSS')</script>"
+            })).toThrow(/Suspicious pattern/);
+        });
+
+        it('rejects data:image/svg+xml XSS', () => {
+            expect(() => validateTemplateData({
+                img: 'data:image/svg+xml,<svg onload=alert(1)>'
+            })).toThrow(/Suspicious pattern/);
+        });
+
+        it('rejects DATA: (case insensitive)', () => {
+            expect(() => validateTemplateData({
+                link: 'DATA:text/html,<script>alert(1)</script>'
+            })).toThrow(/Suspicious pattern/);
+        });
+
+        it('rejects Data: (mixed case)', () => {
+            expect(() => validateTemplateData({
+                link: 'Data:text/html,evil'
+            })).toThrow(/Suspicious pattern/);
+        });
+
+        it('rejects data:application/javascript', () => {
+            expect(() => validateTemplateData({
+                script: 'data:application/javascript,alert(1)'
+            })).toThrow(/Suspicious pattern/);
+        });
+    });
+
     describe('Real-World Attack Vectors', () => {
         it('blocks img onerror attack', () => {
             expect(() => validateTemplateData({
