@@ -74,10 +74,15 @@ export const CONSTANTS = {
  * Source: Bureau of Labor Statistics
  */
 export const cpiData = {
-    2010: 1.6, 2011: 3.2, 2012: 2.1, 2013: 1.5, 2014: 1.6,
-    2015: 0.1, 2016: 1.3, 2017: 2.1, 2018: 2.4, 2019: 1.8,
-    2020: 1.2, 2021: 4.7, 2022: 8.0, 2023: 4.1, 2024: 2.9,
-    2025: 2.5 // Projected
+    2011: 3,
+    2012: 1.7,
+    2013: 1.5,
+    2014: 0.8,
+    2015: 0.7,
+    2016: 2.1,
+    2017: 2.1,
+    2018: 1.9,
+    2019: 2.3
 };
 
 /**
@@ -85,7 +90,7 @@ export const cpiData = {
  * Used for freshness checking and source attribution
  */
 export const cpiMetadata = {
-    lastUpdated: '2025-01', // YYYY-MM format, updated by GitHub Action
+    lastUpdated: '2026-02', // YYYY-MM format, updated by GitHub Action
     source: 'Bureau of Labor Statistics',
     seriesId: 'CUUR0000SA0', // CPI-U All Urban Consumers, U.S. city average
     updateFrequency: 'quarterly',
@@ -130,7 +135,7 @@ export const benchmarkMetadata = {
 
     lastUpdated: {
         salaryBenchmarks: '2024-Q4',
-        inflationData: '2024-12',  // Monthly CPI updates from BLS
+        inflationData: '2026-02',  // Monthly CPI updates from BLS
         industryCagr: '2024-Q3'
     },
 
