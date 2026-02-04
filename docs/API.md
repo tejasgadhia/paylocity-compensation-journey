@@ -453,7 +453,7 @@ Application-wide configuration values.
 | `PROJECTION_RATE_CONSERVATIVE` | `number` | `0.05` | 5% conservative growth |
 | `PROJECTION_RATE_OPTIMISTIC` | `number` | `0.12` | 12% optimistic growth |
 | `CHART_ANIMATION_DURATION` | `number` | `300` | Chart animation ms |
-| `MOBILE_BREAKPOINT` | `number` | `900` | Mobile splash breakpoint |
+| `MIN_VIEWPORT_WIDTH` | `number` | `1280` | Desktop block overlay breakpoint (#146) |
 
 ---
 

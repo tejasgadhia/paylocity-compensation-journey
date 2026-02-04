@@ -43,30 +43,41 @@ import {
 } from './js/charts.js';
 
 // ========================================
-// MOBILE/TABLET DETECTION
+// DESKTOP BLOCK OVERLAY (#146)
 // ========================================
 
-// Only run mobile detection in browser environment
+// Only run viewport detection in browser environment
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     (function() {
-        const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(navigator.userAgent);
-        const isSmallScreen = window.innerWidth < CONSTANTS.MOBILE_BREAKPOINT;
+        let viewportCheckTimeout;
 
-        if (isMobileUA || isSmallScreen) {
-            document.getElementById('mobileSplash').classList.add('active');
-            document.body.style.overflow = 'hidden';
+        function checkViewportSupport() {
+            const overlay = document.getElementById('desktopBlockOverlay');
+            const widthDisplay = document.getElementById('currentViewportWidth');
+            const currentWidth = window.innerWidth;
+
+            // Update displayed width
+            if (widthDisplay) {
+                widthDisplay.textContent = currentWidth + 'px';
+            }
+
+            if (currentWidth >= CONSTANTS.MIN_VIEWPORT_WIDTH) {
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            } else {
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
         }
 
-        // Also check on resize
+        // Debounced resize handler
         window.addEventListener('resize', function() {
-            if (window.innerWidth < CONSTANTS.MOBILE_BREAKPOINT) {
-                document.getElementById('mobileSplash').classList.add('active');
-                document.body.style.overflow = 'hidden';
-            } else if (!(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(navigator.userAgent))) {
-                document.getElementById('mobileSplash').classList.remove('active');
-                document.body.style.overflow = '';
-            }
+            clearTimeout(viewportCheckTimeout);
+            viewportCheckTimeout = setTimeout(checkViewportSupport, 100);
         });
+
+        // Initial check
+        checkViewportSupport();
     })();
 }
 
@@ -1966,7 +1977,7 @@ function initEventListeners() {
         // Landing page
         landingPage: document.getElementById('landingPage'),
         dashboardPage: document.getElementById('dashboardPage'),
-        mobileSplash: document.getElementById('mobileSplash'),
+        desktopBlockOverlay: document.getElementById('desktopBlockOverlay'),
 
         // Import modal
         importModal: document.getElementById('importModal'),

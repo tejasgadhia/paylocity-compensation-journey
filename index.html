@@ -1625,46 +1625,133 @@
         }
 
         /* ========================================
-           MOBILE SPLASH SCREEN
+           DESKTOP BLOCK OVERLAY (#146)
+           Full-screen block for viewports < 1280px
            ======================================== */
-        
-        .mobile-splash {
+
+        .desktop-block-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--bg-primary);
-            z-index: 9999;
-            flex-direction: column;
+            inset: 0;
+            z-index: 10000;
             align-items: center;
             justify-content: center;
             padding: var(--space-8);
-            text-align: center;
+            background: var(--bg-primary);
         }
 
-        .mobile-splash.active {
+        .desktop-block-overlay.active {
             display: flex;
         }
 
-        .mobile-splash-icon {
-            font-size: var(--space-16);
-            margin-bottom: 1.5rem;
+        .desktop-block-card {
+            max-width: 420px;
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-modal);
+            overflow: hidden;
         }
 
-        .mobile-splash-title {
+        .desktop-block-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            padding: var(--space-5);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .desktop-block-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--color-brand-muted);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .desktop-block-icon svg {
+            width: 22px;
+            height: 22px;
+            color: var(--color-brand);
+        }
+
+        .desktop-block-header-text h1 {
             font-family: var(--font-display);
-            font-size: var(--font-size-lg);
+            font-size: var(--font-size-md);
+            font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 1rem;
+            margin: 0;
         }
 
-        .mobile-splash-message {
-            font-size: var(--font-size-base);
+        .desktop-block-status {
+            font-family: var(--font-mono);
+            font-size: var(--font-size-xs);
+            color: var(--color-warning);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: var(--space-1);
+        }
+
+        .desktop-block-body {
+            padding: var(--space-5);
+        }
+
+        .desktop-block-message {
+            font-size: var(--font-size-sm);
             color: var(--text-secondary);
             line-height: 1.6;
-            max-width: 320px;
+            margin: 0 0 var(--space-5);
+        }
+
+        .desktop-block-requirements {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            font-family: var(--font-mono);
+            font-size: var(--font-size-sm);
+        }
+
+        .desktop-block-req-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-2) 0;
+            color: var(--text-muted);
+        }
+
+        .desktop-block-req-row:not(:last-child) {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .desktop-block-req-value {
+            color: var(--color-info);
+            font-weight: 500;
+        }
+
+        .desktop-block-req-row.current .desktop-block-req-value {
+            color: var(--color-danger);
+        }
+
+        .desktop-block-req-row.recommended .desktop-block-req-value {
+            color: var(--color-success);
+        }
+
+        .desktop-block-hint {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            margin-top: var(--space-4);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .desktop-block-hint svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
         }
 
         /* ========================================
@@ -4625,12 +4712,43 @@
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <!-- ==========================================
-         MOBILE SPLASH SCREEN
+         DESKTOP BLOCK OVERLAY (#146)
          ========================================== -->
-    <div id="mobileSplash" class="mobile-splash">
-        <div class="mobile-splash-icon">💻</div>
-        <h1 class="mobile-splash-title">Desktop Required</h1>
-        <p class="mobile-splash-message">Compensation Journey is built for desktop browsers with larger screens. Please visit this page on a laptop or desktop computer to continue.</p>
+    <div id="desktopBlockOverlay" class="desktop-block-overlay">
+        <div class="desktop-block-card">
+            <div class="desktop-block-header">
+                <div class="desktop-block-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8m-4-4v4"/></g></svg>
+                </div>
+                <div class="desktop-block-header-text">
+                    <h1>Viewport Too Small</h1>
+                    <div class="desktop-block-status">Unsupported</div>
+                </div>
+            </div>
+            <div class="desktop-block-body">
+                <p class="desktop-block-message">
+                    This dashboard requires a minimum viewport width to display all compensation analytics properly.
+                </p>
+                <div class="desktop-block-requirements">
+                    <div class="desktop-block-req-row">
+                        <span>Min width</span>
+                        <span class="desktop-block-req-value">1280px</span>
+                    </div>
+                    <div class="desktop-block-req-row current">
+                        <span>Your width</span>
+                        <span class="desktop-block-req-value" id="currentViewportWidth">&mdash;</span>
+                    </div>
+                    <div class="desktop-block-req-row recommended">
+                        <span>Recommended</span>
+                        <span class="desktop-block-req-value">1440px+</span>
+                    </div>
+                </div>
+                <p class="desktop-block-hint">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m18 8l4 4l-4 4M2 12h20M6 8l-4 4l4 4"/></svg>
+                    Works best on laptops (13"+) and desktop monitors
+                </p>
+            </div>
+        </div>
     </div>
 
     <!-- ==========================================

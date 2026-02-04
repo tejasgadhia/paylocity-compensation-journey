@@ -56,7 +56,7 @@ export const CONSTANTS = {
     STORAGE_KEY_CPI_WARNING: 'cpiStaleWarningDismissed',
 
     // Screen size breakpoints
-    MOBILE_BREAKPOINT: 900,             // px - below this shows mobile splash
+    MIN_VIEWPORT_WIDTH: 1280,           // px - minimum width for desktop block overlay (#146)
 
     // Demo scenarios
     DEMO_SCENARIO_COUNT: 4,             // Number of demo scenarios available
