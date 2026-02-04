@@ -2032,27 +2032,27 @@ function initEventListeners() {
     const tabData = {
         home: {
             name: 'Salary Timeline',
-            img: 'screenshots/tab-home.png',
+            img: 'screenshots/tab-home.webp',
             url: 'tejasgadhia.github.io/paylocity-compensation-journey/#home'
         },
         market: {
             name: 'Market Benchmarks',
-            img: 'screenshots/tab-market.png',
+            img: 'screenshots/tab-market.webp',
             url: 'tejasgadhia.github.io/paylocity-compensation-journey/#market'
         },
         history: {
             name: 'Pay History',
-            img: 'screenshots/tab-history.png',
+            img: 'screenshots/tab-history.webp',
             url: 'tejasgadhia.github.io/paylocity-compensation-journey/#history'
         },
         analytics: {
             name: 'Growth Analytics',
-            img: 'screenshots/tab-analytics.png',
+            img: 'screenshots/tab-analytics.webp',
             url: 'tejasgadhia.github.io/paylocity-compensation-journey/#analytics'
         },
         projections: {
             name: 'Future Projections',
-            img: 'screenshots/tab-projections.png',
+            img: 'screenshots/tab-projections.webp',
             url: 'tejasgadhia.github.io/paylocity-compensation-journey/#projections'
         }
     };
@@ -2336,9 +2336,11 @@ function initEventListeners() {
     });
 
     // Paste input textarea
+    // #P2-9: Debounce validation to prevent regex firing on every keystroke
     const pasteInput = document.getElementById('pasteInput');
     if (pasteInput) {
-        pasteInput.addEventListener('input', validatePasteInput);
+        const debouncedValidation = debounce(validatePasteInput, 300);
+        pasteInput.addEventListener('input', debouncedValidation);
     }
 
     // Legal consent checkbox

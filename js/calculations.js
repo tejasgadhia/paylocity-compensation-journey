@@ -4,6 +4,25 @@
 
 import { CONSTANTS, cpiData } from './constants.js';
 
+// ========================================
+// MEMOIZATION CACHE (#P1-4 Performance)
+// ========================================
+
+/**
+ * Cache for inflation calculations to avoid redundant computations.
+ * Key format: "startYear-startMonth-endYear-endMonth"
+ * Value: calculated cumulative inflation percentage
+ */
+const inflationCache = new Map();
+
+/**
+ * Clears the inflation calculation cache.
+ * Call this if CPI data is updated at runtime (e.g., new year's data added).
+ */
+export function clearInflationCache() {
+    inflationCache.clear();
+}
+
 /**
  * Calculates cumulative inflation over a specific time period.
  *
@@ -33,6 +52,12 @@ import { CONSTANTS, cpiData } from './constants.js';
  * // July 2021 through May 2023
  */
 export function calculateInflationOverPeriod(startYear, endYear, startMonth = 0, endMonth = 11) {
+    // Check memoization cache first (#P1-4 Performance)
+    const cacheKey = `${startYear}-${startMonth}-${endYear}-${endMonth}`;
+    if (inflationCache.has(cacheKey)) {
+        return inflationCache.get(cacheKey);
+    }
+
     // Supports partial years - months are 0-indexed (0 = January, 11 = December)
     let cumulativeInflation = 1;
 
@@ -59,7 +84,11 @@ export function calculateInflationOverPeriod(startYear, endYear, startMonth = 0,
             cumulativeInflation *= (1 + rate / 100);
         }
     }
-    return (cumulativeInflation - 1) * 100; // Return as percentage
+    const result = (cumulativeInflation - 1) * 100; // Return as percentage
+
+    // Store in cache for future calls (#P1-4 Performance)
+    inflationCache.set(cacheKey, result);
+    return result;
 }
 
 /**

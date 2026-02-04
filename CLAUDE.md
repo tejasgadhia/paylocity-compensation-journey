@@ -8,15 +8,15 @@ Paylocity Compensation Journey transforms raw Paylocity pay history data into a 
 
 ## Tech Stack
 
-- **Core**: `index.html` (HTML + CSS) + modular JavaScript
+- **Core**: `index.html` (HTML) + `styles.css` (CSS) + modular JavaScript
 - **JavaScript Modules**:
   - `app.js` - Main application logic, UI orchestration
   - `js/charts.js` - Chart building and theme updates (Chart.js)
-  - `js/calculations.js` - Financial calculation helpers
+  - `js/calculations.js` - Financial calculation helpers (with memoization)
   - `js/constants.js` - Named constants (magic numbers eliminated)
   - `js/parser.js` - Paylocity data parser
   - `js/security.js` - Template validation
-- **Chart.js**: Self-hosted with SRI (`assets/js/chart.umd.min.js`)
+- **Chart.js**: Self-hosted v4.4.7 (`assets/js/chart.umd.min.js`)
 - **Fonts**: Self-hosted JetBrains Mono, Space Grotesk
 - **LocalStorage**: Theme preference persistence
 - **Deployment**: GitHub Pages
@@ -24,9 +24,10 @@ Paylocity Compensation Journey transforms raw Paylocity pay history data into a 
 ## Architecture Principles
 
 ### Modular Application
-- `index.html` contains HTML structure and inline CSS
+- `index.html` contains HTML structure
+- `styles.css` contains all CSS (extracted for browser caching)
 - JavaScript split into focused modules (`app.js`, `js/*.js`)
-- Self-hosted dependencies (Chart.js, fonts) with SRI
+- Self-hosted dependencies (Chart.js v4.4.7, fonts)
 - No build process required
 - Works completely offline after initial load
 

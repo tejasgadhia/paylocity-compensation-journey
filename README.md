@@ -8,21 +8,20 @@ Paylocity gives you raw pay history tables. It doesn't show you CAGR, market com
 
 ## Screenshots
 
-**Artistic Theme (Light Mode)**
+**Home Dashboard**
 
-![Splash Screen - Import Your Data](screenshots/splash-artistic.png)
-*Splash screen with data import instructions*
-
-![Home Dashboard - KPIs and Timeline](screenshots/home-artistic.png)
+![Home Dashboard - KPIs and Timeline](screenshots/tab-home.webp)
 *Dashboard with compensation timeline and key metrics*
 
-**Tactical Theme (Dark Mode)**
+**Market Benchmarks**
 
-![Home Dashboard - Dark Mode](screenshots/home-tactical.png)
-*Same dashboard in tactical (dark) theme*
-
-![Market Benchmarks - Industry Comparison](screenshots/market-tactical.png)
+![Market Benchmarks - Industry Comparison](screenshots/tab-market.webp)
 *Benchmark analysis against B2B SaaS industry standards*
+
+**Projections**
+
+![Salary Projections](screenshots/tab-projections.webp)
+*Future salary projections with customizable growth rates*
 
 ## What This Does
 
