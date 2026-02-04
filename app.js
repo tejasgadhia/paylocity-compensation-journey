@@ -2167,29 +2167,6 @@ function initEventListeners() {
         });
     }
 
-    // Import modal "How to verify" link (#144)
-    const importModalVerifyLink = document.getElementById('importModalVerifyLink');
-    if (importModalVerifyLink) {
-        importModalVerifyLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            const modal = document.getElementById('importModal');
-            if (modal) {
-                modal.style.display = 'none';
-                modal.classList.remove('visible');
-            }
-            setTab('help');
-            setTimeout(() => {
-                const securitySection = document.getElementById('security-privacy-section');
-                if (securitySection) {
-                    securitySection.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            }, 100);
-        });
-    }
-
     // JSON file input
     const jsonFileInput = document.getElementById('jsonFileInput');
     if (jsonFileInput) {

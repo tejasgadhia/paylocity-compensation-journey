@@ -1059,6 +1059,22 @@
             color: var(--color-brand);
         }
 
+        .header-privacy-note {
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            margin-left: auto;
+            margin-right: var(--space-4);
+        }
+
+        .header-privacy-note svg {
+            width: 0.875rem;
+            height: 0.875rem;
+            color: var(--color-success);
+        }
+
         .import-modal-close {
             background: none;
             border: none;
@@ -4759,6 +4775,10 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></g></svg>
                     Import Your Data
                 </h2>
+                <span class="header-privacy-note">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></g></svg>
+                    Your data stays on your device
+                </span>
                 <button class="import-modal-close" id="closeImportBtn" aria-label="Close import dialog">✕</button>
             </div>
 
@@ -4766,23 +4786,13 @@
                 <div class="instructions-box">
                     <div class="instructions-title">How to get your data from Paylocity</div>
                     <ol class="instructions-list">
-                        <li>Log in to <code>paylocity.com</code></li>
+                        <li>Log in to <a href="https://access.paylocity.com/" target="_blank" rel="noopener">access.paylocity.com</a></li>
                         <li>On your dashboard, click the <code>Pay</code> card heading</li>
                         <li>Click the <code>Show Private Data</code> button</li>
                         <li>Navigate to the <code>Rates</code> tab</li>
                         <li><strong>Select everything</strong> from the word <code>Rates</code> at the very top, all the way down to <code>items</code> at the bottom — include the Current section, History table, and pagination text</li>
                         <li>Copy (<kbd>Ctrl+C</kbd> / <kbd>Cmd+C</kbd>) and paste below</li>
                     </ol>
-                </div>
-
-                <div class="privacy-callout">
-                    <span class="privacy-callout-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></g></svg></span>
-                    <div class="privacy-callout-content">
-                        <span class="privacy-callout-text">
-                            <strong>Your data stays on your device</strong> — nothing is sent anywhere.
-                        </span>
-                        <a href="#" class="privacy-verify-link" id="importModalVerifyLink">How to verify →</a>
-                    </div>
                 </div>
 
                 <div class="paste-area">
