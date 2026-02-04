@@ -56,7 +56,7 @@ export async function assertChartRendered(page, chartId) {
  */
 export async function assertTabsPresent(page) {
   for (const tabName of TABS) {
-    const tabButton = page.locator(`[data-tab="${tabName}"]`);
+    const tabButton = page.locator(`.tab-btn[data-tab="${tabName}"]`);
     await expect(tabButton).toBeVisible();
     await expect(tabButton).toBeEnabled();
   }
@@ -133,7 +133,7 @@ export async function assertErrorMessage(page, expectedText) {
  */
 export async function assertHistoryTableRows(page, expectedRows) {
   // Switch to History tab (contains history table)
-  const historyTab = page.locator('[data-tab="history"]');
+  const historyTab = page.locator('.tab-btn[data-tab="history"]');
   if (!(await historyTab.isVisible())) {
     await historyTab.click();
     await page.waitForTimeout(300);

@@ -90,8 +90,8 @@ export async function switchTheme(page, theme) {
  * @param {string} tabName - Tab name: 'home', 'story', 'market', 'history', 'analytics', 'projections', 'help'
  */
 export async function switchTab(page, tabName) {
-  // Find tab button by data-tab attribute
-  await page.locator(`[data-tab="${tabName}"]`).click();
+  // Find tab button by class AND data-tab attribute (avoid feature chips)
+  await page.locator(`.tab-btn[data-tab="${tabName}"]`).click();
 
   // Wait for tab content to render (IDs have 'tab-' prefix)
   await page.locator(`#tab-${tabName}.tab-content.active`).waitFor({ state: 'visible' });

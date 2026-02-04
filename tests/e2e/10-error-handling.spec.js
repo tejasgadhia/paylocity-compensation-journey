@@ -92,7 +92,7 @@ test.describe('Error Handling & Recovery', () => {
     await expect(page.locator('.tab-btn')).toHaveCount(7);
 
     // Other tabs should still be accessible
-    await page.locator('[data-tab="history"]').click();
+    await page.locator('.tab-btn[data-tab="history"]').click();
     await expect(page.locator('#tab-history.active')).toBeVisible();
   });
 
