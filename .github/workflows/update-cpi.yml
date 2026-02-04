@@ -1,0 +1,41 @@
+name: Update CPI Data
+
+on:
+  schedule:
+    # Quarterly: 15th of Jan, Apr, Jul, Oct at midnight UTC
+    - cron: '0 0 15 1,4,7,10 *'
+  workflow_dispatch: # Manual trigger for testing
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-cpi:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch and update CPI data
+        run: node .github/scripts/update-cpi.js
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: 'chore: Update CPI inflation data from BLS API'
+          title: 'chore: Update CPI inflation data'
+          body: |
+            Automated quarterly CPI update from Bureau of Labor Statistics.
+
+            **Review**: Verify the new inflation values look reasonable before merging.
+
+            [View BLS CPI Data](https://www.bls.gov/cpi/data.htm)
+          branch: 'chore/update-cpi-data'
+          delete-branch: true
+          labels: 'automation,data'

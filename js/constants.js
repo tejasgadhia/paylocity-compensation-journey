@@ -53,6 +53,7 @@ export const CONSTANTS = {
     // LocalStorage keys
     STORAGE_KEY_THEME: 'theme',
     STORAGE_KEY_DEMO_BANNER: 'demoBannerDismissed',
+    STORAGE_KEY_CPI_WARNING: 'cpiStaleWarningDismissed',
 
     // Screen size breakpoints
     MOBILE_BREAKPOINT: 900,             // px - below this shows mobile splash
@@ -77,6 +78,18 @@ export const cpiData = {
     2015: 0.1, 2016: 1.3, 2017: 2.1, 2018: 2.4, 2019: 1.8,
     2020: 1.2, 2021: 4.7, 2022: 8.0, 2023: 4.1, 2024: 2.9,
     2025: 2.5 // Projected
+};
+
+/**
+ * CPI Data Metadata
+ * Used for freshness checking and source attribution
+ */
+export const cpiMetadata = {
+    lastUpdated: '2025-01', // YYYY-MM format, updated by GitHub Action
+    source: 'Bureau of Labor Statistics',
+    seriesId: 'CUUR0000SA0', // CPI-U All Urban Consumers, U.S. city average
+    updateFrequency: 'quarterly',
+    staleThresholdMonths: 6
 };
 
 // ========================================

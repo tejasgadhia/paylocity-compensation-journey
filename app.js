@@ -9,7 +9,7 @@
 // IMPORTS
 // ========================================
 
-import { CONSTANTS, benchmarks, benchmarkMetadata } from './js/constants.js';
+import { CONSTANTS, benchmarks, benchmarkMetadata, cpiMetadata } from './js/constants.js';
 import {
     calculateInflationOverPeriod,
     calculateRealGrowth,
@@ -740,6 +740,9 @@ function showDashboard() {
             heading.focus();
         }
     }, 100);
+
+    // Check if CPI data is stale and show warning if needed
+    checkCPIDataFreshness();
 }
 
 function resetDashboard() {
@@ -887,6 +890,115 @@ function showUserMessage(message, type = 'error') {
             banner.remove();
         }
     }, 5000);
+}
+
+/**
+ * Checks if CPI inflation data is stale and shows a warning if needed.
+ * Data is considered stale if older than threshold defined in cpiMetadata.
+ * Warning can be dismissed and will be remembered in localStorage.
+ */
+function checkCPIDataFreshness() {
+    const dismissedTimestamp = localStorage.getItem(CONSTANTS.STORAGE_KEY_CPI_WARNING);
+
+    // If dismissed recently (within 30 days), don't show again
+    if (dismissedTimestamp) {
+        const daysSinceDismissed = (Date.now() - parseInt(dismissedTimestamp, 10)) / (1000 * 60 * 60 * 24);
+        if (daysSinceDismissed < 30) {
+            return;
+        }
+    }
+
+    // Parse lastUpdated date (YYYY-MM format)
+    const lastUpdated = new Date(cpiMetadata.lastUpdated + '-01');
+    const monthsOld = (Date.now() - lastUpdated.getTime()) / (1000 * 60 * 60 * 24 * 30);
+
+    if (monthsOld > cpiMetadata.staleThresholdMonths) {
+        showStaleDataWarning(lastUpdated);
+    }
+}
+
+/**
+ * Displays a subtle warning banner when CPI data is stale.
+ * @param {Date} lastUpdated - Date when CPI data was last updated
+ */
+function showStaleDataWarning(lastUpdated) {
+
+    // Remove any existing stale warning
+    document.querySelectorAll('.stale-data-warning').forEach(el => el.remove());
+
+    const formattedDate = lastUpdated.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short'
+    });
+
+    const banner = document.createElement('div');
+    banner.className = 'stale-data-warning';
+    banner.setAttribute('role', 'alert');
+    banner.innerHTML = `
+        <span class="stale-warning-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+        </span>
+        <span class="stale-warning-text">
+            Inflation data last updated ${formattedDate}.
+            <a href="https://www.bls.gov/cpi/" target="_blank" rel="noopener noreferrer">View latest</a>
+        </span>
+        <button class="stale-warning-dismiss" aria-label="Dismiss stale data warning">✕</button>
+    `;
+
+    banner.style.cssText = `
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+        z-index: 9000;
+        padding: 0.75rem 1rem;
+        background: var(--secondary-bg, #1a1a1b);
+        border: 1px solid var(--border-color, #333);
+        border-radius: 8px;
+        color: var(--text-secondary, #a0a0a0);
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        max-width: 360px;
+    `;
+
+    const icon = banner.querySelector('.stale-warning-icon');
+    icon.style.cssText = `
+        color: #f5a623;
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+    `;
+
+    const link = banner.querySelector('a');
+    link.style.cssText = `
+        color: var(--accent-color, #f5a623);
+        text-decoration: none;
+        margin-left: 0.25rem;
+    `;
+
+    const dismissBtn = banner.querySelector('.stale-warning-dismiss');
+    dismissBtn.style.cssText = `
+        background: transparent;
+        border: none;
+        color: var(--text-secondary, #a0a0a0);
+        font-size: 1.25rem;
+        cursor: pointer;
+        padding: 0 0.25rem;
+        margin-left: 0.5rem;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    `;
+
+    dismissBtn.addEventListener('click', () => {
+        localStorage.setItem(CONSTANTS.STORAGE_KEY_CPI_WARNING, Date.now().toString());
+        banner.remove();
+    });
+
+    document.body.appendChild(banner);
 }
 
 function formatCurrency(amount, showDollars = state.showDollars) {
