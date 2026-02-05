@@ -76,6 +76,146 @@ let employeeData = null;
 
 All modules receive dependencies via initialization functions (e.g., `initCharts()`, `initTheme()`, `initNavigation()`) for loose coupling and testability.
 
+## Architecture Diagrams
+
+### Module Dependency Graph
+
+Shows how `app.js` orchestrates all 16 modules through dependency injection:
+
+```mermaid
+graph TD
+    subgraph Core
+        A[app.js]
+    end
+
+    subgraph "UI & Navigation"
+        H[theme.js]
+        I[view.js]
+        J[navigation.js]
+        K[keyboard.js]
+    end
+
+    subgraph "Data Management"
+        N[demo-data.js]
+        M[data-persistence.js]
+        L[io.js]
+        B[parser.js]
+    end
+
+    subgraph Visualization
+        D[charts.js]
+        O[content.js]
+    end
+
+    subgraph "Core Utilities"
+        C[calculations.js]
+        E[constants.js]
+        F[security.js]
+        G[notifications.js]
+        P[event-handlers.js]
+    end
+
+    A --> B
+    A --> C
+    A --> D
+    A --> E
+    A --> F
+    A --> G
+    A --> H
+    A --> I
+    A --> J
+    A --> K
+    A --> L
+    A --> M
+    A --> N
+    A --> O
+    A --> P
+
+    D --> C
+    D --> E
+    C --> E
+    O --> C
+    O --> F
+    M --> L
+```
+
+### Data Flow Diagram
+
+Shows how user data flows through the parsing pipeline to visualization:
+
+```mermaid
+flowchart LR
+    subgraph Input
+        A[User Paste]
+        B[JSON Import]
+        C[Demo Data]
+    end
+
+    subgraph Processing
+        D[parser.js]
+        E[calculations.js]
+    end
+
+    subgraph State
+        F[(employeeData)]
+        G[(state)]
+    end
+
+    subgraph Output
+        H[charts.js]
+        I[content.js]
+        J[DOM Updates]
+        K[localStorage]
+    end
+
+    A --> D
+    B --> F
+    C --> F
+    D --> F
+    F --> E
+    F --> H
+    F --> I
+    E --> H
+    E --> I
+    H --> J
+    I --> J
+    F --> K
+    G --> K
+```
+
+### Chart Lifecycle State Machine
+
+Shows the lifecycle of Chart.js instances managed by `js/charts.js`:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Idle: Page Load
+
+    Idle --> Building: buildChart()
+    Building --> Active: Chart Created
+
+    Active --> Active: updateData()
+    Active --> Active: updateTheme()
+    Active --> Active: updateType()
+
+    Active --> Destroying: destroy()
+    Destroying --> Idle: Cleanup Complete
+
+    Idle --> [*]: Page Unload
+
+    note right of Active
+        Charts use update() for
+        efficient in-place changes
+        instead of full rebuilds
+    end note
+
+    note right of Destroying
+        Always destroy before
+        recreating to prevent
+        memory leaks
+    end note
+```
+
 ## Code Conventions
 
 ### JavaScript
