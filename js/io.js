@@ -4,6 +4,7 @@
 
 import { showUserMessage } from './notifications.js';
 import { validateSalaryRange } from './parser.js';
+import { encryptData, decryptData, isEncrypted, isCryptoSupported, CryptoError } from './crypto.js';
 
 // ========================================
 // CONSTANTS
@@ -54,7 +55,7 @@ export function initIO({ getEmployeeData, setEmployeeData, showDashboard, update
  */
 export function downloadHtmlFile() {
     // Privacy warning - user should understand they're downloading sensitive data
-    if (!confirm('⚠️ This file contains your compensation data. Only share with trusted people.')) {
+    if (!confirm('This file contains your compensation data. Only share with trusted people.')) {
         return;
     }
 
@@ -165,23 +166,168 @@ export function validateImportedData(data) {
 }
 
 // ========================================
+// PASSWORD MODAL
+// ========================================
+
+/**
+ * Shows the password modal and returns user input.
+ * @param {'encrypt' | 'decrypt'} mode - Modal mode
+ * @returns {Promise<string | null>} Password or null if cancelled/skipped
+ */
+function showPasswordModal(mode) {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('passwordModal');
+        const titleText = document.getElementById('passwordModalTitleText');
+        const description = document.getElementById('passwordDescription');
+        const passwordInput = document.getElementById('passwordInput');
+        const confirmInput = document.getElementById('passwordConfirmInput');
+        const confirmGroup = document.getElementById('passwordConfirmGroup');
+        const errorEl = document.getElementById('passwordError');
+        const skipBtn = document.getElementById('passwordSkipBtn');
+        const submitBtn = document.getElementById('passwordSubmitBtn');
+        const closeBtn = document.getElementById('closePasswordBtn');
+
+        // Configure modal for mode
+        if (mode === 'encrypt') {
+            titleText.textContent = 'Encrypt Download';
+            description.textContent = 'Protect your compensation data with a password. You\'ll need this password to open the file later.';
+            confirmGroup.classList.remove('hidden');
+            skipBtn.classList.remove('hidden');
+            submitBtn.textContent = 'Encrypt & Download';
+        } else {
+            titleText.textContent = 'Unlock File';
+            description.textContent = 'This file is encrypted. Enter your password to unlock it.';
+            confirmGroup.classList.add('hidden');
+            skipBtn.classList.add('hidden');
+            submitBtn.textContent = 'Unlock';
+        }
+
+        // Reset state
+        passwordInput.value = '';
+        confirmInput.value = '';
+        errorEl.textContent = '';
+        errorEl.classList.add('hidden');
+
+        // Show modal
+        modal.classList.add('visible');
+        document.body.style.overflow = 'hidden';
+        passwordInput.focus();
+
+        // Cleanup function
+        function cleanup() {
+            modal.classList.remove('visible');
+            document.body.style.overflow = '';
+            document.removeEventListener('keydown', handleKeydown);
+            submitBtn.removeEventListener('click', handleSubmit);
+            skipBtn.removeEventListener('click', handleSkip);
+            closeBtn.removeEventListener('click', handleClose);
+            modal.removeEventListener('click', handleBackdrop);
+        }
+
+        function showError(message) {
+            errorEl.textContent = message;
+            errorEl.classList.remove('hidden');
+        }
+
+        function handleSubmit() {
+            const password = passwordInput.value;
+
+            // Validation
+            if (password.length < 8) {
+                showError('Password must be at least 8 characters');
+                passwordInput.focus();
+                return;
+            }
+
+            if (mode === 'encrypt') {
+                const confirmPassword = confirmInput.value;
+                if (password !== confirmPassword) {
+                    showError('Passwords do not match');
+                    confirmInput.focus();
+                    return;
+                }
+            }
+
+            cleanup();
+            resolve(password);
+        }
+
+        function handleSkip() {
+            cleanup();
+            resolve(null);
+        }
+
+        function handleClose() {
+            cleanup();
+            resolve(null);
+        }
+
+        function handleBackdrop(e) {
+            if (e.target === modal) {
+                cleanup();
+                resolve(null);
+            }
+        }
+
+        function handleKeydown(e) {
+            if (e.key === 'Escape') {
+                cleanup();
+                resolve(null);
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSubmit();
+            }
+        }
+
+        // Attach event listeners
+        submitBtn.addEventListener('click', handleSubmit);
+        skipBtn.addEventListener('click', handleSkip);
+        closeBtn.addEventListener('click', handleClose);
+        modal.addEventListener('click', handleBackdrop);
+        document.addEventListener('keydown', handleKeydown);
+    });
+}
+
+// ========================================
 // JSON FILE IMPORT
 // ========================================
 
 /**
  * Handles JSON file import via file input.
- * Validates the data structure before loading.
+ * Supports both encrypted (v2) and plaintext files.
  *
  * @param {Event} event - File input change event
  */
-export function loadJsonFile(event) {
+export async function loadJsonFile(event) {
     const file = event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = async function(e) {
         try {
-            const parsed = JSON.parse(e.target.result);
+            let parsed = JSON.parse(e.target.result);
+
+            // Check if file is encrypted
+            if (isEncrypted(parsed)) {
+                // Request password for decryption
+                const password = await showPasswordModal('decrypt');
+                if (!password) {
+                    // User cancelled
+                    return;
+                }
+
+                try {
+                    const decrypted = await decryptData(parsed, password);
+                    parsed = JSON.parse(decrypted);
+                } catch (err) {
+                    if (err instanceof CryptoError) {
+                        showUserMessage(err.message, 'error');
+                    } else {
+                        showUserMessage('Error decrypting file: ' + err.message, 'error');
+                    }
+                    return;
+                }
+            }
 
             // Schema validation (#176)
             const validation = validateImportedData(parsed);
@@ -217,18 +363,62 @@ export function loadJsonFile(event) {
 
 /**
  * Exports employee data as a JSON file download.
+ * Optionally encrypts the file with a password.
  */
-export function downloadData() {
+export async function downloadData() {
     const employeeData = _getEmployeeData();
     if (!employeeData) return;
 
-    const dataStr = JSON.stringify(employeeData, null, 2);
+    // Check if crypto is supported
+    if (!isCryptoSupported()) {
+        // Fall back to unencrypted download
+        downloadPlaintext(employeeData, 'compensation-data.json');
+        return;
+    }
+
+    // Show password modal
+    const password = await showPasswordModal('encrypt');
+
+    if (password) {
+        // Encrypt and download
+        try {
+            const plaintext = JSON.stringify(employeeData, null, 2);
+            const encrypted = await encryptData(plaintext, password);
+            const dataStr = JSON.stringify(encrypted, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'compensation-data-encrypted.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showUserMessage('Encrypted file downloaded successfully', 'success');
+        } catch (err) {
+            showUserMessage('Encryption failed: ' + err.message, 'error');
+        }
+    } else {
+        // User skipped encryption - download plaintext
+        downloadPlaintext(employeeData, 'compensation-data.json');
+    }
+}
+
+/**
+ * Downloads employee data as unencrypted JSON.
+ * @param {Object} data - Employee data to download
+ * @param {string} filename - Download filename
+ */
+function downloadPlaintext(data, filename) {
+    const dataStr = JSON.stringify(data, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'compensation-data.json';
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

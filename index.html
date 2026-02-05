@@ -269,6 +269,49 @@ History
     </div>
 
     <!-- ==========================================
+         PASSWORD MODAL (for file encryption)
+         ========================================== -->
+    <div id="passwordModal" class="password-modal" role="dialog" aria-modal="true" aria-labelledby="passwordModalTitle">
+        <div class="password-modal-content">
+            <div class="password-modal-header">
+                <h2 id="passwordModalTitle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></g></svg>
+                    <span id="passwordModalTitleText">Encrypt Download</span>
+                </h2>
+                <button class="password-modal-close" id="closePasswordBtn" aria-label="Close password dialog">&#10005;</button>
+            </div>
+
+            <div class="password-modal-body">
+                <p class="password-description" id="passwordDescription">
+                    Protect your compensation data with a password. You'll need this password to open the file later.
+                </p>
+
+                <div class="password-field-group">
+                    <label for="passwordInput">Password</label>
+                    <input type="password" id="passwordInput" class="password-input" placeholder="Enter password (min 8 characters)" autocomplete="new-password">
+                </div>
+
+                <div class="password-field-group" id="passwordConfirmGroup">
+                    <label for="passwordConfirmInput">Confirm Password</label>
+                    <input type="password" id="passwordConfirmInput" class="password-input" placeholder="Re-enter password" autocomplete="new-password">
+                </div>
+
+                <div class="password-error hidden" id="passwordError"></div>
+
+                <div class="encryption-info">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11v5m0 5a9 9 0 1 1 0-18a9 9 0 0 1 0 18m.05-13v.1h-.1V8z"/></svg>
+                    <span>Uses AES-256-GCM encryption. If you forget your password, the file cannot be recovered.</span>
+                </div>
+            </div>
+
+            <div class="password-modal-footer">
+                <button class="btn btn-secondary" id="passwordSkipBtn">Skip (Save Unencrypted)</button>
+                <button class="btn btn-primary" id="passwordSubmitBtn">Encrypt & Download</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
          DASHBOARD
          ========================================== -->
     <div id="dashboardPage" class="hidden">

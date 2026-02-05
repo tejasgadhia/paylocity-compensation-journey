@@ -69,6 +69,12 @@ export const CONSTANTS = {
 
     // UI display constants
     EMPTY_REASON_PLACEHOLDER: '—',      // Em-dash for missing/empty reason values
+
+    // Encryption constants (for file downloads)
+    CRYPTO_VERSION: 2,                  // Encrypted file format version
+    CRYPTO_ITERATIONS: 100000,          // PBKDF2 iterations (OWASP minimum)
+    CRYPTO_SALT_LENGTH: 16,             // Salt length in bytes
+    CRYPTO_IV_LENGTH: 12,               // IV length in bytes for AES-GCM
 };
 
 // ========================================
