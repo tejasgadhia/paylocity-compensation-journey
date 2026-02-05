@@ -285,10 +285,12 @@ function setupImportModal() {
         }
     });
 
-    // Download offline button
+    // Download offline button (async for lazy-loaded I/O module #180)
     const btnDownloadOffline = document.querySelector('.btn-download-offline');
     if (btnDownloadOffline) {
-        btnDownloadOffline.addEventListener('click', _deps.downloadHtmlFile);
+        btnDownloadOffline.addEventListener('click', async () => {
+            await _deps.downloadHtmlFile();
+        });
     }
 
     return closeImportModal;
@@ -299,11 +301,11 @@ function setupImportModal() {
  * @param {Function} closeImportModal - Modal close function from setupImportModal
  */
 function setupDemoControls(closeImportModal) {
-    // Demo buttons (handle multiple on page)
+    // Demo buttons (handle multiple on page) - async for lazy-loaded demo module (#180)
     document.querySelectorAll('.btn-demo').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
             closeImportModal(); // Close modal if open
-            _deps.loadDemoData();
+            await _deps.loadDemoData();
         });
     });
 
@@ -321,10 +323,12 @@ function setupDemoControls(closeImportModal) {
         });
     }
 
-    // Demo regenerate button
+    // Demo regenerate button - async for lazy-loaded demo module (#180)
     const btnDemoRegen = document.querySelector('.demo-regenerate-btn');
     if (btnDemoRegen) {
-        btnDemoRegen.addEventListener('click', _deps.cycleNextScenario);
+        btnDemoRegen.addEventListener('click', async () => {
+            await _deps.cycleNextScenario();
+        });
     }
 
     // Demo banner close button
@@ -350,10 +354,12 @@ function setupDashboardControls() {
         btn.addEventListener('click', () => _deps.setTheme(btn.dataset.theme));
     });
 
-    // Save data button
+    // Save data button - async for lazy-loaded I/O module (#180)
     const btnSaveData = document.querySelector('.btn-save-data');
     if (btnSaveData) {
-        btnSaveData.addEventListener('click', _deps.downloadData);
+        btnSaveData.addEventListener('click', async () => {
+            await _deps.downloadData();
+        });
     }
 
     // Start over button with confirmation (#20, #142)
@@ -390,10 +396,12 @@ function setupDashboardControls() {
         });
     }
 
-    // JSON file input
+    // JSON file input - async for lazy-loaded I/O module (#180)
     const jsonFileInput = document.getElementById('jsonFileInput');
     if (jsonFileInput) {
-        jsonFileInput.addEventListener('change', _deps.loadJsonFile);
+        jsonFileInput.addEventListener('change', async (event) => {
+            await _deps.loadJsonFile(event);
+        });
     }
 
     // Restore backup button (#142)

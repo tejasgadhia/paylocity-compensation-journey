@@ -133,15 +133,13 @@ export async function assertErrorMessage(page, expectedText) {
  */
 export async function assertHistoryTableRows(page, expectedRows) {
   // Switch to History tab (contains history table)
+  // History table is lazy-loaded on first tab visit (#181)
   const historyTab = page.locator('.tab-btn[data-tab="history"]');
-  if (!(await historyTab.isVisible())) {
-    await historyTab.click();
-    await page.waitForTimeout(300);
-  }
+  await historyTab.click();
 
-  // Count rows in history table (tbody rows)
+  // Wait for lazy-loaded table to render
   const rows = page.locator('#historyTableBody tr');
-  await expect(rows).toHaveCount(expectedRows);
+  await expect(rows).toHaveCount(expectedRows, { timeout: 5000 });
 }
 
 /**

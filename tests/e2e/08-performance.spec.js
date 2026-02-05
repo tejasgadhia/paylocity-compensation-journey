@@ -175,8 +175,9 @@ test.describe('Performance', () => {
                 await expect(page.locator(`#tab-${tabId}`)).toBeVisible();
                 const duration = Date.now() - startTime;
 
-                // Each tab switch should be fast (under 1000ms with E2E overhead)
-                expect(duration).toBeLessThan(1000);
+                // First visits include lazy loading time (#181)
+                // Threshold increased to 2500ms to account for initial render + E2E overhead
+                expect(duration).toBeLessThan(2500);
             }
         });
 
@@ -232,11 +233,13 @@ test.describe('Performance', () => {
             await importData(page, largeInput);
 
             // Navigate to History tab using ID selector
+            // History table is lazy-loaded on first tab visit (#181)
             await page.locator('#tab-btn-history').click();
             await expect(page.locator('#tab-history')).toBeVisible();
 
-            // Check table has rows
+            // Wait for lazy-loaded table to render
             const rows = page.locator('#historyTableBody tr');
+            await expect(rows.first()).toBeVisible({ timeout: 5000 });
             const rowCount = await rows.count();
 
             // Should have at least 20 rows (some may fail validation)

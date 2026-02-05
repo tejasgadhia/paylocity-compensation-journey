@@ -38,11 +38,8 @@ import {
     showUserMessage,
     checkCPIDataFreshness
 } from './js/notifications.js';
-import {
-    initDemoData,
-    loadDemoData,
-    cycleNextScenario
-} from './js/demo-data.js';
+// Phase 2: Demo data module is dynamically imported (#180)
+// import { initDemoData, loadDemoData, cycleNextScenario } from './js/demo-data.js';
 import {
     initTheme,
     setTheme
@@ -52,12 +49,8 @@ import {
     setViewMode,
     togglePrivacy
 } from './js/view.js';
-import {
-    initIO,
-    downloadHtmlFile,
-    loadJsonFile,
-    downloadData
-} from './js/io.js';
+// Phase 2: I/O module is dynamically imported (#180)
+// import { initIO, downloadHtmlFile, loadJsonFile, downloadData } from './js/io.js';
 import {
     initDataPersistence,
     saveBackup,
@@ -74,6 +67,7 @@ import {
     setTab,
     updateUrlParams,
     initFromUrl,
+    resetRenderedTabs,
     VALID_TABS
 } from './js/navigation.js';
 import {
@@ -175,6 +169,89 @@ if (typeof window !== 'undefined') {
     window.employeeData = () => employeeData; // Function to get current value
 }
 
+// ========================================
+// PHASE 2: LAZY-LOADED MODULES (#180)
+// ========================================
+
+/**
+ * Demo data module - loaded on first use (View Demo button, URL ?demo=true)
+ * Saves ~200 lines from initial bundle
+ */
+let demoDataModule = null;
+
+async function getDemoDataModule() {
+    if (!demoDataModule) {
+        try {
+            demoDataModule = await import('./js/demo-data.js');
+            demoDataModule.initDemoData({
+                state,
+                charts,
+                getEmployeeData: () => employeeData,
+                setEmployeeData: (data) => { employeeData = data; },
+                showDashboard: () => showDashboard(),
+                updateUrlParams: () => updateUrlParams(),
+                loadChartJS: () => loadChartJS()
+            });
+        } catch (error) {
+            console.error('Failed to load demo module:', error);
+            showUserMessage('Failed to load demo. Please refresh the page.', 'error');
+            throw error;
+        }
+    }
+    return demoDataModule;
+}
+
+async function loadDemoData(scenarioIndex = null) {
+    const module = await getDemoDataModule();
+    return module.loadDemoData(scenarioIndex);
+}
+
+async function cycleNextScenario() {
+    const module = await getDemoDataModule();
+    return module.cycleNextScenario();
+}
+
+/**
+ * I/O module - loaded on first use (Save Data, Load JSON, Download Offline)
+ * Includes crypto for AES-256-GCM encryption - saves ~400 lines from initial bundle
+ */
+let ioModule = null;
+
+async function getIOModule() {
+    if (!ioModule) {
+        try {
+            ioModule = await import('./js/io.js');
+            ioModule.initIO({
+                getEmployeeData: () => employeeData,
+                setEmployeeData: (data) => { employeeData = data; },
+                showDashboard: () => showDashboard(),
+                updateUrlParams: () => updateUrlParams(),
+                saveBackup: () => saveBackup()
+            });
+        } catch (error) {
+            console.error('Failed to load I/O module:', error);
+            showUserMessage('Failed to load save/export feature. Please refresh the page.', 'error');
+            throw error;
+        }
+    }
+    return ioModule;
+}
+
+async function downloadHtmlFile() {
+    const module = await getIOModule();
+    return module.downloadHtmlFile();
+}
+
+async function loadJsonFile(event) {
+    const module = await getIOModule();
+    return module.loadJsonFile(event);
+}
+
+async function downloadData() {
+    const module = await getIOModule();
+    return module.downloadData();
+}
+
 // Initialize charts module with dependencies
 initCharts({
     state,
@@ -183,16 +260,8 @@ initCharts({
     showUserMessage
 });
 
-// Initialize demo data module with dependencies
-initDemoData({
-    state,
-    charts,
-    getEmployeeData: () => employeeData,
-    setEmployeeData: (data) => { employeeData = data; },
-    showDashboard: () => showDashboard(),
-    updateUrlParams: () => updateUrlParams(),
-    loadChartJS: () => loadChartJS()
-});
+// Demo data module is now lazy-loaded (#180)
+// initDemoData() is called inside getDemoDataModule() on first use
 
 // Initialize theme module with dependencies
 initTheme({
@@ -216,14 +285,8 @@ initView({
     updateUrlParams: () => updateUrlParams()
 });
 
-// Initialize I/O module with dependencies
-initIO({
-    getEmployeeData: () => employeeData,
-    setEmployeeData: (data) => { employeeData = data; },
-    showDashboard: () => showDashboard(),
-    updateUrlParams: () => updateUrlParams(),
-    saveBackup: () => saveBackup()
-});
+// I/O module is now lazy-loaded (#180)
+// initIO() is called inside getIOModule() on first use
 
 // Initialize data persistence module with dependencies
 initDataPersistence({
@@ -256,7 +319,10 @@ initNavigation({
     setTheme,
     setViewMode,
     loadDemoData,
-    charts
+    charts,
+    // Phase 1: Lazy tab rendering deps (#181)
+    buildHistoryTable: () => buildHistoryTable(),
+    updateStory: () => updateStory()
 });
 
 // Initialize content module with dependencies
@@ -563,6 +629,9 @@ function resetDashboard() {
         if (chart) chart.destroy();
     });
     charts = { main: null, yoy: null, projection: null };
+
+    // Reset lazy rendering tracker (#181)
+    resetRenderedTabs();
 
     // Reset state
     state.currentTab = 'home';
@@ -874,7 +943,7 @@ function initDashboard() {
     // Exclude "New Hire" from adjustment counts - it's the starting point, not an adjustment
     const adjustments = employeeData.records.filter(r => r.reason !== 'New Hire');
     const adjustmentCount = adjustments.length;
-    
+
     document.getElementById('currentSalary').textContent = formatCurrency(current);
     document.getElementById('currentSalaryIndexed').textContent = `Index: ${formatCurrency(current, false)}`;
     document.getElementById('totalGrowth').textContent = `+${growth.toFixed(0)}%`;
@@ -882,11 +951,11 @@ function initDashboard() {
     document.getElementById('hireDateText').textContent = `Since ${formatDateSummary(employeeData.hireDate)}`;
     document.getElementById('totalRaises').textContent = adjustmentCount;
     document.getElementById('avgRaisesPerYear').textContent = `Avg: ${(adjustmentCount / years).toFixed(1)} per year`;
-    
-    buildHistoryTable();
+
+    // Only render Home tab content immediately (#181)
+    // Story, History, Market, Analytics, Projections are lazy-loaded on first tab visit
     buildMainChart();
     updateAnalytics();
-    updateStory();
 }
 
 // ========================================

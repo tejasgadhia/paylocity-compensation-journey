@@ -16,6 +16,12 @@ let _setTheme;
 let _setViewMode;
 let _loadDemoData;
 let _charts;
+// Phase 1: Lazy tab rendering deps (#181)
+let _buildHistoryTable;
+let _updateStory;
+
+// Track which tabs have been rendered (Home pre-rendered on dashboard init)
+let _renderedTabs = new Set(['home']);
 
 /**
  * Initializes the navigation module with required dependencies.
@@ -33,6 +39,8 @@ let _charts;
  * @param {Function} deps.setViewMode - Function to set view mode (dollars/index)
  * @param {Function} deps.loadDemoData - Function to load demo data
  * @param {Object} deps.charts - Charts object reference
+ * @param {Function} deps.buildHistoryTable - Function to build history table (#181)
+ * @param {Function} deps.updateStory - Function to update story content (#181)
  */
 export function initNavigation({
     state,
@@ -45,7 +53,9 @@ export function initNavigation({
     setTheme,
     setViewMode,
     loadDemoData,
-    charts
+    charts,
+    buildHistoryTable,
+    updateStory
 }) {
     _state = state;
     _getEmployeeData = getEmployeeData;
@@ -58,6 +68,8 @@ export function initNavigation({
     _setViewMode = setViewMode;
     _loadDemoData = loadDemoData;
     _charts = charts;
+    _buildHistoryTable = buildHistoryTable;
+    _updateStory = updateStory;
 }
 
 /**
@@ -95,23 +107,43 @@ export function setTab(tabId, pushHistory = true) {
         content.classList.toggle('active', content.id === `tab-${tabId}`);
     });
 
-    if (tabId === 'market') {
-        setTimeout(() => {
-            _updateMarket();
-        }, 100);
+    // Lazy render on first visit (#181)
+    if (!_renderedTabs.has(tabId)) {
+        _renderedTabs.add(tabId);
+        renderTabContent(tabId);
     }
-    if (tabId === 'analytics' && !_charts.yoy) {
-        setTimeout(() => {
-            _buildYoyChart();
-        }, 100);
-    }
-    if (tabId === 'projections' && !_charts.projection) {
-        setTimeout(() => {
-            _initProjections();
-            _buildProjectionChart();
-            _buildProjectionTable();
-        }, 100);
-    }
+}
+
+/**
+ * Renders tab-specific content on first visit.
+ * Uses setTimeout to allow UI thread to update first.
+ * @private
+ * @param {string} tabId - Tab identifier
+ */
+function renderTabContent(tabId) {
+    setTimeout(() => {
+        switch(tabId) {
+            case 'story':
+                _updateStory();
+                break;
+            case 'market':
+                _updateMarket();
+                break;
+            case 'history':
+                _buildHistoryTable();
+                break;
+            case 'analytics':
+                if (!_charts.yoy) _buildYoyChart();
+                break;
+            case 'projections':
+                if (!_charts.projection) {
+                    _initProjections();
+                    _buildProjectionChart();
+                    _buildProjectionTable();
+                }
+                break;
+        }
+    }, 50);
 }
 
 /**
@@ -218,6 +250,15 @@ export function initFromUrl() {
     if (params.demo) {
         _loadDemoData();
     }
+}
+
+/**
+ * Resets the rendered tabs tracker.
+ * Called when dashboard is reset (Start Over) to ensure tabs re-render on next visit.
+ * @export
+ */
+export function resetRenderedTabs() {
+    _renderedTabs = new Set(['home']);
 }
 
 // Export VALID_TABS for use by event handlers in app.js
