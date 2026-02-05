@@ -9,9 +9,9 @@ Paylocity Compensation Journey transforms raw Paylocity pay history data into a 
 ## Tech Stack
 
 - **Core**: `index.html` (HTML) + `styles.css` (CSS) + modular JavaScript
-- **JavaScript Modules** (16 total, ~4,800 lines):
-  - **Core** (~960 lines):
-    - `app.js` - State management, initialization, table rendering, analytics
+- **JavaScript Modules** (21 total, ~5,200 lines):
+  - **Core** (~500 lines):
+    - `app.js` - State management, module orchestration, initialization
   - **UI & Navigation** (~460 lines):
     - `js/theme.js` - Theme switching (tactical/artistic)
     - `js/view.js` - View mode (dollars/indexed), display updates
@@ -22,15 +22,21 @@ Paylocity Compensation Journey transforms raw Paylocity pay history data into a 
     - `js/data-persistence.js` - LocalStorage backup/restore
     - `js/io.js` - File import/export (JSON, HTML)
     - `js/parser.js` - Paylocity data parser
+    - `js/validation.js` - Input validation, parse pipeline (DI pattern)
   - **Visualization** (~1,300 lines):
     - `js/charts.js` - Chart.js wrappers (main, YoY, projection)
     - `js/content.js` - Story, market comparison, milestones rendering
-  - **Core Utilities** (~630 lines):
+    - `js/tables.js` - History/projection table rendering (DI pattern)
+  - **Dashboard** (~400 lines):
+    - `js/dashboard.js` - Dashboard lifecycle, KPI initialization (DI pattern)
+    - `js/projections.js` - Projection controls, chart type switching (DI pattern)
+  - **Core Utilities** (~650 lines):
     - `js/calculations.js` - CAGR, inflation, benchmarks (with memoization)
     - `js/constants.js` - Named constants, benchmarks, CPI data
-    - `js/security.js` - Template validation, XSS prevention
+    - `js/security.js` - Template validation, XSS prevention, escapeHTML
     - `js/notifications.js` - User messages, CPI freshness warnings
     - `js/event-handlers.js` - DOM event listeners
+    - `js/utils.js` - Pure utilities (debounce)
 - **Chart.js**: Self-hosted v4.4.7 (`assets/js/chart.umd.min.js`)
 - **Fonts**: Self-hosted JetBrains Mono, Space Grotesk
 - **LocalStorage**: Theme preference persistence
@@ -551,11 +557,16 @@ python -m http.server 8000
 
 ### File Sizes
 - `index.html`: ~120KB (HTML + CSS)
-- JavaScript modules: ~4,800 lines total across 16 files
-  - `app.js`: ~960 lines (core state, initialization)
+- JavaScript modules: ~5,200 lines total across 21 files
+  - `app.js`: ~500 lines (core orchestrator)
   - `js/charts.js`: ~740 lines (Chart.js wrappers)
   - `js/content.js`: ~560 lines (story, market rendering)
   - `js/event-handlers.js`: ~430 lines (DOM listeners)
+  - `js/dashboard.js`: ~200 lines (dashboard lifecycle)
+  - `js/projections.js`: ~170 lines (projection controls)
+  - `js/tables.js`: ~140 lines (table rendering)
+  - `js/validation.js`: ~130 lines (input validation)
+  - `js/utils.js`: ~30 lines (pure utilities)
   - Other modules: 50-400 lines each
 - Chart.js: ~200KB (self-hosted)
 - Fonts: ~100KB (self-hosted TTF files)
@@ -571,30 +582,38 @@ python -m http.server 8000
 ## Module Dependency Graph
 
 ```
-app.js (CORE)
+app.js (CORE ORCHESTRATOR)
   │
   ├── initCharts() ← js/charts.js
-  ├── initDemoData() ← js/demo-data.js
+  ├── initDemoData() ← js/demo-data.js (lazy-loaded)
   ├── initTheme() ← js/theme.js
   ├── initView() ← js/view.js
-  ├── initIO() ← js/io.js
+  ├── initIO() ← js/io.js (lazy-loaded)
   ├── initDataPersistence() ← js/data-persistence.js
   ├── initKeyboard() ← js/keyboard.js
   ├── initNavigation() ← js/navigation.js
   ├── initContent() ← js/content.js
-  └── initEventHandlers() ← js/event-handlers.js
+  ├── initEventHandlers() ← js/event-handlers.js
+  │
+  │ NEW: Testable modules with DI pattern (#148)
+  ├── initTables() ← js/tables.js
+  ├── initProjectionsModule() ← js/projections.js
+  ├── initValidation() ← js/validation.js
+  └── initDashboardModule() ← js/dashboard.js
 
 Shared utilities (no init needed):
   - js/constants.js (CONSTANTS, benchmarks, CPI data)
   - js/calculations.js (CAGR, inflation, benchmarks)
   - js/parser.js (parsePaylocityData)
-  - js/security.js (validateTemplateData)
+  - js/security.js (validateTemplateData, escapeHTML)
   - js/notifications.js (showUserMessage)
+  - js/utils.js (debounce)
 ```
 
 ## Questions?
 
 - **Parsing logic**: `js/parser.js`
+- **Input validation**: `js/validation.js` (parseAndGenerate, validatePasteInput)
 - **Chart.js usage**: `js/charts.js` (build, update, theme functions)
 - **Calculations**: `js/calculations.js` (CAGR, inflation, benchmarks)
 - **Market comparisons**: `js/content.js` (`updateMarket()`, `buildMarketComparison()`)
@@ -602,5 +621,10 @@ Shared utilities (no init needed):
 - **Tab navigation**: `js/navigation.js`
 - **Event listeners**: `js/event-handlers.js`
 - **Demo scenarios**: `js/demo-data.js`
+- **Table rendering**: `js/tables.js` (history table, projection table)
+- **Projection controls**: `js/projections.js` (year slider, chart types)
+- **Dashboard lifecycle**: `js/dashboard.js` (init, show, reset, analytics)
+- **Security**: `js/security.js` (escapeHTML, validateTemplateData)
+- **Utilities**: `js/utils.js` (debounce)
 
 Keep it self-contained, performant, and privacy-first!

@@ -81,6 +81,35 @@ import {
     initEventHandlers,
     initEventListeners
 } from './js/event-handlers.js';
+import { escapeHTML } from './js/security.js';
+import { debounce } from './js/utils.js';
+import {
+    initTables,
+    buildHistoryTable,
+    buildProjectionTable,
+    getBadgeClass
+} from './js/tables.js';
+import {
+    initProjectionsModule,
+    initProjections,
+    setChartType,
+    setYoyChartType,
+    setProjectionYears,
+    setProjectionView,
+    updateCustomRate
+} from './js/projections.js';
+import {
+    initValidation,
+    parseAndGenerate,
+    validatePasteInput
+} from './js/validation.js';
+import {
+    initDashboardModule,
+    showDashboard,
+    resetDashboard,
+    initDashboard,
+    updateAnalytics
+} from './js/dashboard.js';
 
 // ========================================
 // DESKTOP BLOCK OVERLAY (#146)
@@ -331,6 +360,53 @@ initContent({
     getEmployeeData: () => employeeData
 });
 
+// Initialize tables module with dependencies
+initTables({
+    state,
+    getEmployeeData: () => employeeData,
+    escapeHTML,
+    formatCurrency: (amount, showDollars) => formatCurrency(amount, showDollars),
+    getStartingSalary,
+    getCurrentSalary,
+    calculateCAGR
+});
+
+// Initialize projections module with dependencies
+initProjectionsModule({
+    state,
+    getEmployeeData: () => employeeData,
+    updateMainChartType,
+    updateYoyChartType,
+    updateProjectionChartData,
+    buildProjectionTable: () => buildProjectionTable()
+});
+
+// Initialize validation module with dependencies
+initValidation({
+    setEmployeeData: (data) => { employeeData = data; },
+    getDomCache: () => domCache,
+    showDashboard: () => showDashboard(),
+    updateUrlParams: () => updateUrlParams(),
+    saveBackup: () => saveBackup(),
+    loadChartJS: () => loadChartJS(),
+    showUserMessage
+});
+
+// Initialize dashboard module with dependencies
+initDashboardModule({
+    state,
+    charts,
+    getEmployeeData: () => employeeData,
+    setEmployeeData: (data) => { employeeData = data; },
+    getDomCache: () => domCache,
+    setTab: (tabId, pushHistory) => setTab(tabId, pushHistory),
+    resetRenderedTabs,
+    buildMainChart,
+    formatCurrency: (amount, showDollars) => formatCurrency(amount, showDollars),
+    formatPercent,
+    checkCPIDataFreshness
+});
+
 // ========================================
 // BENCHMARK CALCULATION FUNCTIONS
 // ========================================
@@ -339,61 +415,7 @@ initContent({
 // ========================================
 // SECURITY HELPERS
 // ========================================
-
-/**
- * Escapes HTML special characters to prevent XSS attacks.
- * Converts characters that have special meaning in HTML to their entity equivalents.
- *
- * **Security Context:**
- * This function protects against XSS (Cross-Site Scripting) attacks by escaping
- * user-provided data before inserting it into HTML via innerHTML. Even though the
- * parser uses a whitelist approach for the 'reason' field, this provides defense
- * in depth at the display layer.
- *
- * **When to Use:**
- * - Always escape user-provided strings before inserting via innerHTML
- * - Especially important for the 'reason' field from Paylocity data
- * - Use for any data that could potentially contain malicious input
- *
- * **Where Used:**
- * - buildHistoryTable() - Escapes r.reason before display
- * - buildMilestones() - Escapes milestone text fields
- *
- * @param {string} str - The string to escape
- * @returns {string} The escaped string safe for insertion into HTML
- *
- * @example
- * escapeHTML('<script>alert("XSS")</script>')
- * // Returns: '&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;'
- *
- * @example
- * // Safe usage in template literal
- * element.innerHTML = `<span>${escapeHTML(userInput)}</span>`;
- */
-function escapeHTML(str) {
-    if (typeof str !== 'string') return str;
-
-    const htmlEscapeMap = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#x27;',
-        '/': '&#x2F;'
-    };
-
-    return str.replace(/[&<>"'\/]/g, char => htmlEscapeMap[char]);
-}
-
-/**
- * Validates that dynamic data used in HTML templates contains only safe types.
- *
- * Defense-in-depth security check: Ensures template interpolations receive only
- * safe values (numbers, dates, formatted strings) and not malicious payloads.
- *
- * @param {Object} data - Data object to validate
- * @throws {Error} If data contains unsafe types or suspicious patterns
- */
+// escapeHTML moved to js/security.js
 // validateTemplateData moved to js/security.js
 
 // ========================================
@@ -404,22 +426,7 @@ function escapeHTML(str) {
 // ========================================
 // UTILITY FUNCTIONS
 // ========================================
-
-/**
- * Creates a debounced version of a function that delays execution
- * until after a specified wait time has elapsed since the last call.
- *
- * @param {Function} func - Function to debounce
- * @param {number} wait - Milliseconds to wait before executing
- * @returns {Function} Debounced function
- */
-function debounce(func, wait) {
-    let timeoutId;
-    return function (...args) {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => func.apply(this, args), wait);
-    };
-}
+// debounce moved to js/utils.js
 
 // ========================================
 // CHART.JS LAZY LOADING
@@ -447,223 +454,14 @@ async function loadChartJS() {
 }
 
 // ========================================
-// PARSE AND GENERATE
+// PARSE AND GENERATE (Moved to js/validation.js)
 // ========================================
-
-/**
- * Main data pipeline: parses Paylocity input and initializes the dashboard.
- *
- * Validates input, parses compensation records, updates URL with encoded data,
- * hides the landing page, and initializes all dashboard components.
- * Shows user-friendly error messages for invalid or incomplete data.
- *
- * @async
- * @global {Object} employeeData - Sets parsed compensation data
- * @returns {Promise<void>}
- *
- * @example
- * // Triggered by "Generate" button click
- * document.getElementById('generateBtn').addEventListener('click', parseAndGenerate);
- */
-async function parseAndGenerate() {
-    const input = document.getElementById('pasteInput').value.trim();
-    const messageDiv = document.getElementById('validationMessage');
-    
-    if (!input) {
-        messageDiv.className = 'validation-message error visible';
-        messageDiv.textContent = '✗ Please paste your Paylocity data first.';
-        return;
-    }
-    
-    try {
-        employeeData = parsePaylocityData(input);
-
-        if (employeeData.records.length < 2) {
-            throw new Error('Need at least 2 records to generate insights');
-        }
-        
-        // Check if there are any actual adjustments (not just New Hire)
-        const adjustments = employeeData.records.filter(r => r.reason !== 'New Hire');
-        if (adjustments.length === 0) {
-            throw new Error('No salary adjustments found. You may be too new to have raise history yet');
-        }
-        
-        employeeData.isDemo = false;
-        messageDiv.className = 'validation-message';
-
-        // Close import modal if open (#149: Use cached element)
-        if (domCache.importModal) {
-            domCache.importModal.classList.remove('visible');
-            document.body.style.overflow = '';
-        }
-
-        // Lazy-load Chart.js before showing dashboard (performance optimization)
-        await loadChartJS();
-
-        showDashboard();
-        // Hide demo banner for real data
-        document.getElementById('demoBanner').classList.add('hidden');
-        // Update URL (removes demo flag)
-        updateUrlParams();
-        // Save backup to localStorage
-        saveBackup();
-    } catch (e) {
-        console.error('Parse error:', e);
-        messageDiv.className = 'validation-message error visible';
-        messageDiv.textContent = `✗ ${e.message}. Please make sure you copied from "Rates" down to "items".`;
-    }
-}
+// parseAndGenerate, validatePasteInput moved to js/validation.js
 
 // ========================================
-// REAL-TIME VALIDATION
+// VIEW SWITCHING (Moved to js/dashboard.js)
 // ========================================
-
-function validatePasteInput() {
-    const input = document.getElementById('pasteInput').value.trim();
-    const messageDiv = document.getElementById('validationMessage');
-    const generateBtn = document.getElementById('generateBtn');
-    // Checkbox was removed in 5d189c9 but JS still expected it - default to true if missing
-    const legalConsentCheckbox = document.getElementById('legalConsentCheckbox');
-    const legalConsent = legalConsentCheckbox ? legalConsentCheckbox.checked : true;
-
-    if (!input) {
-        messageDiv.className = 'validation-message';
-        messageDiv.textContent = '';
-        generateBtn.disabled = true;
-        return;
-    }
-
-    // Check for date patterns (MM/DD/YYYY)
-    const datePattern = /\d{2}\/\d{2}\/\d{4}/g;
-    const dates = input.match(datePattern) || [];
-
-    // Check for dollar amounts with exactly 2 decimal places (standard currency)
-    const dollarPattern = /\$[0-9,]+\.\d{2}/g;
-    const dollars = input.match(dollarPattern) || [];
-
-    // Check for key structural indicators
-    const hasSalary = /salary/i.test(input);
-    const hasHistory = /history/i.test(input);
-
-    // Validation checks
-    if (dates.length === 0) {
-        messageDiv.className = 'validation-message error visible';
-        messageDiv.textContent = '✗ No dates found. Make sure you copied the table data including dates (MM/DD/YYYY format).';
-        generateBtn.disabled = true;
-        return;
-    }
-
-    if (dollars.length === 0) {
-        messageDiv.className = 'validation-message error visible';
-        messageDiv.textContent = '✗ No salary amounts found. Make sure "Show Private Data" is enabled in Paylocity.';
-        generateBtn.disabled = true;
-        return;
-    }
-
-    if (!hasSalary) {
-        messageDiv.className = 'validation-message warning visible';
-        messageDiv.textContent = '⚠ Data looks incomplete. Make sure you copied from the Rates tab.';
-        generateBtn.disabled = !legalConsent;
-        return;
-    }
-
-    if (!hasHistory && dates.length < 3) {
-        messageDiv.className = 'validation-message warning visible';
-        messageDiv.textContent = '⚠ Only ' + dates.length + ' record(s) found. Did you include the History table?';
-        generateBtn.disabled = !legalConsent;
-        return;
-    }
-
-    if (dollars.length < dates.length) {
-        messageDiv.className = 'validation-message warning visible';
-        messageDiv.textContent = '⚠ Found ' + dates.length + ' dates but only ' + dollars.length + ' salary values. Some data may be missing.';
-        generateBtn.disabled = !legalConsent;
-        return;
-    }
-
-    // Check legal consent before enabling button
-    if (!legalConsent) {
-        messageDiv.className = 'validation-message warning visible';
-        messageDiv.textContent = '✓ Found ' + dates.length + ' compensation records. Please accept the legal notice to continue.';
-        generateBtn.disabled = true;
-        return;
-    }
-
-    // Success
-    messageDiv.className = 'validation-message success visible';
-    messageDiv.textContent = '✓ Found ' + dates.length + ' compensation records. Ready to generate!';
-    generateBtn.disabled = false;
-}
-
-// ========================================
-// VIEW SWITCHING
-// ========================================
-
-function showDashboard() {
-    document.getElementById('landingPage').classList.add('hidden');
-    document.getElementById('dashboardPage').classList.remove('hidden');
-    window.scrollTo(0, 0);
-    initDashboard();
-
-    // If a non-home tab was specified (e.g., from URL), switch to it immediately
-    if (state.currentTab && state.currentTab !== 'home') {
-        setTab(state.currentTab, false);
-    }
-
-    // Focus management for accessibility - move focus to dashboard heading
-    setTimeout(() => {
-        const heading = document.querySelector('.logo-text h1');
-        if (heading) {
-            heading.setAttribute('tabindex', '-1');
-            heading.focus();
-        }
-    }, 100);
-
-    // Check if CPI data is stale and show warning if needed
-    checkCPIDataFreshness();
-}
-
-function resetDashboard() {
-    // Destroy all charts
-    Object.values(charts).forEach(chart => {
-        if (chart) chart.destroy();
-    });
-    charts = { main: null, yoy: null, projection: null };
-
-    // Reset lazy rendering tracker (#181)
-    resetRenderedTabs();
-
-    // Reset state
-    state.currentTab = 'home';
-    employeeData = null;
-    
-    // Update URL - keep theme, remove demo
-    const params = new URLSearchParams();
-    params.set('theme', state.theme);
-    history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
-    
-    // Show landing page
-    document.getElementById('dashboardPage').classList.add('hidden');
-    document.getElementById('landingPage').classList.remove('hidden');
-
-    // Close import modal if open
-    const importModal = document.getElementById('importModal');
-    if (importModal) {
-        importModal.classList.remove('visible');
-        document.body.style.overflow = '';
-    }
-
-    // Clear paste area and validation
-    document.getElementById('pasteInput').value = '';
-    document.getElementById('validationMessage').className = 'validation-message';
-    document.getElementById('generateBtn').disabled = true;
-
-    // Reset legal consent checkbox
-    const legalConsentCheckbox = document.getElementById('legalConsentCheckbox');
-    if (legalConsentCheckbox) {
-        legalConsentCheckbox.checked = false;
-    }
-}
+// showDashboard, resetDashboard moved to js/dashboard.js
 
 // ========================================
 // CONTENT RENDERING (Moved to js/content.js)
@@ -699,264 +497,30 @@ if (typeof window !== 'undefined') {
 }
 
 // ========================================
-// CHART FUNCTIONS
+// CHART FUNCTIONS (Moved to js/projections.js)
 // ========================================
-
-function setChartType(type) {
-    state.mainChartType = type;
-    document.querySelectorAll('.chart-controls .chart-type-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.chart === type);
-    });
-    // Use efficient type update instead of full rebuild
-    updateMainChartType();
-}
-
-function setYoyChartType(type) {
-    state.yoyChartType = type;
-    document.querySelectorAll('[data-chart^="yoy-"]').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.chart === `yoy-${type}`);
-    });
-    // Use efficient type update instead of full rebuild
-    updateYoyChartType();
-}
-
-// Chart build functions moved to js/charts.js (imported above)
-
-function initProjections() {
-    // Set slider to historical CAGR
-    const historicalCAGR = Math.round(calculateCAGR(employeeData));
-    state.cagr = historicalCAGR;
-
-    // Set custom rate to halfway between historical and conservative (3%)
-    // This prevents custom line from overlapping with historical line
-    const conservativeRate = 3;
-    state.customRate = Math.round((historicalCAGR + conservativeRate) / 2);
-
-    // Update slider and display
-    const slider = document.getElementById('customRateSlider');
-    slider.value = state.customRate;
-    document.getElementById('customRateValue').textContent = state.customRate + '%';
-    document.getElementById('historicalRateDisplay').textContent = historicalCAGR + '%';
-
-    // Initialize slider track fill
-    const progress = (state.customRate / 25) * 100;
-    slider.style.setProperty('--range-progress', `${progress}%`);
-}
+// setChartType, setYoyChartType, initProjections moved to js/projections.js
+// Chart build functions moved to js/charts.js
 
 // ========================================
-// TABLE FUNCTIONS
+// TABLE FUNCTIONS (Moved to js/tables.js)
 // ========================================
-
-function buildHistoryTable() {
-    const tbody = document.getElementById('historyTableBody');
-    const startingSalary = getStartingSalary(employeeData);
-
-    tbody.innerHTML = employeeData.records.map(r => {
-        const badgeClass = getBadgeClass(r.reason);
-        const index = ((r.annual / startingSalary) * 100).toFixed(0);
-        const changeDisplay = r.change > 0
-            ? (state.showDollars ? `+${formatCurrency(r.change * CONSTANTS.PAY_PERIODS_PER_YEAR)}` : `+${((r.change * CONSTANTS.PAY_PERIODS_PER_YEAR / startingSalary) * 100).toFixed(1)}`)
-            : '—';
-
-        return `
-            <tr>
-                <td>${formatDateDetail(r.date)}</td>
-                <td><span class="badge ${badgeClass}">${escapeHTML(r.reason)}</span></td>
-                <td>${state.showDollars ? formatCurrency(r.annual) : `Index: ${index}`}</td>
-                <td>${index}</td>
-                <td>${changeDisplay}</td>
-                <td>${r.changePercent > 0 ? `+${r.changePercent.toFixed(2)}%` : '—'}</td>
-            </tr>
-        `;
-    }).join('');
-}
-
-function getBadgeClass(reason) {
-    if (reason.includes('Merit')) return 'badge-merit';
-    if (reason.includes('Equity')) return 'badge-equity';
-    if (reason.includes('Market')) return 'badge-market';
-    if (reason.includes('New')) return 'badge-new';
-    return '';
-}
-
-function buildProjectionTable() {
-    const tbody = document.getElementById('projectionTableBody');
-    const currentSalaryRaw = getCurrentSalary(employeeData);
-    const startingSalary = getStartingSalary(employeeData);
-
-    // Convert to indexed values if privacy mode enabled (same as chart)
-    const currentSalary = state.showDollars
-        ? currentSalaryRaw
-        : (currentSalaryRaw / startingSalary) * 100;
-
-    const cagr = calculateCAGR(employeeData) / 100;
-    const customRate = state.customRate / 100;
-
-    // Fixed intervals: 1-5 yearly, then 10, 15, 20
-    const intervals = [1, 2, 3, 4, 5, 10, 15, 20];
-
-    tbody.innerHTML = intervals.map(year => {
-        const historicalValue = currentSalary * Math.pow(1 + cagr, year);
-        const conservativeValue = currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_CONSERVATIVE, year);
-        const customValue = currentSalary * Math.pow(1 + customRate, year);
-
-        return `
-            <tr>
-                <td>${year} year${year > 1 ? 's' : ''}</td>
-                <td>${state.showDollars ? formatCurrency(historicalValue) : historicalValue.toFixed(0)}</td>
-                <td>${state.showDollars ? formatCurrency(conservativeValue) : conservativeValue.toFixed(0)}</td>
-                <td>${state.showDollars ? formatCurrency(customValue) : customValue.toFixed(0)}</td>
-            </tr>
-        `;
-    }).join('');
-}
+// buildHistoryTable, getBadgeClass, buildProjectionTable moved to js/tables.js
 
 // ========================================
-// ANALYTICS UPDATE
+// ANALYTICS UPDATE (Moved to js/dashboard.js)
 // ========================================
-
-function updateAnalytics() {
-    const records = employeeData.records;
-    const startingSalary = getStartingSalary(employeeData);
-    
-    // Filter out "New Hire" - it's the starting point, not an adjustment
-    const adjustments = records.filter(r => r.reason !== 'New Hire');
-    
-    // Guard against no adjustments (shouldn't happen, but be safe)
-    if (adjustments.length === 0) return;
-    
-    const raises = records.filter(r => r.changePercent > 0);
-    if (raises.length === 0) return;
-    
-    const avgRaisePercent = raises.reduce((sum, r) => sum + r.changePercent, 0) / raises.length;
-    const sortedRaises = [...raises].sort((a, b) => a.changePercent - b.changePercent);
-    const medianRaise = sortedRaises[Math.floor(sortedRaises.length / 2)].changePercent;
-    const largestRaise = Math.max(...raises.map(r => r.changePercent));
-    const largestRaiseRecord = raises.find(r => r.changePercent === largestRaise);
-    
-    const meritCount = adjustments.filter(r => r.reason.includes('Merit')).length;
-    
-    // Use adjustments (excludes New Hire) for time between raises
-    const avgMonths = calculateAverageMonthsBetweenDates(adjustments);
-    
-    document.getElementById('cagr').textContent = formatPercent(calculateCAGR(employeeData));
-    document.getElementById('avgRaise').textContent = formatPercent(avgRaisePercent);
-    
-    const avgRaiseDollar = (avgRaisePercent / 100) * getCurrentSalary(employeeData);
-    document.getElementById('avgRaiseDollar').textContent = state.showDollars 
-        ? `~${formatCurrency(avgRaiseDollar)} per adjustment`
-        : `~${((avgRaiseDollar / startingSalary) * 100).toFixed(1)} index points`;
-    
-    document.getElementById('medianRaise').textContent = formatPercent(medianRaise);
-    document.getElementById('largestRaise').textContent = formatPercent(largestRaise);
-    document.getElementById('largestRaiseDate').textContent = formatDateSummary(largestRaiseRecord.date);
-    document.getElementById('avgTimeBetween').textContent = `${avgMonths.toFixed(1)} mo`;
-    const benchmarkMonths = CONSTANTS.TYPICAL_RAISE_INTERVAL_MONTHS;
-    const timeDiff = avgMonths - benchmarkMonths;
-    let timeContext;
-    if (timeDiff < -2) {
-        timeContext = `${Math.abs(timeDiff).toFixed(1)} mo faster than typical`;
-    } else if (timeDiff > 2) {
-        timeContext = `${timeDiff.toFixed(1)} mo slower than typical`;
-    } else {
-        timeContext = `Near industry standard (12 mo)`;
-    }
-    document.getElementById('avgTimeDetail').textContent = timeContext;
-    document.getElementById('meritCount').textContent = meritCount;
-    document.getElementById('meritPercent').textContent = `${((meritCount / adjustments.length) * 100).toFixed(1)}% of all adjustments`;
-}
+// updateAnalytics moved to js/dashboard.js
 
 // ========================================
-// PROJECTION CONTROLS
+// PROJECTION CONTROLS (Moved to js/projections.js)
 // ========================================
-
-function setProjectionYears(years) {
-    state.projectionYears = years;
-    document.querySelectorAll('.interval-btn').forEach(btn => {
-        btn.classList.toggle('active', parseInt(btn.dataset.years, 10) === years);
-    });
-    // Use efficient update instead of full rebuild
-    updateProjectionChartData();
-}
-
-// Debounced chart update for smoother slider interaction (uses update() instead of rebuild)
-const debouncedProjectionUpdate = debounce(() => {
-    updateProjectionChartData();
-    buildProjectionTable();
-}, 150);
-
-function updateCustomRate() {
-    const slider = document.getElementById('customRateSlider');
-    state.customRate = parseInt(slider.value, 10);
-    // Update display immediately for responsive feel
-    document.getElementById('customRateValue').textContent = state.customRate + '%';
-    // Update slider track fill (CSS variable for gradient)
-    const progress = (state.customRate / 25) * 100;
-    slider.style.setProperty('--range-progress', `${progress}%`);
-    // Debounce chart data updates (uses efficient update() instead of rebuild)
-    debouncedProjectionUpdate();
-}
-
-function setProjectionView(view) {
-    const chartWrapper = document.getElementById('projectionChartWrapper');
-    const tableWrapper = document.getElementById('projectionTableWrapper');
-    const buttons = document.querySelectorAll('#tab-projections .chart-type-btn');
-
-    buttons.forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.view === view);
-    });
-
-    if (view === 'chart') {
-        chartWrapper.classList.remove('hidden');
-        tableWrapper.classList.add('hidden');
-    } else {
-        chartWrapper.classList.add('hidden');
-        tableWrapper.classList.remove('hidden');
-    }
-    // Note: Time period buttons always stay visible (affects both chart and table)
-}
+// setProjectionYears, updateCustomRate, setProjectionView moved to js/projections.js
 
 // ========================================
-// DASHBOARD INITIALIZATION
+// DASHBOARD INITIALIZATION (Moved to js/dashboard.js)
 // ========================================
-
-/**
- * Initializes the main dashboard with KPI cards and summary statistics.
- *
- * Calculates and displays current salary, total growth percentage, tenure,
- * adjustment count, CAGR, and real (inflation-adjusted) growth. Populates
- * the Home tab KPI cards. Called after parsing data or loading demo.
- *
- * @global {Object} employeeData - Parsed compensation records
- * @returns {void}
- *
- * @example
- * // Initialize after parseAndGenerate() or loadDemoData()
- * initDashboard();
- */
-function initDashboard() {
-    const current = getCurrentSalary(employeeData);
-    const start = getStartingSalary(employeeData);
-    const growth = ((current - start) / start) * 100;
-    const years = calculateYearsOfService(employeeData);
-
-    // Exclude "New Hire" from adjustment counts - it's the starting point, not an adjustment
-    const adjustments = employeeData.records.filter(r => r.reason !== 'New Hire');
-    const adjustmentCount = adjustments.length;
-
-    document.getElementById('currentSalary').textContent = formatCurrency(current);
-    document.getElementById('currentSalaryIndexed').textContent = `Index: ${formatCurrency(current, false)}`;
-    document.getElementById('totalGrowth').textContent = `+${growth.toFixed(0)}%`;
-    document.getElementById('yearsService').textContent = years.toFixed(1);
-    document.getElementById('hireDateText').textContent = `Since ${formatDateSummary(employeeData.hireDate)}`;
-    document.getElementById('totalRaises').textContent = adjustmentCount;
-    document.getElementById('avgRaisesPerYear').textContent = `Avg: ${(adjustmentCount / years).toFixed(1)} per year`;
-
-    // Only render Home tab content immediately (#181)
-    // Story, History, Market, Analytics, Projections are lazy-loaded on first tab visit
-    buildMainChart();
-    updateAnalytics();
-}
+// initDashboard moved to js/dashboard.js
 
 // ========================================
 // URL PARAMETER HANDLING (Moved to js/navigation.js)

@@ -3,6 +3,51 @@
 // ========================================
 
 /**
+ * Escapes HTML special characters to prevent XSS attacks.
+ * Converts characters that have special meaning in HTML to their entity equivalents.
+ *
+ * **Security Context:**
+ * This function protects against XSS (Cross-Site Scripting) attacks by escaping
+ * user-provided data before inserting it into HTML via innerHTML. Even though the
+ * parser uses a whitelist approach for the 'reason' field, this provides defense
+ * in depth at the display layer.
+ *
+ * **When to Use:**
+ * - Always escape user-provided strings before inserting via innerHTML
+ * - Especially important for the 'reason' field from Paylocity data
+ * - Use for any data that could potentially contain malicious input
+ *
+ * **Where Used:**
+ * - buildHistoryTable() - Escapes r.reason before display
+ * - buildMilestones() - Escapes milestone text fields
+ *
+ * @param {string} str - The string to escape
+ * @returns {string} The escaped string safe for insertion into HTML
+ *
+ * @example
+ * escapeHTML('<script>alert("XSS")</script>')
+ * // Returns: '&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;'
+ *
+ * @example
+ * // Safe usage in template literal
+ * element.innerHTML = `<span>${escapeHTML(userInput)}</span>`;
+ */
+export function escapeHTML(str) {
+    if (typeof str !== 'string') return str;
+
+    const htmlEscapeMap = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        '/': '&#x2F;'
+    };
+
+    return str.replace(/[&<>"'\/]/g, char => htmlEscapeMap[char]);
+}
+
+/**
  * Validates template data for XSS patterns before innerHTML usage.
  *
  * Defense-in-depth layer that checks all template data values for:
