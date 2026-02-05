@@ -133,6 +133,13 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
 
 /**
  * Application state - simple globals appropriate for this app's complexity.
+ *
+ * Why globals instead of a state management library?
+ * - Single-page app with no routing complexity
+ * - State accessed by ~10 modules makes prop-drilling impractical
+ * - No server sync, undo/redo, or time-travel debugging needs
+ * - Dependency injection via init functions provides testability
+ *
  * Chart functions are in js/charts.js and receive these via initCharts().
  */
 let employeeData = null;
