@@ -40,14 +40,17 @@ export function initEventHandlers(deps) {
     _deps = deps;
 }
 
+// ========================================
+// SUB-FUNCTIONS FOR EVENT LISTENER SETUP
+// ========================================
+
 /**
- * Initialize all DOM event listeners
- * Sets up the domCache and attaches event handlers to UI elements
- * Called once when DOM is ready
+ * Create and return the DOM cache object
+ * #149: Eliminates redundant getElementById calls
+ * @returns {Object} domCache - Cached DOM element references
  */
-export function initEventListeners() {
-    // #149: Initialize DOM cache to eliminate redundant getElementById calls
-    const domCache = {
+function setupDomCache() {
+    return {
         // Landing page
         landingPage: document.getElementById('landingPage'),
         dashboardPage: document.getElementById('dashboardPage'),
@@ -78,10 +81,13 @@ export function initEventListeners() {
         marketFootnote: document.getElementById('marketFootnote'),
         restoreBackupBtn: document.getElementById('restoreBackupBtn')
     };
+}
 
-    // Set domCache in app.js via injected setter
-    _deps.setDomCache(domCache);
-
+/**
+ * Load and apply saved theme preference from localStorage
+ * Sets up landing page theme buttons
+ */
+function setupThemePreference() {
     // Load saved theme preference from localStorage
     try {
         const savedTheme = localStorage.getItem('theme');
@@ -100,11 +106,13 @@ export function initEventListeners() {
     document.querySelectorAll('.landing-theme-btn').forEach(btn => {
         btn.addEventListener('click', () => _deps.setTheme(btn.dataset.theme));
     });
+}
 
-    // ========================================
-    // LANDING PAGE - Feature Chips & Slider
-    // ========================================
-
+/**
+ * Set up landing page feature chips and comparison slider animation
+ * Handles chip selection and image swapping
+ */
+function setupLandingPage() {
     // Tab data for feature chips - maps chip to screenshot and display name
     const tabData = {
         home: {
@@ -215,11 +223,13 @@ export function initEventListeners() {
             animateSlider();
         }, 800); // Wait for page to settle
     }
+}
 
-    // ========================================
-    // IMPORT MODAL
-    // ========================================
-
+/**
+ * Set up import modal open/close, backdrop click, escape key, and download offline
+ * @returns {Function} closeImportModal - Exposed for use by demo controls
+ */
+function setupImportModal() {
     const importModal = document.getElementById('importModal');
     const openImportBtn = document.getElementById('openImportBtn');
     const closeImportBtn = document.getElementById('closeImportBtn');
@@ -281,6 +291,14 @@ export function initEventListeners() {
         btnDownloadOffline.addEventListener('click', _deps.downloadHtmlFile);
     }
 
+    return closeImportModal;
+}
+
+/**
+ * Set up demo buttons, regenerate, and banner close
+ * @param {Function} closeImportModal - Modal close function from setupImportModal
+ */
+function setupDemoControls(closeImportModal) {
     // Demo buttons (handle multiple on page)
     document.querySelectorAll('.btn-demo').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -316,7 +334,12 @@ export function initEventListeners() {
             document.getElementById('demoBanner').classList.add('hidden');
         });
     }
+}
 
+/**
+ * Set up dashboard controls: view/theme buttons, save/start over, backup, footer link, tabs
+ */
+function setupDashboardControls() {
     // Dashboard view mode buttons
     document.querySelectorAll('.view-btn').forEach(btn => {
         btn.addEventListener('click', () => _deps.setViewMode(btn.dataset.view));
@@ -379,6 +402,16 @@ export function initEventListeners() {
         restoreBackupBtn.addEventListener('click', _deps.restoreFromBackup);
     }
 
+    // Tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => _deps.setTab(btn.dataset.tab));
+    });
+}
+
+/**
+ * Set up chart controls: main chart types, YoY types, projection years/view/slider
+ */
+function setupChartControls() {
     // Custom rate slider
     // #149: Debounced to prevent chart rebuild on every pixel of drag (was 10-15 rebuilds per adjustment)
     const customRateSlider = document.getElementById('customRateSlider');
@@ -386,11 +419,6 @@ export function initEventListeners() {
         const debouncedUpdateCustomRate = _deps.debounce(_deps.updateCustomRate, 100);
         customRateSlider.addEventListener('input', debouncedUpdateCustomRate);
     }
-
-    // Tab buttons
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => _deps.setTab(btn.dataset.tab));
-    });
 
     // Main chart type buttons
     document.querySelectorAll('.chart-type-btn[data-chart]').forEach(btn => {
@@ -411,7 +439,12 @@ export function initEventListeners() {
     document.querySelectorAll('.chart-type-btn[data-view]').forEach(btn => {
         btn.addEventListener('click', () => _deps.setProjectionView(btn.dataset.view));
     });
+}
 
+/**
+ * Set up input validation: paste input debounce, legal consent checkbox
+ */
+function setupInputValidation() {
     // Paste input textarea
     // #P2-9: Debounce validation to prevent regex firing on every keystroke
     const pasteInput = document.getElementById('pasteInput');
@@ -425,4 +458,28 @@ export function initEventListeners() {
     if (legalConsentCheckbox) {
         legalConsentCheckbox.addEventListener('change', _deps.validatePasteInput);
     }
+}
+
+// ========================================
+// MAIN INITIALIZATION FUNCTION
+// ========================================
+
+/**
+ * Initialize all DOM event listeners
+ * Sets up the domCache and attaches event handlers to UI elements
+ * Called once when DOM is ready
+ */
+export function initEventListeners() {
+    // Set up DOM cache and share with app.js
+    const domCache = setupDomCache();
+    _deps.setDomCache(domCache);
+
+    // Set up feature-specific event listeners
+    setupThemePreference();
+    setupLandingPage();
+    const closeImportModal = setupImportModal();
+    setupDemoControls(closeImportModal);
+    setupDashboardControls();
+    setupChartControls();
+    setupInputValidation();
 }
