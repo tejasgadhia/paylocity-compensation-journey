@@ -260,7 +260,7 @@ For new features:
 
 ## Architecture Overview
 
-See `CLAUDE.md` for detailed architecture documentation, including:
+See `AGENTS.md` and `docs/API.md` for detailed architecture documentation, including:
 
 - Module dependency graph
 - Data flow diagrams
@@ -270,7 +270,7 @@ See `CLAUDE.md` for detailed architecture documentation, including:
 ## Questions?
 
 - Check existing [issues](https://github.com/tejasgadhia/paylocity-compensation-journey/issues) and discussions
-- Review `CLAUDE.md` for technical details
+- Review `AGENTS.md` and `docs/API.md` for technical details
 - Open a new issue for questions not covered here
 
 ## License

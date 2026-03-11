@@ -66,11 +66,8 @@ export async function switchTheme(page, theme) {
     await page.waitForFunction(
       (expectedTheme) => {
         try {
-          const stored = localStorage.getItem('theme');
-          console.log('localStorage theme:', stored, 'expected:', expectedTheme);
-          return stored === expectedTheme;
-        } catch (e) {
-          console.error('localStorage error:', e);
+          return localStorage.getItem('theme') === expectedTheme;
+        } catch {
           return false;
         }
       },

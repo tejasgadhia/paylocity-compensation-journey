@@ -25,9 +25,8 @@ test.describe('Error Handling & Recovery', () => {
       try {
         const bigData = 'x'.repeat(5 * 1024 * 1024);
         localStorage.setItem('quota-test', bigData);
-      } catch (e) {
-        // Expected to fail on quota - that's the point
-        console.log('localStorage quota reached as expected');
+      } catch {
+        // Expected on some browsers once quota is reached.
       }
     });
 

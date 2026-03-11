@@ -17,7 +17,7 @@ export async function checkA11y(page, options = {}) {
   const axeBuilder = new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21aa']) // WCAG 2.1 AA compliance
     .exclude('#non-accessible-element') // Exclude known non-critical issues if any
-    .disableRules(['color-contrast']); // TODO: Fix landing page color contrast (GitHub issue #TBD)
+    .disableRules(['color-contrast']); // Temporarily excluded until theme contrast is tightened
 
   // Apply custom options
   if (options.include) {

@@ -1,18 +1,15 @@
 # Test Suite Documentation
 
-Comprehensive testing for Paylocity Compensation Journey covering unit tests, E2E tests, visual regression, and accessibility validation.
+Comprehensive testing for Paylocity Compensation Journey covering unit tests, E2E flows, and accessibility validation.
 
 ---
 
 ## Test Overview
 
-**Total Test Coverage**:
-- **89 Unit Tests** (Vitest) - Parser (49) + Calculations (40)
-- **30 Functional E2E Tests** (Playwright) - All 10 critical user flows
-- **14 Visual Regression Tests** (Playwright) - All 7 tabs × 2 themes
-- **30 Accessibility Scans** (axe-core) - WCAG 2.1 AA compliance
-
-**Grand Total**: 163 automated tests
+**Coverage Areas**:
+- Unit tests (Vitest) for parser, calculations, charts, security, performance, tables, and utilities
+- Functional E2E tests (Playwright) for import, dashboard rendering, themes, charts, projections, export/import, and error handling
+- Accessibility scans (axe-core) embedded in functional E2E coverage
 
 ---
 
@@ -87,8 +84,9 @@ tests/e2e/
 ├── 03-theme-privacy.spec.js       # 4 tests + 4 a11y - Theme switching, privacy mode
 ├── 04-charts-interaction.spec.js  # 6 tests + 6 a11y - Chart types, legends, tooltips
 ├── 05-projections-demo.spec.js    # 5 tests + 5 a11y - Projections, demo scenarios
-├── 06-export-import.spec.js       # 4 tests + 4 a11y - Data export/import (skipped if not implemented)
-└── 07-visual-regression.spec.js   # 14 visual tests - All tabs × themes
+├── 06-export-import.spec.js       # Export/import flow coverage
+├── 08-performance.spec.js         # Frontend performance checks
+└── 10-error-handling.spec.js      # Recovery and resilience checks
 
 helpers/
 ├── fixtures.js     # Test data constants (valid input, XSS attempts, demo scenarios)
@@ -212,47 +210,6 @@ helpers/
 - Error handling for malformed JSON
 
 **Note**: Tests are skipped if export/import features not yet implemented.
-
----
-
-### 7. Visual Regression (14 tests)
-
-**File**: `07-visual-regression.spec.js`
-
-**All 7 tabs × 2 themes = 14 screenshots**:
-
-**Tactical Theme**:
-- home-tactical.png
-- story-tactical.png
-- breakdown-tactical.png
-- yoy-tactical.png
-- market-tactical.png
-- projection-tactical.png
-- about-tactical.png
-
-**Artistic Theme**:
-- home-artistic.png
-- story-artistic.png
-- breakdown-artistic.png
-- yoy-artistic.png
-- market-artistic.png
-- projection-artistic.png
-- about-artistic.png
-
-**Key Verifications**:
-- UI consistency across themes
-- Chart rendering stability
-- Layout doesn't shift
-- Color schemes correct
-
-**Baseline Management**:
-```bash
-# Update baselines after intentional UI changes
-npm run test:e2e -- --update-snapshots
-
-# Only update specific test
-npm run test:e2e -- 07-visual-regression --update-snapshots
-```
 
 ---
 
@@ -473,7 +430,6 @@ npm run test:e2e:ui
 - Write descriptive test names
 - Use helper functions for reusable actions
 - Test error states and edge cases
-- Update visual baselines after intentional UI changes
 
 ### ❌ DON'T
 
@@ -482,7 +438,7 @@ npm run test:e2e:ui
 - Hardcode URLs or data (use fixtures)
 - Test implementation details (test user behavior)
 - Ignore flaky tests (fix root cause or add retry logic)
-- Forget to update CLAUDE.md when adding new test patterns
+- Let test docs drift away from the actual spec files
 
 ---
 
@@ -507,26 +463,6 @@ await page.waitForLoadState('networkidle');
 
 // Wait for specific element
 await page.locator('#main-chart').waitFor({ state: 'visible' });
-```
-
-### Visual Regression Failures
-
-**Symptom**: Screenshots don't match baselines
-
-**Causes**:
-- Intentional UI changes (expected)
-- Font rendering differences (platform-specific)
-- Chart animation timing
-
-**Solutions**:
-```bash
-# Update baselines after intentional changes
-npm run test:e2e -- --update-snapshots
-
-# Increase maxDiffPixels threshold
-await expect(page).toHaveScreenshot('name.png', {
-  maxDiffPixels: 200, // More tolerant
-});
 ```
 
 ### Accessibility Violations
@@ -554,9 +490,8 @@ await checkA11y(page, { exclude: '#known-issue' });
 **Test Execution Times** (approximate):
 
 - Unit tests: ~5 seconds (89 tests)
-- E2E tests (1 browser): ~3 minutes (44 tests)
-- E2E tests (3 browsers): ~9 minutes (132 test runs)
-- Visual regression: ~2 minutes (14 screenshots × 3 browsers)
+- E2E tests (1 browser): ~3 minutes
+- E2E tests (3 browsers): ~9 minutes
 
 **CI Total**: ~15 minutes (E2E + unit tests in parallel)
 
@@ -593,6 +528,6 @@ await checkA11y(page, { exclude: '#known-issue' });
 - Review existing tests for patterns
 - Check helper functions (`tests/e2e/helpers/`)
 - Run tests in UI mode for visual debugging
-- See CLAUDE.md for project architecture context
+- See AGENTS.md and docs/API.md for project architecture context
 
 Happy testing! 🎉

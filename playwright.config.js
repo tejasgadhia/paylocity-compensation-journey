@@ -4,9 +4,8 @@ import { defineConfig, devices } from '@playwright/test';
  * Playwright E2E Test Configuration
  *
  * Comprehensive test suite for Compensation Journey web app covering:
- * - 30 functional tests across 6 spec files
- * - 14 visual regression tests (7 tabs × 2 themes)
- * - 30 accessibility scans (WCAG AA validation)
+ * - Functional tests across import, dashboard, theme, chart, projection, export, and recovery flows
+ * - Accessibility scans (WCAG AA validation) embedded in functional coverage
  * - 3 browsers: Chromium, Firefox, WebKit
  */
 export default defineConfig({

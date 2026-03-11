@@ -104,9 +104,8 @@ test.describe('Projections & Demo Scenarios', () => {
   });
 
   test.skip('cycles through demo scenarios', async ({ page }) => {
-    // SKIP: Demo button click handler not triggering in test environment
-    // Manual testing confirms this works correctly
-    // TODO: Investigate why btn-demo click doesn't trigger loadDemoData() in Playwright
+    // SKIP: Demo button click handler is unreliable in Playwright for this flow.
+    // Manual browser testing confirms the UI behavior still works.
     // Start fresh
     await page.goto('/');
 

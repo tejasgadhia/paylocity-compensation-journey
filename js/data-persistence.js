@@ -56,7 +56,6 @@ export function saveBackup() {
             version: 1
         };
         localStorage.setItem('cj-backup', JSON.stringify(backup));
-        console.log('Data backup saved to localStorage');
     } catch (err) {
         // Quota exceeded or localStorage disabled - fail gracefully
         console.warn('Failed to save backup to localStorage:', err.message);
@@ -92,7 +91,6 @@ export function loadBackup() {
 export function clearBackup() {
     try {
         localStorage.removeItem('cj-backup');
-        console.log('Backup cleared from localStorage');
     } catch (err) {
         console.warn('Failed to clear backup:', err.message);
     }

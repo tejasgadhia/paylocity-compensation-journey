@@ -4546,64 +4546,6 @@
         }
 
         /* ========================================
-           DOWNLOAD OFFLINE BUTTON
-           ======================================== */
-        
-        .privacy-download {
-            margin-top: 0.75rem;
-            padding-top: 0.75rem;
-            border-top: 1px dashed var(--border-color);
-        }
-
-        .btn-download-offline {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: var(--space-2);
-            width: 100%;
-            padding: var(--space-2) var(--space-3);
-            background: transparent;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            color: var(--text-secondary);
-            font-family: var(--font-mono);
-            font-size: var(--font-size-xs);
-            cursor: pointer;
-            transition: all var(--transition-speed);
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-
-        .btn-download-offline span {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-download-offline svg {
-            width: 0.875rem;
-            height: 0.875rem;
-        }
-
-        .btn-download-offline:hover {
-            border-color: var(--accent-secondary);
-            color: var(--accent-secondary);
-            background: rgba(69, 212, 138, 0.1);
-        }
-
-        [data-theme="artistic"] .btn-download-offline:hover {
-            background: rgba(0, 150, 199, 0.1);
-        }
-
-        .download-hint {
-            font-size: var(--font-size-xs);
-            color: var(--text-muted);
-            text-align: center;
-            margin-top: 0.4rem;
-            font-style: italic;
-        }
-
-        /* ========================================
            BENCHMARK SOURCES
            ======================================== */
         

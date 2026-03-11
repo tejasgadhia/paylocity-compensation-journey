@@ -58,7 +58,6 @@ export const CONSTANTS = {
 
     // LocalStorage keys
     STORAGE_KEY_THEME: 'theme',
-    STORAGE_KEY_DEMO_BANNER: 'demoBannerDismissed',
     STORAGE_KEY_CPI_WARNING: 'cpiStaleWarningDismissed',
 
     // Screen size breakpoints

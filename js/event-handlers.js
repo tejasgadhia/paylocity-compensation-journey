@@ -19,7 +19,6 @@ let _deps = {};
  * @param {Function} deps.setTab - Tab navigation from navigation.js
  * @param {Function} deps.loadDemoData - Demo data loader from demo-data.js
  * @param {Function} deps.cycleNextScenario - Demo scenario cycler from demo-data.js
- * @param {Function} deps.downloadHtmlFile - HTML download from io.js
  * @param {Function} deps.loadJsonFile - JSON file loader from io.js
  * @param {Function} deps.downloadData - Data download from io.js
  * @param {Function} deps.saveBackup - Backup saver from data-persistence.js
@@ -226,7 +225,7 @@ function setupLandingPage() {
 }
 
 /**
- * Set up import modal open/close, backdrop click, escape key, and download offline
+ * Set up import modal open/close, backdrop click, and escape key
  * @returns {Function} closeImportModal - Exposed for use by demo controls
  */
 function setupImportModal() {
@@ -284,14 +283,6 @@ function setupImportModal() {
             closeImportModal();
         }
     });
-
-    // Download offline button (async for lazy-loaded I/O module #180)
-    const btnDownloadOffline = document.querySelector('.btn-download-offline');
-    if (btnDownloadOffline) {
-        btnDownloadOffline.addEventListener('click', async () => {
-            await _deps.downloadHtmlFile();
-        });
-    }
 
     return closeImportModal;
 }

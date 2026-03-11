@@ -86,7 +86,7 @@ Fair. Here's how to verify this tool is truly private:
 6. **Expected result**: Zero new network requests after initial page load
 
 **Thorough verification (offline test):**
-1. Click the **"Download this tool"** button on the splash screen (or right-click → Save Page As)
+1. Save the page locally with your browser's **Save Page As** feature
 2. **Disconnect from the internet** (turn off Wi-Fi, unplug ethernet)
 3. **Open the downloaded HTML file** in your browser
 4. **Paste your Paylocity data** and generate your dashboard
@@ -152,7 +152,6 @@ compensation-journey/
 ├── screenshots/         # UI screenshots
 ├── tests/               # Playwright E2E + Vitest unit tests
 ├── README.md
-├── CLAUDE.md            # Developer documentation
 ├── CHANGELOG.md         # Version history
 ├── LICENSE
 └── .gitignore

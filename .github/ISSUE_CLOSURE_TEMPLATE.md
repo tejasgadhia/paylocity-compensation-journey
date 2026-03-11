@@ -79,7 +79,7 @@ Issue acknowledged but not addressing due to product/design decisions.
 
 **Verification:** N/A
 
-**Related Artifacts:** See CLAUDE.md architecture principles
+**Related Artifacts:** See AGENTS.md and docs/API.md for architecture principles
 ```
 
 ---
@@ -143,4 +143,5 @@ gh issue close 123 --comment "**Resolution Type:** Fixed
 
 - `.github/ISSUE_TEMPLATE/` - Issue creation templates
 - `CONTRIBUTING.md` - Contribution guidelines
-- `CLAUDE.md` - Development guidelines
+- `AGENTS.md` - Project context and conventions
+- `docs/API.md` - Module-level technical reference

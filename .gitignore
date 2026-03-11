@@ -17,6 +17,9 @@ test-structure.txt
 
 # Claude working files
 .claude/
+CLAUDE.md
+GEMINI.md
+.ui-design/
 
 # Agent operational state (session-specific, not for version control)
 .context/
@@ -44,13 +47,6 @@ docs/troubleshooting/
 docs/test-results/
 docs/issues/
 docs/future/
-.ui-design/reviews/
-.ui-design/*-backup.html
-.ui-design/theme-comparison*.html
-.ui-design/theme-final*.html
-.ui-design/theme-hybrid*.html
-.ui-design/theme-left*.html
-.ui-design/theme-v5*.html
 screenshots/originals/
 
 # Editor directories and files

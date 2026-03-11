@@ -46,32 +46,6 @@ export function initIO({ getEmployeeData, setEmployeeData, showDashboard, update
 }
 
 // ========================================
-// HTML DOWNLOAD
-// ========================================
-
-/**
- * Downloads the current page as an HTML file.
- * Includes privacy warning before download.
- */
-export function downloadHtmlFile() {
-    // Privacy warning - user should understand they're downloading sensitive data
-    if (!confirm('This file contains your compensation data. Only share with trusted people.')) {
-        return;
-    }
-
-    const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-    const blob = new Blob([html], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'compensation-journey.html';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-// ========================================
 // JSON IMPORT VALIDATION
 // ========================================
 

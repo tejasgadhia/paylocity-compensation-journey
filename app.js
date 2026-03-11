@@ -50,7 +50,7 @@ import {
     togglePrivacy
 } from './js/view.js';
 // Phase 2: I/O module is dynamically imported (#180)
-// import { initIO, downloadHtmlFile, loadJsonFile, downloadData } from './js/io.js';
+// import { initIO, loadJsonFile, downloadData } from './js/io.js';
 import {
     initDataPersistence,
     saveBackup,
@@ -241,7 +241,7 @@ async function cycleNextScenario() {
 }
 
 /**
- * I/O module - loaded on first use (Save Data, Load JSON, Download Offline)
+ * I/O module - loaded on first use (Save Data, Load JSON)
  * Includes crypto for AES-256-GCM encryption - saves ~400 lines from initial bundle
  */
 let ioModule = null;
@@ -264,11 +264,6 @@ async function getIOModule() {
         }
     }
     return ioModule;
-}
-
-async function downloadHtmlFile() {
-    const module = await getIOModule();
-    return module.downloadHtmlFile();
 }
 
 async function loadJsonFile(event) {
@@ -535,7 +530,6 @@ initEventHandlers({
     setTab,
     loadDemoData,
     cycleNextScenario,
-    downloadHtmlFile,
     loadJsonFile,
     downloadData,
     saveBackup,
