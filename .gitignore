@@ -19,11 +19,11 @@ test-structure.txt
 # Claude working files
 .claude/
 
+# Agent operational state (session-specific, not for version control)
+.context/
+
 # Internal development docs (keep locally, don't publish)
-LEARNINGS.md
-NEXT-STEPS.md
-PROJECT-STATUS.md
-ISSUE-PLAN.md
+_planning/
 NEXT-SESSION-PROMPT.md
 NEXT-SESSION-RESUME.md
 NEXT-SESSION-E2E-TESTS.md
