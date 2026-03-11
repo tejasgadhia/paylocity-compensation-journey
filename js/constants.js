@@ -78,12 +78,18 @@ export const CONSTANTS = {
 };
 
 // ========================================
-// CPI DATA (US CPI-U Annual Inflation Rates)
+// CPI DATA (US CPI-U December 12-Month Percent Change)
 // ========================================
 
 /**
- * US CPI-U Annual Inflation Rates (%)
- * Source: Bureau of Labor Statistics
+ * US CPI-U all-items, U.S. city average, 12-month percent change in December (%).
+ * Source: Bureau of Labor Statistics.
+ *
+ * Notes:
+ * - This app currently uses one CPI rate per calendar year for lightweight client-side calculations.
+ * - Values are December-over-December changes, which match the historical convention already used here.
+ * - The dataset is intentionally kept to complete year-end values; moving to monthly CPI would require
+ *   a different calculation model for partial-year precision.
  */
 export const cpiData = {
     2011: 3,
@@ -94,7 +100,13 @@ export const cpiData = {
     2016: 2.1,
     2017: 2.1,
     2018: 1.9,
-    2019: 2.3
+    2019: 2.3,
+    2020: 1.4,
+    2021: 7,
+    2022: 6.5,
+    2023: 3.4,
+    2024: 2.9,
+    2025: 2.7
 };
 
 /**
@@ -102,7 +114,7 @@ export const cpiData = {
  * Used for freshness checking and source attribution
  */
 export const cpiMetadata = {
-    lastUpdated: '2026-02', // YYYY-MM format, updated by GitHub Action
+    lastUpdated: '2025-12', // YYYY-MM format for the most recent complete year in cpiData
     source: 'Bureau of Labor Statistics',
     seriesId: 'CUUR0000SA0', // CPI-U All Urban Consumers, U.S. city average
     updateFrequency: 'quarterly',
@@ -147,7 +159,7 @@ export const benchmarkMetadata = {
 
     lastUpdated: {
         salaryBenchmarks: '2024-Q4',
-        inflationData: '2026-02',  // Monthly CPI updates from BLS
+        inflationData: '2025-12',  // Complete December year-end CPI used by this app
         industryCagr: '2024-Q3'
     },
 

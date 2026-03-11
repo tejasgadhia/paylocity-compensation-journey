@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { CONSTANTS, benchmarks } from '../js/constants.js';
+import { CONSTANTS, benchmarks, cpiData } from '../js/constants.js';
 import {
     calculateInflationOverPeriod,
     calculateRealGrowth,
@@ -457,6 +457,15 @@ describe('CONSTANTS Validation', () => {
 
     it('has default CPI rate for missing data', () => {
         expect(CONSTANTS.DEFAULT_CPI_RATE).toBe(2.5);
+    });
+
+    it('includes CPI year-end data through 2025', () => {
+        expect(cpiData[2020]).toBe(1.4);
+        expect(cpiData[2021]).toBe(7);
+        expect(cpiData[2022]).toBe(6.5);
+        expect(cpiData[2023]).toBe(3.4);
+        expect(cpiData[2024]).toBe(2.9);
+        expect(cpiData[2025]).toBe(2.7);
     });
 
     it('has em-dash placeholder for empty reasons', () => {

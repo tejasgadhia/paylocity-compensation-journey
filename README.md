@@ -41,7 +41,7 @@ Includes CPI data from Bureau of Labor Statistics for real purchasing power anal
 - Geographic scope: **United States**, primarily tech hubs (SF Bay, NYC, Seattle, Austin, Boston)
 - Industry focus: **B2B SaaS** (growth-stage companies, IC and mid-level roles)
 - Full methodology and limitations disclosed in Market tab
-- Last updated: **Q4 2024** (salary benchmarks), **Dec 2024** (CPI data)
+- Last updated: **Q4 2024** (salary benchmarks), **Dec 2025** (CPI year-end data)
 
 Desktop-only. Mobile is intentionally blocked because responsive complexity isn't worth it for a financial dashboard.
 
@@ -66,9 +66,10 @@ That's it! Your data is processed entirely in your browser—nothing is uploaded
 
 - 100% client-side processing (vanilla JavaScript)
 - Zero server uploads or external requests
-- No cookies, no storage, no tracking, no AI/ML APIs
+- No cookies, no tracking, no AI/ML APIs
+- Local browser storage may be used for theme preference, dismissed notices, and session recovery
 - Works completely offline after the page loads
-- Your salary data stays in your browser tab
+- Your salary data stays on your device
 
 Save as JSON to your computer if you want. Load it later. That's it.
 
@@ -107,7 +108,7 @@ Fair. Here's how to verify this tool is truly private:
 - **Network Monitoring Guide**: [SECURITY.md Network Monitoring](SECURITY.md#network-monitoring-guide) — Real-time monitoring for paranoid users (DevTools, system-level, proxy methods)
 - **Third-Party Audits**: [Audit Status](SECURITY.md#third-party-audit-status) — Current status and how to commission an independent audit
 
-**Privacy promise**: Your salary data never touches a server. It processes in your browser tab and disappears when you close it (unless you explicitly save it).
+**Privacy promise**: Your salary data never touches a server. It is processed locally in your browser, and any persistence stays on your device rather than being sent anywhere.
 
 ## Security
 

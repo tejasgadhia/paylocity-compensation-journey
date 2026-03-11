@@ -195,13 +195,15 @@ grep -r "\.ajax" .
 
 ### 3. Storage Audit (What's Stored Locally)
 
-**Check localStorage** — Only theme preference is stored:
+**Check localStorage** — Local-only browser data may be stored:
 
 1. Open DevTools → **Application** tab
 2. Expand **Local Storage** → Select the app's origin
 3. **Expected contents**:
    - `theme`: `"tactical"` or `"artistic"`
-   - Nothing else (no salary data, no user info)
+   - `cj-backup`: parsed compensation data for session recovery, if a recoverable session exists
+   - `cpiStaleWarningDismissed`: timestamp if the CPI freshness notice was dismissed
+   - No cookies, no IndexedDB, no remote persistence
 
 **Verify**:
 - No cookies set (check **Cookies** section)
