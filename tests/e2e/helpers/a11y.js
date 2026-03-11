@@ -16,8 +16,7 @@ import AxeBuilder from '@axe-core/playwright';
 export async function checkA11y(page, options = {}) {
   const axeBuilder = new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21aa']) // WCAG 2.1 AA compliance
-    .exclude('#non-accessible-element') // Exclude known non-critical issues if any
-    .disableRules(['color-contrast']); // Temporarily excluded until theme contrast is tightened
+    .exclude('#non-accessible-element'); // Exclude known non-critical issues if any
 
   // Apply custom options
   if (options.include) {

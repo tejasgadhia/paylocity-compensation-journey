@@ -139,9 +139,6 @@ export async function loadDemoScenario(page, scenarioIndex) {
   // Wait for landing page
   await page.locator('#landingPage').waitFor({ state: 'visible' });
 
-  // Extra wait for initialization
-  await page.waitForTimeout(1000);
-
   // Force click the demo button
   await page.locator('button.btn-demo').click({ force: true });
 
@@ -151,14 +148,30 @@ export async function loadDemoScenario(page, scenarioIndex) {
   // Wait for main chart to be visible
   await page.locator('#mainChart').waitFor({ state: 'visible', timeout: 5000 });
 
-  // Wait for chart to fully render
-  await page.waitForTimeout(1500);
+  await page.waitForFunction(
+    () => window.employeeData && window.employeeData()?.scenarioId !== undefined,
+    { timeout: 5000 }
+  );
 
-  // Click regenerate button (scenarioIndex) times to cycle to the desired scenario
-  for (let i = 0; i < scenarioIndex; i++) {
+  const currentIndex = await page.evaluate(() => window.state.currentScenarioIndex);
+  const scenarioCount = 4;
+  const clicksNeeded = (scenarioIndex - currentIndex + scenarioCount) % scenarioCount;
+
+  // Cycle from the default scenario to the requested scenario.
+  for (let i = 0; i < clicksNeeded; i++) {
+    const expectedIndex = (currentIndex + i + 1) % scenarioCount;
     await page.locator('button.demo-regenerate-btn').click();
-    await page.waitForTimeout(1000);
+    await page.waitForFunction(
+      (targetIndex) =>
+        window.state?.currentScenarioIndex === targetIndex &&
+        window.employeeData?.()?.scenarioId === targetIndex + 1,
+      expectedIndex,
+      { timeout: 5000 }
+    );
   }
+
+  // Let CSS transitions settle before follow-up assertions or axe scans.
+  await page.waitForTimeout(400);
 }
 
 /**

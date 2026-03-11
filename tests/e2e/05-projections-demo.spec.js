@@ -21,6 +21,21 @@ import { assertChartRendered } from './helpers/assertions.js';
 import { checkA11y } from './helpers/a11y.js';
 
 test.describe('Projections & Demo Scenarios', () => {
+  async function getScenarioSnapshot(page) {
+    return page.evaluate(() => {
+      const data = window.employeeData();
+      const records = data?.records || [];
+      const oldestRecord = records[records.length - 1];
+      const newestRecord = records[0];
+
+      return {
+        scenarioId: data?.scenarioId ?? null,
+        startingSalary: oldestRecord?.annual ?? 0,
+        endingSalary: newestRecord?.annual ?? 0,
+      };
+    });
+  }
+
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     await importData(page, VALID_PAYLOCITY_INPUT);
@@ -103,9 +118,7 @@ test.describe('Projections & Demo Scenarios', () => {
     await checkA11y(page);
   });
 
-  test.skip('cycles through demo scenarios', async ({ page }) => {
-    // SKIP: Demo button click handler is unreliable in Playwright for this flow.
-    // Manual browser testing confirms the UI behavior still works.
+  test('cycles through demo scenarios', async ({ page }) => {
     // Start fresh
     await page.goto('/');
 
@@ -113,31 +126,26 @@ test.describe('Projections & Demo Scenarios', () => {
     await loadDemoScenario(page, 0);
 
     // Verify starting salary matches early career
-    let startingSalary = await page.evaluate(() => {
-      const data = window.employeeData();
-      return data?.[0]?.annual || 0;
-    });
-    expect(startingSalary).toBe(DEMO_SCENARIOS.earlyCareer.startingSalary);
+    let scenario = await getScenarioSnapshot(page);
+    expect(scenario.scenarioId).toBe(1);
+    expect(scenario.startingSalary).toBe(DEMO_SCENARIOS.earlyCareer.startingSalary);
+    expect(scenario.endingSalary).toBe(DEMO_SCENARIOS.earlyCareer.endingSalary);
 
     // Load growth phase scenario (index 1)
-    await page.getByRole('button', { name: 'Regenerate Demo' }).click();
-    await page.waitForTimeout(500);
-
-    startingSalary = await page.evaluate(() => {
-      const data = window.employeeData();
-      return data?.[0]?.annual || 0;
-    });
-    expect(startingSalary).toBe(DEMO_SCENARIOS.growthPhase.startingSalary);
+    await page.locator('button.demo-regenerate-btn').click();
+    await page.waitForFunction(() => window.employeeData()?.scenarioId === 2);
+    await page.waitForTimeout(400);
+    scenario = await getScenarioSnapshot(page);
+    expect(scenario.startingSalary).toBe(DEMO_SCENARIOS.growthPhase.startingSalary);
+    expect(scenario.endingSalary).toBe(DEMO_SCENARIOS.growthPhase.endingSalary);
 
     // Load established scenario (index 2)
-    await page.getByRole('button', { name: 'Regenerate Demo' }).click();
-    await page.waitForTimeout(500);
-
-    startingSalary = await page.evaluate(() => {
-      const data = window.employeeData();
-      return data?.[0]?.annual || 0;
-    });
-    expect(startingSalary).toBe(DEMO_SCENARIOS.established.startingSalary);
+    await page.locator('button.demo-regenerate-btn').click();
+    await page.waitForFunction(() => window.employeeData()?.scenarioId === 3);
+    await page.waitForTimeout(400);
+    scenario = await getScenarioSnapshot(page);
+    expect(scenario.startingSalary).toBe(DEMO_SCENARIOS.established.startingSalary);
+    expect(scenario.endingSalary).toBe(DEMO_SCENARIOS.established.endingSalary);
 
     // A11y check
     await checkA11y(page);
