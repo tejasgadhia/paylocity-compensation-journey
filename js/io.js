@@ -2,19 +2,10 @@
 // FILE I/O MODULE
 // ========================================
 
+import { VALID_REASONS } from './constants.js';
 import { showUserMessage } from './notifications.js';
 import { validateSalaryRange } from './parser.js';
 import { encryptData, decryptData, isEncrypted, isCryptoSupported, CryptoError } from './crypto.js';
-
-// ========================================
-// CONSTANTS
-// ========================================
-
-/**
- * Valid change reasons for compensation records.
- * Must match parser.js extractReason() whitelist.
- */
-export const VALID_REASONS = ['Merit Increase', 'Promotion', 'Market Adjustment', 'Equity', 'New Hire'];
 
 // ========================================
 // MODULE STATE (injected via initIO)

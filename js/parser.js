@@ -2,6 +2,8 @@
 // PARSER FUNCTIONS
 // ========================================
 
+import { VALID_REASONS } from './constants.js';
+
 /**
  * Validates salary values are within reasonable ranges.
  * Prevents parsing of corrupted/malicious data with extreme values.
@@ -93,8 +95,7 @@ export function validateSalaryRange(value, fieldName = 'salary') {
  * Extract change reason from record text (Closes #25 - complexity reduction)
  */
 function extractReason(text) {
-    const reasons = ['Merit Increase', 'Promotion', 'Market Adjustment', 'Equity', 'New Hire'];
-    for (const r of reasons) {
+    for (const r of VALID_REASONS) {
         if (text.includes(r)) {
             return r.replace(/<[^>]*>/g, '');
         }

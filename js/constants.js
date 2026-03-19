@@ -8,6 +8,12 @@
  */
 export const VALID_TABS = ['home', 'story', 'market', 'history', 'analytics', 'projections', 'help'];
 
+/**
+ * Valid change reasons for compensation records.
+ * Used by parser.js (extractReason) and io.js (import validation).
+ */
+export const VALID_REASONS = ['Merit Increase', 'Promotion', 'Market Adjustment', 'Equity', 'New Hire'];
+
 export const CONSTANTS = {
     // Salary validation
     MIN_REALISTIC_SALARY: 1000,         // $1K minimum (sanity check)

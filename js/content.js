@@ -15,7 +15,7 @@ import {
     formatDateSummary,
     formatDateDetail
 } from './calculations.js';
-import { validateTemplateData } from './security.js';
+import { escapeHTML, validateTemplateData } from './security.js';
 
 // ========================================
 // MODULE STATE (injected via initContent)
@@ -34,32 +34,6 @@ let _state, _getEmployeeData;
 export function initContent({ state, getEmployeeData }) {
     _state = state;
     _getEmployeeData = getEmployeeData;
-}
-
-// ========================================
-// SECURITY HELPERS
-// ========================================
-
-/**
- * Escapes HTML special characters to prevent XSS attacks.
- * Private utility - copied from app.js since it's small and used here.
- *
- * @param {string} str - The string to escape
- * @returns {string} The escaped string safe for insertion into HTML
- */
-function escapeHTML(str) {
-    if (typeof str !== 'string') return str;
-
-    const htmlEscapeMap = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#x27;',
-        '/': '&#x2F;'
-    };
-
-    return str.replace(/[&<>"'\/]/g, char => htmlEscapeMap[char]);
 }
 
 // ========================================

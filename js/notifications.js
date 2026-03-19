@@ -3,30 +3,7 @@
 // ========================================
 
 import { CONSTANTS, cpiMetadata } from './constants.js';
-
-// ========================================
-// UTILITY FUNCTIONS
-// ========================================
-
-/**
- * Escapes HTML special characters to prevent XSS attacks.
- * @param {string} str - The string to escape
- * @returns {string} The escaped string
- */
-function escapeHTML(str) {
-    if (typeof str !== 'string') return str;
-
-    const htmlEscapeMap = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#x27;',
-        '/': '&#x2F;'
-    };
-
-    return str.replace(/[&<>"'\/]/g, char => htmlEscapeMap[char]);
-}
+import { escapeHTML } from './security.js';
 
 // ========================================
 // USER MESSAGES

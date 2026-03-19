@@ -52,10 +52,10 @@ Content-Security-Policy:
 
 **Location**: `js/parser.js`
 
-#### Whitelist Approach (Lines 96-106)
+#### Whitelist Approach
 ```javascript
-// Only allow specific reason strings
-const reasons = ['Merit Increase', 'Promotion', 'Market Adjustment', 'Equity', 'New Hire'];
+// js/constants.js — single source of truth for valid reasons
+export const VALID_REASONS = ['Merit Increase', 'Promotion', 'Market Adjustment', 'Equity', 'New Hire'];
 ```
 
 **Protection**:
@@ -63,7 +63,7 @@ const reasons = ['Merit Increase', 'Promotion', 'Market Adjustment', 'Equity', '
 - ✅ HTML tags stripped: `.replace(/<[^>]*>/g, '')`
 - ✅ Rejects any unexpected input patterns
 
-#### Range Validation (Lines 25-56)
+#### Range Validation (`js/parser.js`)
 ```javascript
 const ranges = {
   annual: { min: 1000, max: 10000000 },      // $1K - $10M
@@ -80,24 +80,23 @@ const ranges = {
 
 ### 3. Output Escaping
 
-**Location**: `app.js:175-184`
+**Location**: `js/security.js:35` (centralized, imported by all modules that render HTML)
 
 ```javascript
-function escapeHTML(str) {
+export function escapeHTML(str) {
   if (typeof str !== 'string') return str;
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+  const htmlEscapeMap = {
+    '&': '&amp;', '<': '&lt;', '>': '&gt;',
+    '"': '&quot;', "'": '&#x27;', '/': '&#x2F;'
+  };
+  return str.replace(/[&<>"'\/]/g, char => htmlEscapeMap[char]);
 }
 ```
 
 **Usage**:
-- ✅ `app.js:720` - User messages (banner display)
-- ✅ `app.js:1151-1152` - Milestone titles and icons
-- ✅ `app.js:1419` - History table reason field (user-controlled)
+- ✅ `js/notifications.js:31` - User messages (banner display)
+- ✅ `js/content.js:432-437` - Milestone icons, titles, details, dates
+- ✅ `js/tables.js:120` - History table reason field (user-controlled)
 
 **Protection**:
 - ✅ Escapes all HTML special characters
@@ -106,20 +105,20 @@ function escapeHTML(str) {
 
 ### 4. innerHTML Usage Audit
 
-All `innerHTML` usages have been audited for XSS safety:
+All `innerHTML` usages have been audited for XSS safety (updated 2026-03-19 after modularization):
 
-| Line | Location | Safety | Notes |
-|------|----------|--------|-------|
-| 173 | Example | ✅ Safe | Documentation only |
-| 720 | `showMessage()` | ✅ Safe | Uses `escapeHTML()` |
-| 1035 | `updateStory()` | ✅ Safe | Template contains only numeric values from `.toFixed()` |
-| 1088 | `updateMarket()` | ✅ Safe | Only `<strong>` tags around numeric values |
-| 1103 | `buildMarketComparison()` | ✅ Safe | All values numeric (toFixed, formatCurrency) |
-| 1149 | `buildMilestones()` | ✅ Safe | Uses `escapeHTML()` on icon and title |
-| 1164 | `buildMarketComparison()` error | ✅ Safe | Hardcoded string literal |
-| 1228 | `buildMarketComparison()` cards | ✅ Safe | All values numeric or hardcoded strings |
-| 1414 | `updateHistory()` table | ✅ Safe | Uses `escapeHTML(r.reason)` on user input |
-| 1451 | `updateAnalytics()` intervals | ✅ Safe | All values numeric |
+| Module | Function | Safety | Notes |
+|--------|----------|--------|-------|
+| `notifications.js:30` | `showUserMessage()` | ✅ Safe | Uses `escapeHTML()` on message text |
+| `notifications.js:92` | `showStaleDataWarning()` | ✅ Safe | Only formatted date string (from `toLocaleDateString`) |
+| `content.js:288` | `updateStory()` | ✅ Safe | Template contains only numeric values from `.toFixed()` |
+| `content.js:340` | `updateMarket()` | ✅ Safe | Only `<strong>` tags around numeric values |
+| `content.js:377` | `buildInflationAnalysis()` | ✅ Safe | All values numeric (toFixed, formatCurrency) |
+| `content.js:432` | `buildMilestones()` | ✅ Safe | Uses `escapeHTML()` on icon, title, detail, date |
+| `content.js:457` | `buildMarketComparison()` error | ✅ Safe | Hardcoded string literal |
+| `content.js:521` | `buildMarketComparison()` cards | ✅ Safe | All values numeric or hardcoded strings |
+| `tables.js:108` | `buildHistoryTable()` | ✅ Safe | Uses `escapeHTML(r.reason)` on user input |
+| `tables.js:164` | `buildProjectionTable()` | ✅ Safe | All values numeric |
 
 **Conclusion**: All innerHTML usages are safe. User-controlled strings are either:
 1. Escaped with `escapeHTML()` before insertion, or
