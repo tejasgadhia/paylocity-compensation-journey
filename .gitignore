@@ -17,8 +17,6 @@ test-structure.txt
 
 # Claude working files
 .claude/
-CLAUDE.md
-GEMINI.md
 .ui-design/
 
 # Agent operational state (session-specific, not for version control)
@@ -26,27 +24,6 @@ GEMINI.md
 
 # Internal development docs (keep locally, don't publish)
 _planning/
-NEXT-SESSION-PROMPT.md
-NEXT-SESSION-RESUME.md
-NEXT-SESSION-E2E-TESTS.md
-CODEBASE_ANALYSIS.md
-REFACTOR_PLAN.md
-PHASE-2-IMPLEMENTATION-SUMMARY.md
-E2E-TEST-STATUS.md
-E2E-TEST-FINAL-SUMMARY.md
-E2E-TEST-FIXES-SUMMARY.md
-FINAL-TEST-AND-CODE-QUALITY-SUMMARY.md
-TEST-FIXES-PROGRESS.md
-TEST-FIXES-SUMMARY.md
-TEST-FIXES-COMPLETE.md
-docs/sessions/
-docs/plans/
-docs/archive/
-docs/learnings/
-docs/troubleshooting/
-docs/test-results/
-docs/issues/
-docs/future/
 screenshots/originals/
 
 # Editor directories and files
