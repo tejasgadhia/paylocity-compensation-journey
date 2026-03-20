@@ -107,6 +107,37 @@ export function getTooltipConfig(options = {}) {
     };
 }
 
+/**
+ * Builds projection datasets (labels + 3 scenario arrays) from current state.
+ * Shared by buildProjectionChart and updateProjectionChartData.
+ */
+function buildProjectionDatasets() {
+    const employeeData = _getEmployeeData();
+    const currentSalaryRaw = getCurrentSalary(employeeData);
+    const startingSalary = getStartingSalary(employeeData);
+    const currentSalary = _state.showDollars
+        ? currentSalaryRaw
+        : (currentSalaryRaw / startingSalary) * 100;
+
+    const cagr = calculateCAGR(employeeData) / 100;
+    const years = _state.projectionYears;
+    const customRate = _state.customRate / 100;
+
+    const labels = ['Now'];
+    const historical = [currentSalary];
+    const conservative = [currentSalary];
+    const custom = [currentSalary];
+
+    for (let i = 1; i <= years; i++) {
+        labels.push(`+${i}yr`);
+        historical.push(currentSalary * Math.pow(1 + cagr, i));
+        conservative.push(currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_CONSERVATIVE, i));
+        custom.push(currentSalary * Math.pow(1 + customRate, i));
+    }
+
+    return { labels, historical, conservative, custom, cagr };
+}
+
 // ========================================
 // THEME UPDATE FUNCTIONS
 // ========================================
@@ -602,30 +633,7 @@ export function buildProjectionChart() {
         if (!ctx) return;
 
         const colors = getThemeColors();
-
-        const currentSalaryRaw = getCurrentSalary(employeeData);
-        const startingSalary = getStartingSalary(employeeData);
-
-        // Convert to indexed values if privacy mode enabled (same as main chart)
-        const currentSalary = _state.showDollars
-            ? currentSalaryRaw
-            : (currentSalaryRaw / startingSalary) * 100;
-
-        const cagr = calculateCAGR(employeeData) / 100;
-        const years = _state.projectionYears;
-        const customRate = _state.customRate / 100;
-
-        const labels = ['Now'];
-        const historical = [currentSalary];
-        const conservative = [currentSalary];
-        const custom = [currentSalary];
-
-        for (let i = 1; i <= years; i++) {
-            labels.push(`+${i}yr`);
-            historical.push(currentSalary * Math.pow(1 + cagr, i));
-            conservative.push(currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_CONSERVATIVE, i));
-            custom.push(currentSalary * Math.pow(1 + customRate, i));
-        }
+        const { labels, historical, conservative, custom, cagr } = buildProjectionDatasets();
 
         if (_charts.projection) _charts.projection.destroy();
 
@@ -691,32 +699,8 @@ export const updateProjectionChartData = createChartUpdater(
     'projection',
     buildProjectionChart,
     (chart) => {
-        const employeeData = _getEmployeeData();
-        const currentSalaryRaw = getCurrentSalary(employeeData);
-        const startingSalary = getStartingSalary(employeeData);
+        const { labels, historical, conservative, custom } = buildProjectionDatasets();
 
-        // Convert to indexed values if privacy mode enabled (same as main chart)
-        const currentSalary = _state.showDollars
-            ? currentSalaryRaw
-            : (currentSalaryRaw / startingSalary) * 100;
-
-        const cagr = calculateCAGR(employeeData) / 100;
-        const years = _state.projectionYears;
-        const customRate = _state.customRate / 100;
-
-        const labels = ['Now'];
-        const historical = [currentSalary];
-        const conservative = [currentSalary];
-        const custom = [currentSalary];
-
-        for (let i = 1; i <= years; i++) {
-            labels.push(`+${i}yr`);
-            historical.push(currentSalary * Math.pow(1 + cagr, i));
-            conservative.push(currentSalary * Math.pow(1 + CONSTANTS.PROJECTION_RATE_CONSERVATIVE, i));
-            custom.push(currentSalary * Math.pow(1 + customRate, i));
-        }
-
-        // Update data in place
         chart.data.labels = labels;
         chart.data.datasets[0].data = historical;
         chart.data.datasets[1].data = conservative;

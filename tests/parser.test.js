@@ -14,7 +14,7 @@ import {
     parseRecord,
     validateSalaryRange
 } from '../js/parser.js';
-import { escapeHTML } from '../app.js';
+import { escapeHTML } from '../js/security.js';
 
 describe('parsePaylocityData', () => {
     describe('Valid Input Handling', () => {

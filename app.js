@@ -15,10 +15,7 @@ import {
     getStartingSalary,
     getCurrentSalary,
     calculateYearsOfService,
-    calculateCAGR,
-    calculateAverageMonthsBetweenDates,
-    formatDateSummary,
-    formatDateDetail
+    calculateCAGR
 } from './js/calculations.js';
 import {
     validateSalaryRange,
@@ -38,8 +35,6 @@ import {
     showUserMessage,
     checkCPIDataFreshness
 } from './js/notifications.js';
-// Phase 2: Demo data module is dynamically imported (#180)
-// import { initDemoData, loadDemoData, cycleNextScenario } from './js/demo-data.js';
 import {
     initTheme,
     setTheme
@@ -49,8 +44,6 @@ import {
     setViewMode,
     togglePrivacy
 } from './js/view.js';
-// Phase 2: I/O module is dynamically imported (#180)
-// import { initIO, loadJsonFile, downloadData } from './js/io.js';
 import {
     initDataPersistence,
     saveBackup,
@@ -86,8 +79,7 @@ import { debounce } from './js/utils.js';
 import {
     initTables,
     buildHistoryTable,
-    buildProjectionTable,
-    getBadgeClass
+    buildProjectionTable
 } from './js/tables.js';
 import {
     initProjectionsModule,
@@ -154,17 +146,7 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
 // STATE MANAGEMENT
 // ========================================
 
-/**
- * Application state - simple globals appropriate for this app's complexity.
- *
- * Why globals instead of a state management library?
- * - Single-page app with no routing complexity
- * - State accessed by ~10 modules makes prop-drilling impractical
- * - No server sync, undo/redo, or time-travel debugging needs
- * - Dependency injection via init functions provides testability
- *
- * Chart functions are in js/charts.js and receive these via initCharts().
- */
+/** Application state — globals with DI for testability. Charts in js/charts.js. */
 let employeeData = null;
 
 let state = {
@@ -284,16 +266,13 @@ initCharts({
     showUserMessage
 });
 
-// Demo data module is now lazy-loaded (#180)
-// initDemoData() is called inside getDemoDataModule() on first use
-
 // Initialize theme module with dependencies
 initTheme({
     state,
     charts,
     getEmployeeData: () => employeeData,
-    updateStory: () => updateStory(),
-    updateUrlParams: () => updateUrlParams()
+    updateStory,
+    updateUrlParams
 });
 
 // Initialize view module with dependencies
@@ -301,31 +280,26 @@ initView({
     state,
     charts,
     getEmployeeData: () => employeeData,
-    formatCurrency: (amount, showDollars) => formatCurrency(amount, showDollars),
-    buildHistoryTable: () => buildHistoryTable(),
-    updateAnalytics: () => updateAnalytics(),
-    updateStory: () => updateStory(),
-    buildProjectionTable: () => buildProjectionTable(),
-    updateUrlParams: () => updateUrlParams()
+    formatCurrency,
+    buildHistoryTable,
+    updateAnalytics,
+    updateStory,
+    buildProjectionTable,
+    updateUrlParams
 });
-
-// I/O module is now lazy-loaded (#180)
-// initIO() is called inside getIOModule() on first use
 
 // Initialize data persistence module with dependencies
 initDataPersistence({
     getEmployeeData: () => employeeData,
     setEmployeeData: (data) => { employeeData = data; },
-    showDashboard: () => showDashboard(),
-    updateUrlParams: () => updateUrlParams(),
+    showDashboard,
+    updateUrlParams,
     getDomCache: () => domCache
 });
 
-// Initialize keyboard module with dependencies
-// Note: setTab is now imported from navigation.js
 initKeyboard({
     getEmployeeData: () => employeeData,
-    setTab: (tabId) => setTab(tabId),
+    setTab,
     setTheme,
     togglePrivacy,
     state
@@ -335,18 +309,17 @@ initKeyboard({
 initNavigation({
     state,
     getEmployeeData: () => employeeData,
-    updateMarket: () => updateMarket(),
+    updateMarket,
     buildYoyChart,
-    initProjections: () => initProjections(),
+    initProjections,
     buildProjectionChart,
-    buildProjectionTable: () => buildProjectionTable(),
+    buildProjectionTable,
     setTheme,
     setViewMode,
     loadDemoData,
     charts,
-    // Phase 1: Lazy tab rendering deps (#181)
-    buildHistoryTable: () => buildHistoryTable(),
-    updateStory: () => updateStory()
+    buildHistoryTable,
+    updateStory
 });
 
 // Initialize content module with dependencies
@@ -360,7 +333,7 @@ initTables({
     state,
     getEmployeeData: () => employeeData,
     escapeHTML,
-    formatCurrency: (amount, showDollars) => formatCurrency(amount, showDollars),
+    formatCurrency,
     getStartingSalary,
     getCurrentSalary,
     calculateCAGR
@@ -373,17 +346,17 @@ initProjectionsModule({
     updateMainChartType,
     updateYoyChartType,
     updateProjectionChartData,
-    buildProjectionTable: () => buildProjectionTable()
+    buildProjectionTable
 });
 
 // Initialize validation module with dependencies
 initValidation({
     setEmployeeData: (data) => { employeeData = data; },
     getDomCache: () => domCache,
-    showDashboard: () => showDashboard(),
-    updateUrlParams: () => updateUrlParams(),
-    saveBackup: () => saveBackup(),
-    loadChartJS: () => loadChartJS(),
+    showDashboard,
+    updateUrlParams,
+    saveBackup,
+    loadChartJS,
     showUserMessage
 });
 
@@ -394,38 +367,13 @@ initDashboardModule({
     getEmployeeData: () => employeeData,
     setEmployeeData: (data) => { employeeData = data; },
     getDomCache: () => domCache,
-    setTab: (tabId, pushHistory) => setTab(tabId, pushHistory),
+    setTab,
     resetRenderedTabs,
     buildMainChart,
-    formatCurrency: (amount, showDollars) => formatCurrency(amount, showDollars),
+    formatCurrency,
     formatPercent,
     checkCPIDataFreshness
 });
-
-// ========================================
-// BENCHMARK CALCULATION FUNCTIONS
-// ========================================
-// All calculation functions moved to js/calculations.js for better modularity and testability
-
-// ========================================
-// SECURITY HELPERS
-// ========================================
-// escapeHTML moved to js/security.js
-// validateTemplateData moved to js/security.js
-
-// ========================================
-// PARSER
-// ========================================
-// (Moved to js/parser.js - imported above)
-
-// ========================================
-// UTILITY FUNCTIONS
-// ========================================
-// debounce moved to js/utils.js
-
-// ========================================
-// CHART.JS LAZY LOADING
-// ========================================
 
 async function loadChartJS() {
     // If Chart.js already loaded, return immediately
@@ -448,28 +396,6 @@ async function loadChartJS() {
     });
 }
 
-// ========================================
-// PARSE AND GENERATE (Moved to js/validation.js)
-// ========================================
-// parseAndGenerate, validatePasteInput moved to js/validation.js
-
-// ========================================
-// VIEW SWITCHING (Moved to js/dashboard.js)
-// ========================================
-// showDashboard, resetDashboard moved to js/dashboard.js
-
-// ========================================
-// CONTENT RENDERING (Moved to js/content.js)
-// ========================================
-// storyContent, formatCurrency, formatPercent, detectMilestones, updateStory,
-// updateMarket, buildInflationAnalysis, buildMilestones, buildMarketComparison
-// moved to js/content.js
-
-// ========================================
-// TAB FUNCTIONS (Moved to js/navigation.js)
-// ========================================
-// setTab, handleTabFromUrl, checkInitialHash moved to js/navigation.js
-
 // Warn before losing unsaved data (browser only)
 if (typeof window !== 'undefined') {
     window.addEventListener('beforeunload', (e) => {
@@ -490,37 +416,6 @@ if (typeof window !== 'undefined') {
         }
     });
 }
-
-// ========================================
-// CHART FUNCTIONS (Moved to js/projections.js)
-// ========================================
-// setChartType, setYoyChartType, initProjections moved to js/projections.js
-// Chart build functions moved to js/charts.js
-
-// ========================================
-// TABLE FUNCTIONS (Moved to js/tables.js)
-// ========================================
-// buildHistoryTable, getBadgeClass, buildProjectionTable moved to js/tables.js
-
-// ========================================
-// ANALYTICS UPDATE (Moved to js/dashboard.js)
-// ========================================
-// updateAnalytics moved to js/dashboard.js
-
-// ========================================
-// PROJECTION CONTROLS (Moved to js/projections.js)
-// ========================================
-// setProjectionYears, updateCustomRate, setProjectionView moved to js/projections.js
-
-// ========================================
-// DASHBOARD INITIALIZATION (Moved to js/dashboard.js)
-// ========================================
-// initDashboard moved to js/dashboard.js
-
-// ========================================
-// URL PARAMETER HANDLING (Moved to js/navigation.js)
-// ========================================
-// updateUrlParams, getUrlParams, initFromUrl moved to js/navigation.js
 
 // Initialize event handlers module with dependencies
 initEventHandlers({
@@ -573,23 +468,3 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     }
 }
 
-// Export functions for testing (ES Modules)
-export {
-    // Parser functions
-    parsePaylocityData,
-    parseRecord,
-    validateSalaryRange,
-    escapeHTML,
-
-    // Calculation functions
-    calculateCAGR,
-    calculateInflationAdjustedSalary,
-
-    // Helper functions
-    calculateYearsOfService,
-    getStartingSalary,
-    getCurrentSalary,
-
-    // Constants
-    CONSTANTS
-};

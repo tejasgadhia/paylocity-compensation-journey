@@ -136,9 +136,6 @@ export function validatePasteInput() {
     const input = document.getElementById('pasteInput').value.trim();
     const messageDiv = document.getElementById('validationMessage');
     const generateBtn = document.getElementById('generateBtn');
-    // Checkbox was removed in 5d189c9 but JS still expected it - default to true if missing
-    const legalConsentCheckbox = document.getElementById('legalConsentCheckbox');
-    const legalConsent = legalConsentCheckbox ? legalConsentCheckbox.checked : true;
 
     if (!input) {
         messageDiv.className = 'validation-message';
@@ -177,29 +174,21 @@ export function validatePasteInput() {
     if (!hasSalary) {
         messageDiv.className = 'validation-message warning visible';
         messageDiv.textContent = '⚠ Data looks incomplete. Make sure you copied from the Rates tab.';
-        generateBtn.disabled = !legalConsent;
+        generateBtn.disabled = false;
         return;
     }
 
     if (!hasHistory && dates.length < 3) {
         messageDiv.className = 'validation-message warning visible';
         messageDiv.textContent = '⚠ Only ' + dates.length + ' record(s) found. Did you include the History table?';
-        generateBtn.disabled = !legalConsent;
+        generateBtn.disabled = false;
         return;
     }
 
     if (dollars.length < dates.length) {
         messageDiv.className = 'validation-message warning visible';
         messageDiv.textContent = '⚠ Found ' + dates.length + ' dates but only ' + dollars.length + ' salary values. Some data may be missing.';
-        generateBtn.disabled = !legalConsent;
-        return;
-    }
-
-    // Check legal consent before enabling button
-    if (!legalConsent) {
-        messageDiv.className = 'validation-message warning visible';
-        messageDiv.textContent = '✓ Found ' + dates.length + ' compensation records. Please accept the legal notice to continue.';
-        generateBtn.disabled = true;
+        generateBtn.disabled = false;
         return;
     }
 

@@ -16,14 +16,6 @@ import { CONSTANTS, cpiData } from './constants.js';
 const inflationCache = new Map();
 
 /**
- * Clears the inflation calculation cache.
- * Call this if CPI data is updated at runtime (e.g., new year's data added).
- */
-export function clearInflationCache() {
-    inflationCache.clear();
-}
-
-/**
  * Calculates cumulative inflation over a specific time period.
  *
  * Supports partial-year calculations with month-level precision using CPI data.

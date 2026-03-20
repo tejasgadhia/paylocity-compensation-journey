@@ -59,19 +59,23 @@ npm run test:e2e:report
 
 ## Test Structure
 
-### Unit Tests (`tests/unit/`)
+### Unit Tests (`tests/`)
 
 **Vitest** tests for core business logic:
 
 ```
-tests/unit/
-├── parser.test.js       # 49 tests - parsePaylocityData()
-└── calculations.test.js # 40 tests - CAGR, inflation, projections
+tests/
+├── parser.test.js            # 37 tests - parsePaylocityData(), parseRecord(), validateSalaryRange(), escapeHTML()
+├── calculations.test.js      # 72 tests - CAGR, inflation, benchmarks, date formatting
+├── charts.test.js            # 42 tests - chart config, theme colors, tooltips, updaters
+├── security.test.js          # 38 tests - XSS prevention, input sanitization
+├── security-extended.test.js # 20 tests - advanced security edge cases
+├── tables.test.js            #  8 tests - getBadgeClass(), history table rendering
+├── performance.test.js       # 15 tests - large dataset handling, memoization
+└── utils.test.js             #  7 tests - debounce utility
 ```
 
-**Run**: `npm test`
-
-**Coverage**: 95%+ of parser.js and calculations.js
+**Run**: `npm test` (239 tests total)
 
 ### E2E Tests (`tests/e2e/`)
 
@@ -489,7 +493,7 @@ await checkA11y(page, { exclude: '#known-issue' });
 
 **Test Execution Times** (approximate):
 
-- Unit tests: ~5 seconds (89 tests)
+- Unit tests: ~5 seconds (239 tests)
 - E2E tests (1 browser): ~3 minutes
 - E2E tests (3 browsers): ~9 minutes
 
