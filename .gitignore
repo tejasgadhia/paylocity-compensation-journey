@@ -26,6 +26,10 @@ test-structure.txt
 _planning/
 screenshots/originals/
 
+# Catalyst
+.catalystrc
+dist/
+
 # Editor directories and files
 .vscode/
 .idea/

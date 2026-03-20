@@ -12,7 +12,7 @@ Transforms raw Paylocity pay history (paste from "Rates" tab) into a 7-tab finan
 - **Charts**: Chart.js v4.4.7 self-hosted (`assets/js/chart.umd.min.js`), always destroy before recreate
 - **Themes**: tactical (dark) / artistic (light), CSS variables, `js/theme.js`
 - **Data flow**: paste → `parser.js` → `validation.js` → `employeeData` → `charts.js` + `content.js` + `tables.js`
-- **Deployment**: GitHub Pages, no build step
+- **Deployment**: Zoho Catalyst static hosting, no build step (`scripts/build-client.sh` → `catalyst deploy`)
 
 ### Key Modules
 | Module | Responsibility |

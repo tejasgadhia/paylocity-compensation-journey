@@ -15,7 +15,7 @@ const path = require('path');
 
 const BLS_API_URL = 'https://api.bls.gov/publicAPI/v2/timeseries/data/';
 const SERIES_ID = 'CUUR0000SA0'; // CPI-U All items, U.S. city average
-const CONSTANTS_FILE = path.join(__dirname, '../../js/constants.js');
+const CONSTANTS_FILE = path.join(__dirname, '../js/constants.js');
 
 /**
  * Fetches CPI data from BLS API

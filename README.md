@@ -4,7 +4,7 @@ Turn your Paylocity pay history into an actual useful dashboard with market benc
 
 Paylocity gives you raw pay history tables. It doesn't show you CAGR, market comparisons, inflation-adjusted growth, or any of the metrics an employee would actually want to see. So here's a tool that does.
 
-**[Live Demo](https://tejasgadhia.github.io/paylocity-compensation-journey/)**
+**[Live Demo](https://paylocity-compensation-60047883702.development.catalystserverless.in/app/index.html)**
 
 ## Screenshots
 
