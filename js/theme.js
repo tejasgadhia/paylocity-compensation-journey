@@ -8,7 +8,7 @@ import { updateChartTheme } from './charts.js';
 // MODULE STATE (injected via initTheme)
 // ========================================
 
-let _state, _charts, _getEmployeeData, _updateStory, _updateUrlParams;
+let _state, _charts, _getEmployeeData, _updateStory, _updateUrlParams, _updateHeroTheme;
 
 /**
  * Initializes the theme module with required dependencies.
@@ -21,12 +21,13 @@ let _state, _charts, _getEmployeeData, _updateStory, _updateUrlParams;
  * @param {Function} deps.updateStory - Function to update story content
  * @param {Function} deps.updateUrlParams - Function to update URL parameters
  */
-export function initTheme({ state, charts, getEmployeeData, updateStory, updateUrlParams }) {
+export function initTheme({ state, charts, getEmployeeData, updateStory, updateUrlParams, updateHeroTheme }) {
     _state = state;
     _charts = charts;
     _getEmployeeData = getEmployeeData;
     _updateStory = updateStory;
     _updateUrlParams = updateUrlParams;
+    _updateHeroTheme = updateHeroTheme;
 }
 
 /**
@@ -62,6 +63,9 @@ export function setTheme(theme) {
 
     // Update URL
     _updateUrlParams();
+
+    // Update hero preview chart if on landing page
+    if (_updateHeroTheme) _updateHeroTheme();
 
     if (_getEmployeeData()) {
         _updateStory();

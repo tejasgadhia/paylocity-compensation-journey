@@ -74,6 +74,12 @@ import {
     initEventHandlers,
     initEventListeners
 } from './js/event-handlers.js';
+import {
+    initHeroPreview,
+    switchHeroView,
+    updateHeroTheme,
+    destroyHeroPreview
+} from './js/hero-preview.js';
 import { escapeHTML } from './js/security.js';
 import { debounce } from './js/utils.js';
 import {
@@ -272,7 +278,8 @@ initTheme({
     charts,
     getEmployeeData: () => employeeData,
     updateStory,
-    updateUrlParams
+    updateUrlParams,
+    updateHeroTheme
 });
 
 // Initialize view module with dependencies
@@ -372,7 +379,8 @@ initDashboardModule({
     buildMainChart,
     formatCurrency,
     formatPercent,
-    checkCPIDataFreshness
+    checkCPIDataFreshness,
+    destroyHeroPreview
 });
 
 async function loadChartJS() {
@@ -439,7 +447,8 @@ initEventHandlers({
     setProjectionYears,
     setProjectionView,
     updateCustomRate,
-    debounce
+    debounce,
+    switchHeroView
 });
 
 // Initialize from URL on page load (only in browser, not during tests)
@@ -457,14 +466,22 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     updateBackupUI();
 
     // Initialize event listeners when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            initEventListeners();
-            setupKeyboardShortcuts();
-        });
-    } else {
+    const onReady = () => {
         initEventListeners();
         setupKeyboardShortcuts();
+
+        // Initialize hero preview with idle callback for non-blocking Chart.js load
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => initHeroPreview({ loadChartJS }));
+        } else {
+            setTimeout(() => initHeroPreview({ loadChartJS }), 500);
+        }
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', onReady);
+    } else {
+        onReady();
     }
 }
 

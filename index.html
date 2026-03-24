@@ -34,8 +34,7 @@
     <!-- Chart.js self-hosted, lazy-loaded dynamically when needed for faster landing page -->
     <!-- Main stylesheet (extracted for browser caching) -->
     <link rel="stylesheet" href="styles.css">
-    <!-- Image Comparison Slider (self-hosted) -->
-    <link rel="stylesheet" href="assets/css/img-comparison-slider.css">
+    <!-- Hero preview styles handled in styles.css -->
     <!-- Any additional inline styles below this line -->
 </head>
 <body>
@@ -158,38 +157,42 @@
                 </div>
             </div>
 
-            <!-- Right Column: Browser Mockup with Slider -->
+            <!-- Right Column: Live Mini-Dashboard Preview -->
             <div class="landing-right">
-                <div class="slider-wrapper">
-                    <div class="slider-header">
-                        <span class="slider-title">Before & After</span>
-                        <span class="slider-tab-indicator" id="tabIndicator">Salary Timeline</span>
-                    </div>
-                    <div class="browser-window">
-                        <div class="browser-titlebar">
-                            <div class="traffic-lights">
-                                <span class="traffic-light red"></span>
-                                <span class="traffic-light yellow"></span>
-                                <span class="traffic-light green"></span>
-                            </div>
-                            <div class="browser-url">
-                                <span class="browser-url-icon">🔒</span>
-                                <span id="browserUrl">tejasgadhia.github.io/paylocity-compensation-journey</span>
-                            </div>
+                <div class="browser-window">
+                    <div class="browser-titlebar">
+                        <div class="traffic-lights">
+                            <span class="traffic-light red"></span>
+                            <span class="traffic-light yellow"></span>
+                            <span class="traffic-light green"></span>
                         </div>
-                        <div class="browser-content">
-                            <img-comparison-slider id="comparisonSlider">
-                                <!-- Before: Paylocity raw data -->
-                                <img slot="first" id="beforeImg" src="screenshots/paylocity-blurred.webp" alt="Before: Paylocity interface">
-                                <!-- After: Dashboard view (changes based on selected chip) -->
-                                <img slot="second" id="afterImg" src="screenshots/tab-home.webp" alt="After: Dashboard view">
-                                <div slot="handle" class="custom-handle">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M15 19l-7-7 7-7"/>
-                                        <path d="M9 19l7-7-7-7" transform="translate(6,0)"/>
-                                    </svg>
+                        <div class="browser-url">
+                            <span class="browser-url-icon">🔒</span>
+                            <span id="browserUrl">paylocity-comp.tejaszoho.com</span>
+                        </div>
+                    </div>
+                    <div class="browser-content">
+                        <div class="hero-preview">
+                            <div class="hero-preview-header">
+                                <span class="hero-preview-title" id="tabIndicator">Salary Timeline</span>
+                            </div>
+                            <div class="hero-preview-metrics">
+                                <div class="mini-metric">
+                                    <span class="mini-metric-value">$0</span>
+                                    <span class="mini-metric-label">Current Salary</span>
                                 </div>
-                            </img-comparison-slider>
+                                <div class="mini-metric">
+                                    <span class="mini-metric-value">0%</span>
+                                    <span class="mini-metric-label">Total Growth</span>
+                                </div>
+                                <div class="mini-metric">
+                                    <span class="mini-metric-value">0</span>
+                                    <span class="mini-metric-label">Tenure</span>
+                                </div>
+                            </div>
+                            <div class="hero-preview-chart">
+                                <canvas id="heroChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -827,8 +830,6 @@ History
         </footer>
     </div>
 
-    <!-- Image Comparison Slider Web Component -->
-    <script type="module" src="assets/js/img-comparison-slider.js"></script>
     <script type="module" src="app.js"></script>
 </body>
 </html>

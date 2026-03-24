@@ -29,6 +29,7 @@ let _buildMainChart;
 let _formatCurrency;
 let _formatPercent;
 let _checkCPIDataFreshness;
+let _destroyHeroPreview;
 
 /**
  * Initialize the dashboard module with dependencies.
@@ -57,7 +58,8 @@ export function initDashboardModule({
     buildMainChart,
     formatCurrency,
     formatPercent,
-    checkCPIDataFreshness
+    checkCPIDataFreshness,
+    destroyHeroPreview
 }) {
     _state = state;
     _charts = charts;
@@ -69,6 +71,7 @@ export function initDashboardModule({
     _formatCurrency = formatCurrency;
     _formatPercent = formatPercent;
     _checkCPIDataFreshness = checkCPIDataFreshness;
+    _destroyHeroPreview = destroyHeroPreview;
 
     // Store setEmployeeData for resetDashboard
     _setEmployeeData = setEmployeeData;
@@ -88,6 +91,9 @@ let _setEmployeeData;
  * and handles focus management for accessibility.
  */
 export function showDashboard() {
+    // Clean up hero preview chart to free memory
+    if (_destroyHeroPreview) _destroyHeroPreview();
+
     document.getElementById('landingPage').classList.add('hidden');
     document.getElementById('dashboardPage').classList.remove('hidden');
     window.scrollTo(0, 0);

@@ -76,7 +76,6 @@ function setupDomCache() {
         customRateValue: document.getElementById('customRateValue'),
 
         // Other frequently accessed elements
-        comparisonSlider: document.getElementById('comparisonSlider'),
         marketFootnote: document.getElementById('marketFootnote'),
         restoreBackupBtn: document.getElementById('restoreBackupBtn')
     };
@@ -108,47 +107,19 @@ function setupThemePreference() {
 }
 
 /**
- * Set up landing page feature chips and comparison slider animation
- * Handles chip selection and image swapping
+ * Set up landing page feature chips to switch hero preview views
  */
 function setupLandingPage() {
-    // Tab data for feature chips - maps chip to screenshot and display name
-    const tabData = {
-        home: {
-            name: 'Salary Timeline',
-            img: 'screenshots/tab-home.webp',
-            url: 'tejasgadhia.github.io/paylocity-compensation-journey/#home'
-        },
-        market: {
-            name: 'Market Benchmarks',
-            img: 'screenshots/tab-market.webp',
-            url: 'tejasgadhia.github.io/paylocity-compensation-journey/#market'
-        },
-        history: {
-            name: 'Pay History',
-            img: 'screenshots/tab-history.webp',
-            url: 'tejasgadhia.github.io/paylocity-compensation-journey/#history'
-        },
-        analytics: {
-            name: 'Growth Analytics',
-            img: 'screenshots/tab-analytics.webp',
-            url: 'tejasgadhia.github.io/paylocity-compensation-journey/#analytics'
-        },
-        projections: {
-            name: 'Future Projections',
-            img: 'screenshots/tab-projections.webp',
-            url: 'tejasgadhia.github.io/paylocity-compensation-journey/#projections'
-        }
+    // View name mapping for feature chips
+    const viewNames = {
+        home: 'Salary Timeline',
+        market: 'Market Benchmarks',
+        analytics: 'Growth Analytics',
+        projections: 'Future Projections'
     };
 
-    // Feature chip click handlers - switch "after" image in slider
     const featureChips = document.querySelectorAll('.feature-chip');
-    const afterImg = document.getElementById('afterImg');
     const tabIndicator = document.getElementById('tabIndicator');
-    const browserUrl = document.getElementById('browserUrl');
-
-    // Get slider reference for reset on chip click (#108, #111)
-    const comparisonSliderRef = document.getElementById('comparisonSlider');
 
     featureChips.forEach(chip => {
         chip.addEventListener('click', () => {
@@ -156,72 +127,19 @@ function setupLandingPage() {
             featureChips.forEach(c => c.classList.remove('active'));
             chip.classList.add('active');
 
-            // Get tab info
             const tab = chip.dataset.tab;
-            const data = tabData[tab];
 
-            if (data && afterImg && tabIndicator && browserUrl) {
-                // Update indicator and URL
-                tabIndicator.textContent = data.name;
-                browserUrl.textContent = data.url;
+            // Update indicator text
+            if (tabIndicator && viewNames[tab]) {
+                tabIndicator.textContent = viewNames[tab];
+            }
 
-                // Swap image with fade effect
-                afterImg.style.opacity = '0.5';
-                setTimeout(() => {
-                    afterImg.src = data.img;
-                    afterImg.style.opacity = '1';
-                }, 150);
-
-                // Reset slider to show full "after" view (#108, #111)
-                // Use setTimeout to let the image swap start first
-                if (comparisonSliderRef) {
-                    setTimeout(() => {
-                        comparisonSliderRef.value = 0;
-                    }, 250);
-                }
+            // Switch hero preview chart view
+            if (_deps.switchHeroView) {
+                _deps.switchHeroView(tab);
             }
         });
     });
-
-    // Slider animation on page load - sweeping motion to catch attention
-    const comparisonSlider = document.getElementById('comparisonSlider');
-    if (comparisonSlider) {
-        // Wait for component to initialize, then animate
-        setTimeout(() => {
-            // Animate slider: 50 -> 15 -> 85 -> 50 (sweep left, then right, back to center)
-            const animateSlider = () => {
-                const duration = 600; // ms per segment
-                const easeInOut = (t) => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-
-                const animate = (from, to, onComplete) => {
-                    const startTime = performance.now();
-                    const step = (currentTime) => {
-                        const elapsed = currentTime - startTime;
-                        const progress = Math.min(elapsed / duration, 1);
-                        const easedProgress = easeInOut(progress);
-                        const currentValue = from + (to - from) * easedProgress;
-                        comparisonSlider.value = currentValue;
-
-                        if (progress < 1) {
-                            requestAnimationFrame(step);
-                        } else if (onComplete) {
-                            onComplete();
-                        }
-                    };
-                    requestAnimationFrame(step);
-                };
-
-                // Chain: 50 -> 15 -> 85 -> 50
-                animate(50, 15, () => {
-                    animate(15, 85, () => {
-                        animate(85, 50);
-                    });
-                });
-            };
-
-            animateSlider();
-        }, 800); // Wait for page to settle
-    }
 }
 
 /**
