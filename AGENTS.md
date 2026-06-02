@@ -1,4 +1,3 @@
-<!-- reviewed: 2026-03-11 | next-review: 2026-Q3 | ~600 tokens -->
 # Paylocity Compensation Journey
 
 ## What This Is
@@ -50,9 +49,3 @@ Transforms raw Paylocity pay history (paste from "Rates" tab) into a 7-tab finan
 - Never skip chart `destroy()` before recreating (memory leaks)
 - Never hardcode benchmark values — use `BENCHMARKS` constant in `js/constants.js`
 
-## Session Protocol
-- **Start**: read `.context/handoff.md`. If missing: fresh environment — read `_planning/decisions.md` + `_planning/learnings.md` and ask user for current state.
-- **End**: reset `.context/handoff.md` (5-layer format), append `.context/sessions.md`, commit `_planning/`
-
-## Review Discipline
-Check `<!-- next-review -->` header at session start. If overdue, flag before starting work.

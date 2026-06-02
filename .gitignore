@@ -19,6 +19,10 @@ test-structure.txt
 .claude/
 .ui-design/
 
+# Personal agent config — never commit
+CLAUDE.local.md
+GEMINI.md
+
 # Agent operational state (session-specific, not for version control)
 .context/
 
